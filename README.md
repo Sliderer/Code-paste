@@ -1,4 +1,4 @@
-# Pastebin-Rework
+# Code-Paste
 
 # Фичи
 
