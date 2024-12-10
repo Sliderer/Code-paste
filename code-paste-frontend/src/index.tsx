@@ -11,7 +11,6 @@ const root = ReactDOM.createRoot(
 root.render(
 <ChakraProvider value={defaultSystem}>
   <React.StrictMode>
-    <Header></Header>
     <PageTemplate page={new ResourceCreationPage({})} />
   </React.StrictMode>
     </ChakraProvider>

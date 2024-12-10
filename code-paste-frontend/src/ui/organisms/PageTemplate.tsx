@@ -1,6 +1,8 @@
+import Header from "./Header";
+
 const PageTemplate = ({page}: {page: React.Component}) => {
     return <div>
-        <p>Hi</p>
+        <Header/>
         {page.render()}
     </div>
 }
