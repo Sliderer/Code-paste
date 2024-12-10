@@ -22,8 +22,8 @@
 
 # Стек
 
+* Mobx - для MVVM
 * Chakra 
-* @yoskutik (MVVM)
 * MiniO
 * https://github.com/aralroca/next-translate
 
