@@ -1,7 +1,11 @@
-import { Button } from "@chakra-ui/react"
+import { Button } from "@mui/material";
 
 const CreateResourceButton = () => {
-    return <Button>
+    return <Button style={{
+        boxShadow: "5px 15px 15px 10px rgba(0, 0, 255, .2)",
+        color: "black",
+        background: "white"
+    }}>
         Create resource
     </Button>
 }

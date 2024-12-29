@@ -1,7 +1,11 @@
-import { Input } from "@chakra-ui/react";
+
+import { inputFocuse } from "../css/css";
+import { Input, TextField } from '@mui/material';
 
 const SearchBar = () => {
-    return <Input/>
+    return <TextField style={{
+        background: "white"
+    }}/>
 }
 
 export default SearchBar;

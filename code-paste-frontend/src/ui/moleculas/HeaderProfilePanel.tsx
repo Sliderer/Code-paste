@@ -1,11 +1,11 @@
-import { HStack, Text} from "@chakra-ui/react";
+import { Stack, TextField } from "@mui/material";
 import HeaderProfilePanelIcon from "../atoms/HeaderProfilePanelIcon";
 
 const HeaderProfilePanel = () => {
-    return <HStack>
+    return <>
         <HeaderProfilePanelIcon/>
-        <Text>Nickname</Text>
-    </HStack>
+        <TextField>Nickname</TextField>
+    </>
 }
 
 export default HeaderProfilePanel;
