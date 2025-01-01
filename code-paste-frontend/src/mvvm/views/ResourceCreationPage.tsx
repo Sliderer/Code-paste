@@ -1,17 +1,17 @@
-import React from "react";
-import { Container, Stack } from "@mui/material";
+import { Stack, useTheme } from "@mui/material";
 import ResourceInputField from "../../ui/atoms/ResourceInputField";
 import ResourceCreationSettings from "../../ui/moleculas/ResourceCreationSettings";
+import { useStyles } from "../../ui/styling/styles/ElementStyles";
 
-class ResourceCreationPage extends React.Component {
-  render(): React.ReactNode {
+const ResourceCreationPage = () => {
+    const theme = useTheme();
+    const styles = useStyles(theme);
     return (
-      <Stack direction={"row"} sx={{ display: "flex", margin: 5, justifyContent: "space-between", justifyItems: "center"}}>
+      <Stack direction={"row"} className={styles.basicPanel}>
         <ResourceInputField />
         <ResourceCreationSettings />
       </Stack>
     );
-  }
 }
 
 export default ResourceCreationPage;

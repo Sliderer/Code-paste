@@ -13,15 +13,23 @@ function cunstructStyles(theme: Theme) {
         borderRadius: "10px"
     }
 
-    const createResourceButton = {
+    const headerPanelButton = {
         ...basicStyles.basicShadow,
-        ...basicStyles.textStyle,
+        ...basicStyles.basicButton,
     }
 
     const headerPanel = {
         ...basicStyles.basicShadow,
-        padding: "20px",
-        borderRadius: "15px"
+        ...basicStyles.basicPanel,
+        borderRadius: "15px",
+        padding: "15px 0px 15px 50px",
+        display: "flex",
+        justifyContent: "space-evenly",
+        minWidth: "100px"
+    }
+
+    const createResourcePanel = {
+        ...basicStyles.basicPanel,
     }
 
     const settingsPanel = {
@@ -30,14 +38,14 @@ function cunstructStyles(theme: Theme) {
         justifyContent: "center",
         justifyItems: "center",
         alignItems: "center",
-        alignContent: "center",
+        alignContent: "top",
         borderRadius: 10,
         padding: 40,
         marginLeft: 5
     }
 
     const settingBox = {
-        ...basicStyles.basicShadow,
+        ...basicStyles.lightShadow,
         ...basicStyles.textStyle,
         minWidth: "100px",
         marginTop: 40,
@@ -50,22 +58,40 @@ function cunstructStyles(theme: Theme) {
 
     const publishButton = {
         ...basicStyles.basicShadow,
-        ...basicStyles.textStyle,
-        marginTop: "20px",
+        ...basicStyles.basicButton,
+        marginTop: "40px",
         marginBottom: "20px",
-        borderRadius: 10,
         display: "flex",
-        justifyContent: "center"
+        justifyContent: "center",
+    }
+
+    const searchBar = {
+        ...basicStyles.lightShadow,
+        alignContent: "center",
+        borderRadius: "10px 0px 0px 10px",
+        border: "0px"
+    }
+
+    const searchButton = {
+        ...headerPanelButton,
+        ...basicStyles.lightShadow,
+        alignContent: "center",
+        display: "flex",
+        alignItems: "center",
+        borderRadius: "0px 10px 10px 0px !important",
     }
     
     return {
         ...basicStyles,
         resourceInputFieldStyle: resourceInputFieldStyle,
-        createResourceButton: createResourceButton,
+        headerPanelButton: headerPanelButton,
         headerPanel: headerPanel,
         settingBox: settingBox,
         publishButton: publishButton,
-        settingsPanel: settingsPanel
+        settingsPanel: settingsPanel,
+        searchBar: searchBar,
+        createResourcePanel: createResourcePanel,
+        searchButton: searchButton,
     }
 }
 

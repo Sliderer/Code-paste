@@ -5,11 +5,10 @@ import { useStyles } from '../styling/styles/ElementStyles';
 
 const HeaderProfilePanel = () => {
     const theme = useTheme();
-    const classes = useStyles(theme);
-    return <>
+    const styles = useStyles(theme);
+    return <Box sx={{marginRight: 10}}>
         <HeaderProfilePanelIcon/>
-        <Box className={classes.textStyle}>Nickname</Box>
-    </>
+    </Box>
 }
 
 export default HeaderProfilePanel;

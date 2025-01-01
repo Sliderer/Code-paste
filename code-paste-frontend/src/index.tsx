@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import PageTemplate from './ui/organisms/PageTemplate';
 import ResourceCreationPage from './mvvm/views/ResourceCreationPage';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { ThemeProvider } from '@mui/material';
+import { ThemeProvider, useTheme } from '@mui/material';
 import { lightTheme } from './ui/styling/themes';
 
 const root = ReactDOM.createRoot(
@@ -13,7 +13,7 @@ const root = ReactDOM.createRoot(
 const router = createBrowserRouter([
   {
     path: "/create_resource",
-    element: <PageTemplate page={new ResourceCreationPage({})} />
+    element: <PageTemplate page={ResourceCreationPage} />
   },
 ]);
 

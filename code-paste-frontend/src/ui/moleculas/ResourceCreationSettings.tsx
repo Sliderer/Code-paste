@@ -39,7 +39,9 @@ const ResourceCreationSettings = () => {
         ))}
 
         <Box className={styles.publishButton}>
-          <Button>
+          <Button sx={{
+            color: "inherit",
+          }}>
             Опубликовать
           </Button>
         </Box>
