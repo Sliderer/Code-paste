@@ -1,11 +1,16 @@
+import React from 'react';
 import SearchBar from "../atoms/SearchBar";
 import HeaderProfilePanel from "../moleculas/HeaderProfilePanel";
 import CreateResourceButton from "../atoms/CreateResourceButton";
-import { Grid2, Stack } from "@mui/material";
+import { Stack, useTheme } from "@mui/material";
+import { useStyles } from '../styling/styles/ElementStyles';
 
 const Header = () => {
-    return <Stack direction={"column"} sx={{margin: 5, background: "gray"}}>
-        <Stack spacing={20} direction={"row"} justifyContent={"center"} sx={{display: "flex", maxHeight: "50px"}}>
+    const theme = useTheme();
+    const styles = useStyles(theme);
+
+    return <Stack direction={"column"} sx={{margin: 5}}>
+        <Stack spacing={20} direction={"row"} justifyContent={"center"} className={styles.headerPanel}>
             <SearchBar />
             <CreateResourceButton />
             <HeaderProfilePanel />

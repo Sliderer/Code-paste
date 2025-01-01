@@ -1,3 +1,4 @@
+import React from 'react';
 import { createStyles, Grid2, makeStyles, Paper }  from '@mui/material'; 
 
 const VariantSelector = ({values}: {values: string[]}) => {

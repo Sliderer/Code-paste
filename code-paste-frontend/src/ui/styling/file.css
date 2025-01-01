@@ -1,0 +1,11 @@
+.code-editor {
+    outline: none;
+    border: none;
+    border-color: #444;
+    border-width: 1px;
+    border-radius: 4px;
+    border-top-style: solid !important;
+    border-bottom-style: solid !important;
+    border-left-style: solid !important;
+    border-right-style: solid !important;
+}

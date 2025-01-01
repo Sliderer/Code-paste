@@ -6,7 +6,7 @@ import ResourceCreationSettings from "../../ui/moleculas/ResourceCreationSetting
 class ResourceCreationPage extends React.Component {
   render(): React.ReactNode {
     return (
-      <Stack direction={"row"} sx={{ display: "flex", height: "100%", margin: 5, justifyContent: "space-between", justifyItems: "center", minHeight: "1000px"}}>
+      <Stack direction={"row"} sx={{ display: "flex", margin: 5, justifyContent: "space-between", justifyItems: "center"}}>
         <ResourceInputField />
         <ResourceCreationSettings />
       </Stack>

@@ -1,11 +1,11 @@
-import { Button } from "@mui/material";
+import { Button, useTheme } from "@mui/material";
+import { useStyles } from '../styling/styles/ElementStyles';
 
 const CreateResourceButton = () => {
-    return <Button style={{
-        boxShadow: "5px 15px 15px 10px rgba(0, 0, 255, .2)",
-        color: "black",
-        background: "white"
-    }}>
+    const theme = useTheme();
+    const classes = useStyles(theme);
+    
+    return <Button className={classes.createResourceButton}>
         Create resource
     </Button>
 }
