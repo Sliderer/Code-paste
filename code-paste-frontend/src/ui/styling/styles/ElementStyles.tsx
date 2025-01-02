@@ -68,8 +68,10 @@ function cunstructStyles(theme: Theme) {
     const searchBar = {
         ...basicStyles.lightShadow,
         alignContent: "center",
+        display: "block",
         borderRadius: "10px 0px 0px 10px",
-        border: "0px"
+        border: "0px",
+        minWidth: "400px"
     }
 
     const searchButton = {

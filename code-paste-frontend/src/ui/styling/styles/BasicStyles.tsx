@@ -2,7 +2,7 @@ import { Theme } from "@mui/material";
 
 export function cunstructBasicStyles(theme: Theme) {
     const basicShadow = {
-        boxShadow: `0px 5px 50px 4px ${theme.palette.background.default}`
+        boxShadow: `0px 5px 20px 4px ${theme.palette.background.default}`
     };
 
     const lightShadow = {

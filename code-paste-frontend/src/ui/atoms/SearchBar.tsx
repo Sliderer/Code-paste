@@ -14,10 +14,10 @@ const SearchBar = () => {
               disableUnderline: true,
             },
           }}
-          sx={{ paddingLeft: 1, paddingRight: 1 }}
+          sx={{ paddingLeft: 1, paddingRight: 1, width: "95%"}}
         />
       </Box>
-      <Button className={styles.searchButton} sx={{ color: theme.palette.primary.light, backgroundColor: theme.palette.primary.main }}>Найти</Button>
+      <Button className={styles.searchButton} sx={{ color: theme.palette.primary.light, backgroundColor: theme.palette.primary.main, minWidth: "140px"}}>Найти</Button>
     </Stack>
   );
 };
