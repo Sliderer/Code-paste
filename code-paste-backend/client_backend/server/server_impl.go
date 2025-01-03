@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -34,7 +34,7 @@ func (serverImpl *ServerImpl) UploadDocument(w http.ResponseWriter, r *http.Requ
 	}
 	defer decompressed.Close()
 
-	decompressedData, err := ioutil.ReadAll(decompressed)
+	decompressedData, err := io.ReadAll(decompressed)
 	if err != nil {
 		panic(err)
 	}
