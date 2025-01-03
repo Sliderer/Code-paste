@@ -9,13 +9,14 @@
     "@mui/material": "^6.3.0",
     "@mui/styles": "^6.3.0",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.123",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "ace-builds": "^1.37.1",
+    "axios": "^1.7.9",
     "brace": "^0.11.1",
     "mobx": "^6.13.5",
     "mobx-react": "^9.2.0",
+    "pako": "^2.1.0",
     "prismjs": "^1.29.0",
     "react": "^19.0.0",
     "react-ace": "^13.0.0",
@@ -25,7 +26,9 @@
     "react-simple-code-editor": "^0.14.1",
     "react-syntax-highlighter": "^15.6.1",
     "typescript": "^5.7.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zlib": "^1.0.5",
+    "zlibt": "0.0.5"
   },
   "resolutions": {
     "@types/react": "17.0.14",
@@ -56,6 +59,8 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^16.18.123",
+    "@types/pako": "^2.0.3",
     "@types/prismjs": "^1.26.5",
     "@types/react-syntax-highlighter": "^15.5.13"
   }

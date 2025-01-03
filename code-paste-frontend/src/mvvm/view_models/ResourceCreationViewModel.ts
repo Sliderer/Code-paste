@@ -1,3 +1,4 @@
+import { ZlibEncode } from "../../helpers/ZlibModule";
 import ClientServerAPI from "../api/ClientServerAPI";
 import ResourceCreationModel from "../models/ResourceCreationModel";
 
@@ -21,8 +22,9 @@ export class ResourceCreationViewModel {
         return this.model.text;
     }
 
-    uploadResource() {
-        this.clientAPI.uploadDocument(this.model.text);
+    async uploadResource() {
+        const compressedText = await ZlibEncode(this.model.text);
+        this.clientAPI.uploadDocument(compressedText);
     }
 
 }

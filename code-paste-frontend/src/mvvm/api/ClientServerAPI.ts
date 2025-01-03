@@ -1,6 +1,8 @@
+import axios from "axios";
+
 class ClientServerAPI {
-    uploadDocument(text: string) {
-        console.log('Uplodaing ', text);
+    async uploadDocument(data: Uint8Array<ArrayBufferLike>) {
+        await axios.post('http://127.0.0.1:80/upload_resource', data);
     }
 }
 

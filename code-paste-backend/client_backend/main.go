@@ -1,9 +1,11 @@
 package main
 
-import "server/server"
+import (
+	. "client_backend/server"
+)
 
 func main() {
 	server := ClientServer{}
 
-	server.
+	server.StartServer()
 }

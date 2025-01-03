@@ -15,10 +15,10 @@ func (parser *ConfigParser) ParseConfig() (bool, string) {
 
 func ParseConfig(configPath string) *ServerSettings {
 	configParser := ConfigParser{configPath: configPath}
-	isParsed, result := configParser.ParseConfig()
+	isParsed, _ := configParser.ParseConfig()
 
 	if isParsed {
 		panic("Can not parse config")
 	}
-	return &ServerSettings{port: atoi(result)}
+	return &ServerSettings{port: 1}
 }
