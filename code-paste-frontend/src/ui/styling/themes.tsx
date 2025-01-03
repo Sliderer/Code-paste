@@ -5,13 +5,17 @@ export const lightTheme = createTheme({
   palette: {
     primary: {
       main: "#d5bdaf",
-      light: "#936639",
+      dark: "#936639",
+      contrastText: '#ffff',
     },
     background: {
       default: "#c9ada7"
     },
   },
   typography: {
+    allVariants: {
+      color: "#936639"
+    },
     fontFamily: "Montserrat Alternates"
   },
 });

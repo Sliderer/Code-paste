@@ -10,7 +10,7 @@ export function cunstructBasicStyles(theme: Theme) {
     };
 
     const textStyle = {
-        color: theme.palette.primary.main,
+        color: theme.palette.primary.dark,
     }
 
     const noOutlineOnFocus = {
@@ -22,7 +22,7 @@ export function cunstructBasicStyles(theme: Theme) {
 
     const basicButton = {
         backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.light,
+        color: theme.palette.primary.dark,
         borderRadius: 10,
     }
 

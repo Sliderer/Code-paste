@@ -10,7 +10,7 @@ const CreateResourceButton = () => {
       className={styles.lightShadow}
       sx={{
         backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.light,
+        color: theme.palette.primary.dark,
         borderRadius: 3,
         marginRight: 30,
         minWidth: "200px"

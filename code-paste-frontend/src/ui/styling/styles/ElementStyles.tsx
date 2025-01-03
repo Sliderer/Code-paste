@@ -4,7 +4,7 @@ import { Theme } from "@mui/material";
 
 function cunstructStyles(theme: Theme) {
     const basicStyles = cunstructBasicStyles(theme)
-    
+
     const resourceInputFieldStyle = {
         ...basicStyles.basicShadow,
         ...basicStyles.noOutlineOnFocus,
@@ -26,6 +26,13 @@ function cunstructStyles(theme: Theme) {
         display: "flex",
         justifyContent: "space-evenly",
         minWidth: "100px"
+    }
+
+    const radioButton = {
+        color: theme.palette.primary.main,
+        '&.Mui-checked': {
+            color: theme.palette.primary.main,
+        },
     }
 
     const createResourcePanel = {
@@ -54,7 +61,7 @@ function cunstructStyles(theme: Theme) {
         paddingLeft: 50,
         paddingRight: 50,
         borderRadius: 10,
-    } 
+    }
 
     const publishButton = {
         ...basicStyles.basicShadow,
@@ -82,7 +89,7 @@ function cunstructStyles(theme: Theme) {
         alignItems: "center",
         borderRadius: "0px 10px 10px 0px !important",
     }
-    
+
     return {
         ...basicStyles,
         resourceInputFieldStyle: resourceInputFieldStyle,
@@ -94,6 +101,7 @@ function cunstructStyles(theme: Theme) {
         searchBar: searchBar,
         createResourcePanel: createResourcePanel,
         searchButton: searchButton,
+        radioButton: radioButton
     }
 }
 
