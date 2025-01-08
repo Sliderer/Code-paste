@@ -1,9 +1,10 @@
 import { makeStyles } from "@mui/styles";
 import { cunstructBasicStyles } from "./BasicStyles";
 import { Theme } from "@mui/material";
+import { Padding } from "@mui/icons-material";
 
 function cunstructStyles(theme: Theme) {
-    const basicStyles = cunstructBasicStyles(theme)
+    const basicStyles = cunstructBasicStyles(theme);
 
     const resourceInputFieldStyle = {
         ...basicStyles.basicShadow,
@@ -11,12 +12,12 @@ function cunstructStyles(theme: Theme) {
         width: "75%",
         padding: "10px",
         borderRadius: "10px"
-    }
+    };
 
     const headerPanelButton = {
         ...basicStyles.basicShadow,
         ...basicStyles.basicButton,
-    }
+    };
 
     const headerPanel = {
         ...basicStyles.basicShadow,
@@ -26,18 +27,18 @@ function cunstructStyles(theme: Theme) {
         display: "flex",
         justifyContent: "space-evenly",
         minWidth: "100px"
-    }
+    };
 
     const radioButton = {
         color: theme.palette.primary.main,
         '&.Mui-checked': {
             color: theme.palette.primary.main,
         },
-    }
+    };
 
     const createResourcePanel = {
         ...basicStyles.basicPanel,
-    }
+    };
 
     const settingsPanel = {
         ...basicStyles.basicShadow,
@@ -49,7 +50,7 @@ function cunstructStyles(theme: Theme) {
         borderRadius: 10,
         padding: 40,
         marginLeft: 5
-    }
+    };
 
     const settingBox = {
         ...basicStyles.lightShadow,
@@ -61,7 +62,7 @@ function cunstructStyles(theme: Theme) {
         paddingLeft: 50,
         paddingRight: 50,
         borderRadius: 10,
-    }
+    };
 
     const publishButton = {
         ...basicStyles.basicShadow,
@@ -70,7 +71,7 @@ function cunstructStyles(theme: Theme) {
         marginBottom: "20px",
         display: "flex",
         justifyContent: "center",
-    }
+    };
 
     const searchBar = {
         ...basicStyles.lightShadow,
@@ -79,6 +80,28 @@ function cunstructStyles(theme: Theme) {
         borderRadius: "10px 0px 0px 10px",
         border: "0px",
         minWidth: "400px"
+    };
+
+    const settingsTextInput = {
+        ...basicStyles.noOutlineOnFocus,
+        ...basicStyles.textStyle, 
+        ...basicStyles.lightShadow,
+        borderRadius: 10,
+    };
+
+    const selectPanel = {
+        ...basicStyles.lightShadow,
+        ...basicStyles.noOutlineOnFocus,
+        border: 'none',
+        outline: 'none',
+        paddingLeft: "10px",
+        paddingRight: "10px",
+        borderRadius: 10
+    };
+
+    const selectMenuItem = {
+        borderRadius: 10,
+        color: theme.palette.primary.dark,
     }
 
     const searchButton = {
@@ -101,7 +124,10 @@ function cunstructStyles(theme: Theme) {
         searchBar: searchBar,
         createResourcePanel: createResourcePanel,
         searchButton: searchButton,
-        radioButton: radioButton
+        radioButton: radioButton,
+        settingsTextInput: settingsTextInput,
+        selectPanel: selectPanel,
+        selectMenuItem: selectMenuItem
     }
 }
 
