@@ -1,5 +1,5 @@
 import { MenuItem, Select, useTheme } from "@mui/material"
-import { useStyles } from "../styling/styles/ElementStyles";
+import { useStyles } from "../../styling/styles/ElementStyles";
 
 const SettingsSelectInput = ({values, onChange}: {values: string[], onChange: Function}) => {
     const theme = useTheme();

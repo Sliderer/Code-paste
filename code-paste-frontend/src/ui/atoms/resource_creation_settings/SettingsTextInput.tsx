@@ -1,5 +1,5 @@
 import { TextField, useTheme } from "@mui/material"
-import { useStyles } from "../styling/styles/ElementStyles";
+import { useStyles } from "../../styling/styles/ElementStyles";
 
 const SettingsTextInput = ({ placeholder, type }: { placeholder: string, type?: string }) => {
     const theme = useTheme();
@@ -9,9 +9,10 @@ const SettingsTextInput = ({ placeholder, type }: { placeholder: string, type?: 
             input: {
                 disableUnderline: true,
             },
-        }} placeholder={placeholder}
+        }}
+        placeholder={placeholder}
         type={type}
-        className={styles.settingsTextInput} sx={{paddingLeft: 1, paddingRight: 1 }}></TextField>
+        className={styles.settingsTextInput} sx={{paddingLeft: 1, paddingRight: 1}}></TextField>
 }
 
 export default SettingsTextInput;

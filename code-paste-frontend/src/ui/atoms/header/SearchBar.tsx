@@ -1,5 +1,5 @@
 import { Box, Button, Stack, TextField, useTheme } from "@mui/material";
-import { useStyles } from "../styling/styles/ElementStyles";
+import { useStyles } from "../../styling/styles/ElementStyles";
 
 const SearchBar = () => {
   const theme = useTheme();

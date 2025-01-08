@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Stack, Typography, useTheme } from "@mui/material";
-import HeaderProfilePanelIcon from "../atoms/HeaderProfilePanelIcon";
+import HeaderProfilePanelIcon from "../atoms/header/HeaderProfilePanelIcon";
 import { useStyles } from '../styling/styles/ElementStyles';
 
 const HeaderProfilePanel = () => {

@@ -14,10 +14,8 @@ import {
   useTheme,
 } from "@mui/material";
 import { useStyles } from "../styling/styles/ElementStyles";
-import { languages } from "prismjs";
-import SettingsTextInput from "../atoms/SettingsTextInput";
-import SettingsSelectInput from "../atoms/SettingsSelectInput";
-
+import SettingsTextInput from "../atoms/resource_creation_settings/SettingsTextInput";
+import SettingsSelectInput from "../atoms/resource_creation_settings/SettingsSelectInput";
 type ChangeHandler = (highlightSettings: any) => void;
 
 const ResourceCreationSettings = ({ onTranslateLanguageChange, onProgrammingLanguageChange, onPublish }: { onTranslateLanguageChange: ChangeHandler, onProgrammingLanguageChange: ChangeHandler, onPublish: Function }) => {

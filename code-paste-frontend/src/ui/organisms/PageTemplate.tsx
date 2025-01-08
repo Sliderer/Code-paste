@@ -3,9 +3,11 @@ import { ThemeProvider } from '@mui/material';
 import { lightTheme } from '../styling/themes';
 import { ReactNode } from "react";
 
-const PageTemplate = ({page}: {page: ReactNode}) => {
+const PageTemplate = ({page, needHeader}: {page: ReactNode, needHeader?: boolean}) => {
     return <ThemeProvider theme={lightTheme}>
-        <Header/>
+        {
+            needHeader && <Header/>
+        }
         {page}
     </ThemeProvider>
 }

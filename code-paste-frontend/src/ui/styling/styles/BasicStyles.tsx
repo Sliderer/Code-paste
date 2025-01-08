@@ -11,6 +11,12 @@ export function cunstructBasicStyles(theme: Theme) {
 
     const textStyle = {
         color: theme.palette.primary.dark,
+        fontFamily: theme.typography.fontFamily
+    }
+
+    const headerStyle = {
+        ...textStyle,
+        padding: 10,
     }
 
     const noOutlineOnFocus = {
@@ -39,6 +45,7 @@ export function cunstructBasicStyles(theme: Theme) {
         noOutlineOnFocus: noOutlineOnFocus,
         basicPanel: basicPanel,
         basicButton: basicButton,
-        lightShadow: lightShadow
+        lightShadow: lightShadow,
+        headerStyle: headerStyle
     }
 }

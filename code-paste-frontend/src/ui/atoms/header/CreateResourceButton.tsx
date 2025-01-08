@@ -1,5 +1,5 @@
 import { Box, Button, useTheme } from "@mui/material";
-import { useStyles } from "../styling/styles/ElementStyles";
+import { useStyles } from "../../styling/styles/ElementStyles";
 
 const CreateResourceButton = () => {
   const theme = useTheme();
