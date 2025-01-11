@@ -8,7 +8,7 @@ const HeaderProfilePanel = () => {
     const styles = useStyles(theme);
     return <Stack direction={"row"} sx={{display: "flex", alignItems: "center"}}>
         <HeaderProfilePanelIcon />
-        <Typography className={styles.textStyle}>Nickname</Typography>
+        <Typography className={styles.textStyle}>Аккаунт</Typography>
     </Stack>
 }
 

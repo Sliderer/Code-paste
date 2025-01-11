@@ -34,7 +34,7 @@ const ResourceCreationPage = observer(({ viewModel }: { viewModel: ResourceCreat
   );
 
   return (
-    <Stack direction={"row"} className={styles.basicPanel}>
+    <Stack direction={"row"} className={styles.basicPanel} sx={{justifyContent: "space-between"}}>
       <ResourceInputField highlightSyntax={programmingLanguageHighlight} getTextDefaultValue={viewModel.getText} onTextUpdate={viewModel.setText}/>
       <ResourceCreationSettings onProgrammingLanguageChange={onProgrammingLanguageChange}
         onTranslateLanguageChange={onTranslateLanguageChange}

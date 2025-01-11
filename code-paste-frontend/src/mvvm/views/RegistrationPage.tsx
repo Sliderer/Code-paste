@@ -3,6 +3,7 @@ import { RegistrationViewModel } from "../view_models/RegistratioinViewModel";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import SettingsTextInput from "../../ui/atoms/resource_creation_settings/SettingsTextInput";
+import { Link } from "react-router-dom";
 const RegistrationPage = observer(
   ({ viewModel }: { viewModel: RegistrationViewModel }) => {
     const theme = useTheme();
@@ -13,20 +14,15 @@ const RegistrationPage = observer(
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundClip: '0px',
+        minHeight: "100vh"
       }}>
-        <Box
-          display="flex"
-          justifyContent="center"
-          textAlign={"center"}
-          alignItems="center"
-          minHeight="100vh"
-        >
+        <Box className={styles.centerPanel}>
           <Stack>
-            <Typography className={styles.headerStyle} sx={{ fontSize: 30 }}>
+            <Typography className={styles.headerStyle} sx={{ fontSize: 30, textAlign: "center" }}>
               Регистрация
             </Typography>
             <Box className={styles.settingsPanel} sx={{background: "white"}}>
-              <Stack spacing={5}>
+              <Stack spacing={4}>
                 <SettingsTextInput placeholder="Имя" />
                 <SettingsTextInput placeholder="E-mail" />
                 <SettingsTextInput placeholder="Пароль" type="password" />
@@ -40,6 +36,7 @@ const RegistrationPage = observer(
                 >
                   Зарегистрироваться
                 </Button>
+                <Link style={{color: theme.palette.primary.light, fontSize: "15px", textDecoration: 'none', textAlign: "center", fontFamily: "Montserrat Alternates"}} to={"/enter"}>Войти</Link>
               </Stack>
             </Box>
           </Stack>

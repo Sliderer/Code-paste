@@ -67,8 +67,6 @@ function cunstructStyles(theme: Theme) {
     const publishButton = {
         ...basicStyles.basicShadow,
         ...basicStyles.basicButton,
-        marginTop: "40px",
-        marginBottom: "20px",
         display: "flex",
         justifyContent: "center",
     };

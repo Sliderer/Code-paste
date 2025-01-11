@@ -26,6 +26,13 @@ export function cunstructBasicStyles(theme: Theme) {
         },
     }
 
+    const centerPanel = {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "80vh",
+    }
+
     const basicButton = {
         backgroundColor: theme.palette.primary.main,
         color: theme.palette.primary.dark,
@@ -35,8 +42,8 @@ export function cunstructBasicStyles(theme: Theme) {
     const basicPanel = {
         display: "flex",
         margin: 40,
-        justifyContent: "space-between",
-        justifyItems: "center"
+        justifyContent: "center",
+        justifyItems: "center",
     }
 
     return {
@@ -46,6 +53,7 @@ export function cunstructBasicStyles(theme: Theme) {
         basicPanel: basicPanel,
         basicButton: basicButton,
         lightShadow: lightShadow,
-        headerStyle: headerStyle
+        headerStyle: headerStyle,
+        centerPanel: centerPanel
     }
 }

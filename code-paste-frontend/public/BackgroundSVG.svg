@@ -1,6 +1,6 @@
 <svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
   <path
-    d="M0,160 C 70,50, 150,150, 300,10 L300,180 Z"
+    d="M0,100 C 70,20, 150,170, 300,10 L300,180 L0,180 Z"
     fill="#d5bdaf"
   />
 </svg>

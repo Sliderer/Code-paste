@@ -10,6 +10,8 @@ import RegistrationPage from './mvvm/views/RegistrationPage';
 import EnterPage from './mvvm/views/EnterPage';
 import { registrationViewModel } from './mvvm/view_models/RegistratioinViewModel';
 import { enterViewModel } from './mvvm/view_models/EnterViewModel';
+import ResourceDemonstrationPage from './mvvm/views/ResourceDemonstrationPage';
+import { resourceDemonstrationViewModel } from './mvvm/view_models/ResourceDemonstrationViewModel';
 
 document.body.style.margin = '0';
 document.body.style.padding = '0';
@@ -30,6 +32,10 @@ const router = createBrowserRouter([
   {
     path: "/enter",
     element: <PageTemplate page={<EnterPage viewModel={enterViewModel}/>} />
+  },
+  {
+    path: "/show_resouce/:resource_id",
+    element: <PageTemplate needHeader={true} page={<ResourceDemonstrationPage viewModel={resourceDemonstrationViewModel}/>} />
   },
 ]);
 
