@@ -1,9 +1,9 @@
-import { ZlibEncode } from "../../helpers/ZlibModule";
-import ClientServerAPI from "../api/ClientServerAPI";
-import ResourceCreationModel from "../models/ResourceCreationModel";
+import { makeObservable } from "mobx";
 
 export class EnterViewModel {
-
+    constructor() {
+        makeObservable(this);
+    }
 }
 
 export let enterViewModel = new EnterViewModel();

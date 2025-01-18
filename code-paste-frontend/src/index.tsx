@@ -12,6 +12,12 @@ import { registrationViewModel } from './mvvm/view_models/RegistratioinViewModel
 import { enterViewModel } from './mvvm/view_models/EnterViewModel';
 import ResourceDemonstrationPage from './mvvm/views/ResourceDemonstrationPage';
 import { resourceDemonstrationViewModel } from './mvvm/view_models/ResourceDemonstrationViewModel';
+import AccountPage from './mvvm/views/AccountPage';
+import { accountViewModel } from './mvvm/view_models/AccountViewModel';
+import SearchPage from './mvvm/views/SearchPage';
+import { searchViewModel } from './mvvm/view_models/SearchViewModel';
+import FolderPage from './mvvm/views/FolderPage';
+import { folderViewModel } from './mvvm/view_models/FolderViewModel';
 
 document.body.style.margin = '0';
 document.body.style.padding = '0';
@@ -26,6 +32,10 @@ const router = createBrowserRouter([
     element: <PageTemplate needHeader={true} page={<ResourceCreationPage viewModel={resourceCreationViewModel}/>} />
   },
   {
+    path: "/account/:nickname",
+    element: <PageTemplate needHeader={true} page={<AccountPage viewModel={accountViewModel}/>} />
+  },
+  {
     path: "/registration",
     element: <PageTemplate page={<RegistrationPage viewModel={registrationViewModel}/>} />
   },
@@ -34,8 +44,16 @@ const router = createBrowserRouter([
     element: <PageTemplate page={<EnterPage viewModel={enterViewModel}/>} />
   },
   {
-    path: "/show_resouce/:resource_id",
+    path: "/resource/:resource_id",
     element: <PageTemplate needHeader={true} page={<ResourceDemonstrationPage viewModel={resourceDemonstrationViewModel}/>} />
+  },
+  {
+    path: "/search/:text_search",
+    element: <PageTemplate needHeader={true} page={<SearchPage viewModel={searchViewModel}/>} />
+  },
+  {
+    path: "/folder/:folder_id",
+    element: <PageTemplate needHeader={true} page={<FolderPage viewModel={folderViewModel}/>} />
   },
 ]);
 
