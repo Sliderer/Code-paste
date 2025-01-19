@@ -4,7 +4,12 @@ go 1.23.2
 
 require github.com/minio/minio-go/v7 v7.0.82
 
-require github.com/mitchellh/go-homedir v1.1.0 // indirect
+require (
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/mitchellh/go-homedir v1.1.0 // indirect
+	github.com/redis/go-redis/v9 v9.7.0 // indirect
+)
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.32.7 // indirect

@@ -33,10 +33,24 @@ const ResourceCreationPage = observer(({ viewModel }: { viewModel: ResourceCreat
     }, []
   );
 
+  const onFileNameChange = (value: string) => {
+    console.log(value)
+    viewModel.setFileName(value);
+  }
+  
+  const onFolderNameChange = useCallback(
+    (value: string) => {
+      viewModel.setFolder(value);
+    }, []
+  );
+
   return (
     <Stack direction={"row"} className={styles.basicPanel} sx={{justifyContent: "space-between"}}>
       <ResourceInputField highlightSyntax={programmingLanguageHighlight} getTextDefaultValue={viewModel.getText} onTextUpdate={viewModel.setText}/>
-      <ResourceCreationSettings onProgrammingLanguageChange={onProgrammingLanguageChange}
+      <ResourceCreationSettings
+        onFileNameChange={onFileNameChange}
+        onFolderNameChange={onFolderNameChange}
+        onProgrammingLanguageChange={onProgrammingLanguageChange}
         onTranslateLanguageChange={onTranslateLanguageChange}
         onPublish={viewModel.uploadResource} />
     </Stack>

@@ -10,7 +10,11 @@ const SettingsTextInput = ({ placeholder, type, onChange }: { placeholder: strin
                 disableUnderline: true,
             },
         }}
-        onChange={e => onChange??(e.target.value)}
+        onChange={e => {
+            if (onChange) {
+                onChange(e.target.value)
+            }
+        }}
         placeholder={placeholder}
         type={type}
         className={styles.settingsTextInput} sx={{paddingLeft: 1, paddingRight: 1}}></TextField>

@@ -6,6 +6,6 @@ import (
 
 func main() {
 	server := ClientServer{}
-
+	server.InitFields()
 	server.StartServer()
 }

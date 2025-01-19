@@ -1,9 +1,9 @@
 package minio
 
 import (
+	"bytes"
 	. "client_backend/lib"
 	"context"
-	"fmt"
 	"io"
 	"log"
 
@@ -13,12 +13,12 @@ import (
 
 type MinioClient struct {
 	Settings MinioSettings
-	Client   *minio.Client
+	client   *minio.Client
 }
 
 func (minioClient *MinioClient) CreateClient() error {
 	var err error
-	minioClient.Client, err = minio.New(minioClient.Settings.Endpoint, &minio.Options{
+	minioClient.client, err = minio.New(minioClient.Settings.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(minioClient.Settings.AccessKeyID, minioClient.Settings.SecretAccessKey, ""),
 		Secure: minioClient.Settings.UseSSL,
 	})
@@ -27,21 +27,37 @@ func (minioClient *MinioClient) CreateClient() error {
 		log.Fatalln(err)
 	}
 
-	minioClient.CreateBucketIfNotExists()
-
 	return nil
 }
 
-func (minioClient *MinioClient) CreateBucketIfNotExists() error {
+func (minioClient *MinioClient) CreateBucketIfNotExists(bucketName string) error {
+	result, err := minioClient.client.BucketExists(context.Background(), bucketName)
+	if err != nil || result {
+		return err
+	}
 
-}
+	err = minioClient.client.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
 
-func (minioClient *MinioClient) UploadFile(userName, fileName string, data io.Reader, dataSize int64) error {
-	info, err := minioClient.Client.PutObject(context.Background(), userName, fileName, data, dataSize, minio.PutObjectOptions{ContentType: "application/octet-stream"})
-	fmt.Println(info)
 	return err
 }
 
-func (minioClient *MinioClient) DownloadFile() error {
-	return nil
+func (minioClient *MinioClient) UploadFile(userName, fileName, data string, dataSize int64, result chan error) {
+	go minioClient.CreateBucketIfNotExists(userName)
+	_, err := minioClient.client.PutObject(context.Background(), userName, fileName, bytes.NewReader([]byte(data)), dataSize, minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	result <- err
+}
+
+func (minioClient *MinioClient) DownloadFile(bucketName, filePath string) (io.Reader, error) {
+	options := minio.GetObjectOptions{}
+	options.Header().Add("Content-Type", "plain/text")
+	result, err := minioClient.client.GetObject(context.Background(), bucketName, filePath, options)
+	if err != nil {
+		log.Print(err)
+	}
+	// data := make([]byte, 1024)
+
+	// result.Read(data)
+	// log.Println("Data: ", string(data))
+	log.Print(result.Stat())
+	return result, nil
 }

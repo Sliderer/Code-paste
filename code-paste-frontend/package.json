@@ -21,7 +21,6 @@
     "pako": "^2.1.0",
     "prismjs": "^1.29.0",
     "react": "^19.0.0",
-    "react-ace": "^13.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.1",
     "react-scripts": "^5.0.1",
@@ -64,7 +63,6 @@
     "@types/prismjs": "^1.26.5",
     "@types/react-syntax-highlighter": "^15.5.13",
     "grpc-tools": "^1.12.4",
-    "ts-protoc-gen": "^0.15.0",
-    "typescript": "^5.7.2"
+    "ts-protoc-gen": "^0.15.0"
   }
 }

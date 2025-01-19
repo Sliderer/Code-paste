@@ -2,8 +2,6 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Box, Stack, useTheme } from "@mui/material";
 import { useStyles } from "../styling/styles/ElementStyles";
 import Prism, { highlight, languages } from "prismjs";
-import AceEditor from "react-ace";
-
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-java";
