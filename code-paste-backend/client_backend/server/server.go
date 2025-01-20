@@ -40,8 +40,8 @@ func (server *ClientServer) InitFields() {
 
 func (server *ClientServer) StartServer() {
 	log.Print("Starting server")
-	http.HandleFunc("/upload_resource/{userName}/{fileName}/{folderName}", server.serverImpl.UploadDocument)
-	http.HandleFunc("/get_resource/{resourceId}", server.serverImpl.GetDocument)
+	http.HandleFunc("/upload_resource/{fileName}/{folderName}", server.serverImpl.UploadDocument)
+	http.HandleFunc("/get_resource/{resourceId}", server.serverImpl.GetResourceData)
 	err := http.ListenAndServe(":90", nil)
 	if err != nil {
 		log.Fatal(err)
