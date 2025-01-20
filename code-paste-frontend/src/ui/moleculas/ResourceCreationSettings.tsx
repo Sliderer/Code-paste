@@ -23,12 +23,14 @@ const ResourceCreationSettings = ({
   onProgrammingLanguageChange,
   onFileNameChange,
   onFolderNameChange,
+  onPasswordChange,
   onPublish,
 }: {
   onTranslateLanguageChange: ChangeHandler;
   onProgrammingLanguageChange: ChangeHandler;
   onFileNameChange: ChangeHandler;
   onFolderNameChange: ChangeHandler;
+  onPasswordChange: ChangeHandler
   onPublish: Function;
 }) => {
   const theme = useTheme();
@@ -64,6 +66,7 @@ const ResourceCreationSettings = ({
           key={"password"}
           placeholder="Пароль"
           type="password"
+          onChange={onPasswordChange}
         />
 
         <SettingsTextInput

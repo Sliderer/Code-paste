@@ -1,3 +1,4 @@
+import { SHA256 } from "crypto-ts";
 import { getCurrentNickname } from "../../helpers/SessionController";
 import { ZlibEncode } from "../../helpers/ZlibModule";
 import ClientServerAPI from "../api/ClientServerAPI";
@@ -32,6 +33,10 @@ export class ResourceCreationViewModel {
         this.model.folderPath = folderPath
     }
 
+    setPassword(password: string) {
+        this.model.password = password
+    }
+
     async uploadResource() {
         const compressedText = await ZlibEncode(this.model.text);
         let userName = getCurrentNickname();
@@ -42,7 +47,8 @@ export class ResourceCreationViewModel {
         if (folderPath.length === 0) {
             folderPath = 'default';
         }
-        this.clientAPI.uploadDocument(userName, this.model.fileName, folderPath, compressedText);
+        const password = SHA256(this.model.password).string
+        this.clientAPI.uploadDocument(userName, this.model.fileName, password, folderPath, compressedText);
     }
 
 }

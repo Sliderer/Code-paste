@@ -8,53 +8,69 @@ import { HighlightingSyntax } from "../../helpers/HighlightingSyntax";
 import { ResourceCreationViewModel } from "../view_models/ResourceCreationViewModel";
 import { observer } from "mobx-react";
 
-const ResourceCreationPage = observer(({ viewModel }: { viewModel: ResourceCreationViewModel }) => {
-  const [programmingLanguageHighlight, setProgrammingLanguageHighlight] = useState<HighlightingSyntax>({
-    grammar: languages.java,
-    language: 'jss'
-  });
+const ResourceCreationPage = observer(
+  ({ viewModel }: { viewModel: ResourceCreationViewModel }) => {
+    const [programmingLanguageHighlight, setProgrammingLanguageHighlight] =
+      useState<HighlightingSyntax>({
+        grammar: languages.java,
+        language: "jss",
+      });
 
-  const [translateLanguageHighlight, setTranslateLanguageHightlight] = useState<HighlightingSyntax>({
-    grammar: languages.text,
-    language: ''
-  });
+    const [translateLanguageHighlight, setTranslateLanguageHightlight] =
+      useState<HighlightingSyntax>({
+        grammar: languages.text,
+        language: "",
+      });
 
-  const theme = useTheme();
-  const styles = useStyles(theme);
+    const theme = useTheme();
+    const styles = useStyles(theme);
 
-  const onProgrammingLanguageChange = useCallback(
-    (highlightSettings: HighlightingSyntax) => {
-      setProgrammingLanguageHighlight(highlightSettings)
-    }, []
-  );
+    const onProgrammingLanguageChange = useCallback(
+      (highlightSettings: HighlightingSyntax) => {
+        setProgrammingLanguageHighlight(highlightSettings);
+      },
+      []
+    );
 
-  const onTranslateLanguageChange = useCallback(
-    (highlightSettings: string) => {
-    }, []
-  );
+    const onTranslateLanguageChange = useCallback(
+      (highlightSettings: string) => {},
+      []
+    );
 
-  const onFileNameChange = (value: string) => {
-    console.log(value)
-    viewModel.setFileName(value);
-  }
-  
-  const onFolderNameChange = useCallback(
-    (value: string) => {
+    const onFileNameChange = useCallback((value: string) => {
+      viewModel.setFileName(value);
+    }, []);
+
+    const onFolderNameChange = useCallback((value: string) => {
       viewModel.setFolder(value);
-    }, []
-  );
+    }, []);
 
-  return (
-    <Stack direction={"row"} className={styles.basicPanel} sx={{justifyContent: "space-between"}}>
-      <ResourceInputField highlightSyntax={programmingLanguageHighlight} getTextDefaultValue={viewModel.getText} onTextUpdate={viewModel.setText}/>
-      <ResourceCreationSettings
-        onFileNameChange={onFileNameChange}
-        onFolderNameChange={onFolderNameChange}
-        onProgrammingLanguageChange={onProgrammingLanguageChange}
-        onTranslateLanguageChange={onTranslateLanguageChange}
-        onPublish={viewModel.uploadResource} />
-    </Stack>
-  );
-});
+    const onPasswordChange = useCallback((value: string) => {
+      viewModel.setPassword(value);
+    }, []);
+
+    return (
+      <Stack
+        direction={"row"}
+        className={styles.basicPanel}
+        sx={{ justifyContent: "space-between" }}
+      >
+        <ResourceInputField
+          highlightSyntax={programmingLanguageHighlight}
+          getTextDefaultValue={viewModel.getText}
+          onTextUpdate={viewModel.setText}
+        />
+        <ResourceCreationSettings
+          onFileNameChange={onFileNameChange}
+          onFolderNameChange={onFolderNameChange}
+          onProgrammingLanguageChange={onProgrammingLanguageChange}
+          onTranslateLanguageChange={onTranslateLanguageChange}
+          onPasswordChange={onPasswordChange}
+          onPublish={viewModel.uploadResource}
+        />
+      </Stack>
+    );
+  }
+);
 
 export default ResourceCreationPage;
