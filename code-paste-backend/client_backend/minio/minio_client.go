@@ -54,10 +54,7 @@ func (minioClient *MinioClient) DownloadFile(bucketName, filePath string) (io.Re
 	if err != nil {
 		log.Print(err)
 	}
-	// data := make([]byte, 1024)
 
-	// result.Read(data)
-	// log.Println("Data: ", string(data))
 	log.Print(result.Stat())
 	return result, nil
 }

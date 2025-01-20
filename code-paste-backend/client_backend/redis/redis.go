@@ -1,7 +1,10 @@
 package redis
 
 import (
+	. "client_backend/models"
 	"context"
+	"encoding/json"
+	"log"
 
 	redis "github.com/redis/go-redis/v9"
 )
@@ -16,10 +19,16 @@ func (redisClient *RedisClient) CreateClient() error {
 	return nil
 }
 
-func (redisClient *RedisClient) UploadResourceData(uuid, path string) {
-	redisClient.Client.Set(context.Background(), uuid, path, 0)
+func (redisClient *RedisClient) UploadResourceMetaData(uuid string, metaData ResourceMetaData) {
+	redisClient.Client.Set(context.Background(), uuid, metaData, 0)
 }
 
-func (redisClient *RedisClient) GetResourcePath(uuid string) string {
-	return redisClient.Client.Get(context.Background(), uuid).Val()
+func (redisClient *RedisClient) GetResourceMetaData(uuid string) ResourceMetaData {
+	var data ResourceMetaData
+	err := json.Unmarshal([]byte(redisClient.Client.Get(context.Background(), uuid).Val()), &data)
+
+	if err != nil {
+		log.Println(err)
+	}
+	return data
 }
