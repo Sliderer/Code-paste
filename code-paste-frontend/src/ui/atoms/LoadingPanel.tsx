@@ -1,7 +1,7 @@
 import { Box, CircularProgress, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../styling/styles/ElementStyles";
 
-const LoadingPanel = ({progress} : {progress: number}) => {
+const LoadingPanel = ({progress} : {progress?: number}) => {
     const theme = useTheme();
     const styles = useStyles(theme);
 

@@ -1,43 +1,86 @@
-import { action, makeObservable, observable } from "mobx";
-import ClientHttpAPI from "../api/ClientHttpAPI";
+import { makeObservable, observable } from "mobx";
 import ResourceModel from "../models/ResourceModel";
 import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
+import ClientServerAPI from "../api/ClientServerAPI";
 
 export class ResourceDemonstrationViewModel {
-    @observable isOpened: boolean;
-    @observable
-    resourceModel: ResourceModel = new ResourceModel();
-    clientAPI: ClientHttpAPI;
+  @observable isPasswordEntered = false;
+  @observable resourceModel: ResourceModel = new ResourceModel();
+  clientServerAPI: ClientServerAPI;
 
-    constructor() {
-        makeObservable(this);
-        this.clientAPI = new ClientHttpAPI();
-        this.isOpened = false;
-    }
+  constructor() {
+    this.clientServerAPI = new ClientServerAPI();
+    makeObservable(this);
+  }
 
-    setResourceId = (value: string) => {
-        this.resourceModel.resourceId = value;
-    }
+  setResourceId = async (resourceUuid: string) => {
+    this.resourceModel.resourceUuid = resourceUuid;
+    this.clientServerAPI
+      .getResourceMetaData(resourceUuid)
+      .then(async (data) => {
+        this.resourceModel = {
+          isPrivate: data.data.IsPrivate,
+          resource: this.resourceModel.resource,
+          resourceUuid: this.resourceModel.resourceUuid,
+          owner: this.resourceModel.owner,
+        };
 
-    getResource = () => {
-        if (this.resourceModel.resource.status == FetchingStatus.NotStarted) {
-            this.downloadResource();
+        if (!data.data.isPrivate) {
+          this.getResourceData("");
         }
-        return this.resourceModel.resource;
+      });
+  };
+
+  getResource = () => {
+    return this.resourceModel.resource;
+  };
+
+  needToAskPassword() {
+    return this.resourceModel.isPrivate === false || this.isPasswordEntered;
+  }
+
+  checkPassword = async (password: string) => {
+    if (this.resourceModel.resourceUuid === undefined) {
+      return;
     }
 
-    downloadResource = () => {
-        
-    }
+    this.clientServerAPI
+      .checkResourcePassword(this.resourceModel.resourceUuid, password)
+      .then(async (data) => {
+        this.isPasswordEntered = true;
+        await this.getResourceData(password);
+      })
+      .catch((_) => {
+        console.log("Incorrect password");
+      });
+  };
 
-    checkPassword = async (password: string) => {
-        if (this.resourceModel.resourceId === undefined) {
-            return;
-        }
-        const checkResult = await this.clientAPI.checkResourcePassword(this.resourceModel.resourceId, password);
-        this.isOpened = checkResult;
-        console.log(this.isOpened)
-    }
+  getResourceData = async (password: string) => {
+    this.resourceModel = {
+      isPrivate: this.resourceModel.isPrivate,
+      resource: {
+        text: "",
+        status: FetchingStatus.InProgress,
+      },
+      resourceUuid: this.resourceModel.resourceUuid,
+      owner: this.resourceModel.owner,
+    };
+
+    this.clientServerAPI
+      .getResourceData(this.resourceModel.resourceUuid!, password)
+      .then((data) => {
+        this.resourceModel = {
+          isPrivate: this.resourceModel.isPrivate,
+          resource: {
+            text: data.data,
+            status: FetchingStatus.Finished,
+          },
+          resourceUuid: this.resourceModel.resourceUuid,
+          owner: this.resourceModel.owner,
+        };
+      });
+  };
 }
 
-export let resourceDemonstrationViewModel = new ResourceDemonstrationViewModel();
+export let resourceDemonstrationViewModel =
+  new ResourceDemonstrationViewModel();

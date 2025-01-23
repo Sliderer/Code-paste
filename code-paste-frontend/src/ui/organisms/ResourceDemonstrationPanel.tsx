@@ -21,7 +21,7 @@ const ResourceDemonstrationPanel = ({
   return (
     <Box>
       {resource.status == FetchingStatus.InProgress && (
-        <LoadingPanel progress={resource.progress} />
+        <LoadingPanel progress={0} />
       )}
       {resource.status == FetchingStatus.Finished && (
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>

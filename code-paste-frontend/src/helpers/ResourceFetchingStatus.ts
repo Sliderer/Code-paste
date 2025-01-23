@@ -6,6 +6,5 @@ export enum FetchingStatus {
 
 export type ResourceFetchingStatus = {
     text: string,
-    status: FetchingStatus,
-    progress: number
+    status: FetchingStatus
 };

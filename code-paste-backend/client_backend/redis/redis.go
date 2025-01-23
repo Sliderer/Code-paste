@@ -19,7 +19,7 @@ func (redisClient *RedisClient) CreateClient() error {
 	return nil
 }
 
-func (redisClient *RedisClient) UploadResourceMetaData(uuid string, metaData ResourceMetaData) {
+func (redisClient *RedisClient) UploadResourceMetaData(uuid string, metaData *ResourceMetaData) {
 	redisClient.Client.Set(context.Background(), uuid, metaData, 0)
 }
 

@@ -1,18 +1,16 @@
-import { status } from "@grpc/grpc-js";
-import { FetchingStatus, ResourceFetchingStatus } from "../../helpers/ResourceFetchingStatus";
+import {
+  FetchingStatus,
+  ResourceFetchingStatus,
+} from "../../helpers/ResourceFetchingStatus";
 
 class ResourceModel {
-    isPrivate: boolean = false;
-    resource: ResourceFetchingStatus;
-    resourceId: string | undefined = undefined;
-
-    constructor() {
-        this.resource = {
-            text: "dwd",
-            status: FetchingStatus.Finished,
-            progress: 0
-        }
-    }
+  isPrivate: boolean | undefined = undefined;
+  owner: string | undefined = undefined;
+  resource: ResourceFetchingStatus = {
+    text: "",
+    status: FetchingStatus.NotStarted,
+  };
+  resourceUuid: string | undefined = undefined;
 }
 
 export default ResourceModel;

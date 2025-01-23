@@ -7,6 +7,7 @@ import { languages } from "prismjs";
 import { HighlightingSyntax } from "../../helpers/HighlightingSyntax";
 import { ResourceCreationViewModel } from "../view_models/ResourceCreationViewModel";
 import { observer } from "mobx-react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const ResourceCreationPage = observer(
   ({ viewModel }: { viewModel: ResourceCreationViewModel }) => {
@@ -48,6 +49,11 @@ const ResourceCreationPage = observer(
     const onPasswordChange = useCallback((value: string) => {
       viewModel.setPassword(value);
     }, []);
+
+    const navigate = useNavigate();
+    if (viewModel.createdResource !== undefined) {
+      navigate(`/resource/${viewModel.createdResource}`)
+    }
 
     return (
       <Stack

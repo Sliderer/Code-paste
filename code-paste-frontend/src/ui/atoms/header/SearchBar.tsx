@@ -5,7 +5,7 @@ const SearchBar = () => {
   const theme = useTheme();
   const styles = useStyles(theme);
   return (
-    <Stack direction={"row"} sx={{ justifyContent: "center", marginRight: 30, marginLeft: 10}}>
+    <Stack direction={"row"} sx={{ justifyContent: "center"}}>
       <Box className={styles.searchBar}>
         <TextField
           variant="standard"

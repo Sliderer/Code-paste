@@ -6,47 +6,57 @@ import ResourcePasswordPanel from "../../ui/moleculas/ResourcePasswordPanel";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import ResourceDemonstrationPanel from "../../ui/organisms/ResourceDemonstrationPanel";
 import { ResourceAction } from "../../helpers/ResourceAction";
+import LoadingPanel from "../../ui/atoms/LoadingPanel";
+import { useEffect } from "react";
+import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 
 const ResourceDemonstrationPage = observer(
   ({ viewModel }: { viewModel: ResourceDemonstrationViewModel }) => {
     const theme = useTheme();
     const styles = useStyles(theme);
-
     const location = useLocation();
-    const resourceId = location.pathname.split("/").reverse()[0];
+
+    useEffect(() => {
+      const resourceId = location.pathname.split("/").reverse()[0];
+      viewModel.setResourceId(resourceId);
+    }, []);
 
     const actions: ResourceAction[] = [
-        {
-            title: 'Автор',
-            action: () => {}
-        },
-        {
-            title: 'В избранное',
-            action: () => {}
-        },
-        {
-            title: 'Скачать',
-            action: () => {}
-        },
-        {
-            title: 'Скопировать',
-            action: () => {}
-        },
-        {
-            title: 'Поделиться',
-            action: () => {}
-        },
-    ] 
+      {
+        title: "Автор",
+        action: () => {},
+      },
+      {
+        title: "В избранное",
+        action: () => {},
+      },
+      {
+        title: "Скачать",
+        action: () => {},
+      },
+      {
+        title: "Скопировать",
+        action: () => {},
+      },
+      {
+        title: "Поделиться",
+        action: () => {},
+      },
+    ];
 
-    viewModel.setResourceId(resourceId);
-    console.log(resourceId);
+    if (viewModel.resourceModel.isPrivate === undefined || viewModel.getResource().status === FetchingStatus.NotStarted) {
+      return <LoadingPanel />;
+    }
 
     return (
       <Box className={styles.basicPanel}>
-        {viewModel.isOpened ? (
-          <ResourceDemonstrationPanel resource={viewModel.getResource()} actions={actions}/>
-        ) : (
+        {!viewModel.needToAskPassword ? (
           <ResourcePasswordPanel onCheckButtonClick={viewModel.checkPassword} />
+        ) : (
+          <ResourceDemonstrationPanel
+            resource={viewModel.getResource()}
+            actions={actions}
+          />
         )}
       </Box>
     );

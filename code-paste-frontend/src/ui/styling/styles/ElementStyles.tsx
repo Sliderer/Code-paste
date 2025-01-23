@@ -23,10 +23,9 @@ function cunstructStyles(theme: Theme) {
         ...basicStyles.basicShadow,
         ...basicStyles.basicPanel,
         borderRadius: "15px",
+        minWidth: "300px",
+        overflow: "hidden",
         padding: "15px 0px 15px 50px",
-        display: "flex",
-        justifyContent: "space-evenly",
-        minWidth: "100px"
     };
 
     const radioButton = {

@@ -1,19 +1,13 @@
 package server
 
 import (
-	"bytes"
 	. "client_backend/kafka"
 	. "client_backend/minio"
-	. "client_backend/models"
 	. "client_backend/redis"
-	"compress/gzip"
+	. "client_backend/server/handlers"
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
-	"unicode/utf8"
-
-	"github.com/google/uuid"
 )
 
 type ServerImpl struct {
@@ -22,93 +16,82 @@ type ServerImpl struct {
 	kafkaClient *KafkaClient
 }
 
+func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Max-Age", "15")
+
+	if r.Method == "GET" {
+		resourceUuid := r.PathValue("resourceId")
+		passwordToCheck := r.Header.Get("Password")
+		checkResult := ResourcePasswordCheckGet(resourceUuid, passwordToCheck, serverImpl.redisClient)
+
+		if checkResult {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}
+}
+
 func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Max-Age", "15")
 
-	resourceId := r.PathValue("resourceId")
-	resourceMetaData := serverImpl.redisClient.GetResourceMetaData(resourceId)
+	if r.Method == "GET" {
+		resourceUuid := r.PathValue("resourceId")
+		resourceMetaData := ResourceMetaDataGet(resourceUuid, serverImpl.redisClient)
+		response, err := json.Marshal(resourceMetaData)
 
-	responseData, err := json.Marshal(resourceMetaData)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
-	if err != nil {
-		log.Println(err)
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(response)
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/text")
-	w.Write(responseData)
 }
 
 func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Max-Age", "15")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
 
-	resourceId := r.PathValue("resourceId")
-	resourceMetaData := serverImpl.redisClient.GetResourceMetaData(resourceId)
-	octetData, err := serverImpl.minioClient.DownloadFile("temp", resourceMetaData.Path)
+	resourceUuid := r.PathValue("resourceId")
+	textData, err := ResourceDataGet(resourceUuid, serverImpl.redisClient, serverImpl.minioClient)
 
 	if err != nil {
-		log.Println(err)
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
-	textData, err := io.ReadAll(octetData)
-	if err != nil {
-		panic(err)
-	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/text")
 	w.Write(textData)
 }
 
 func (serverImpl *ServerImpl) UploadDocument(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Content-Type", "*")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Max-Age", "15")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
 
-	len := r.ContentLength
-	body := make([]byte, len)
-	r.Body.Read(body)
-	log.Println(body)
+	if r.Method == "POST" {
+		len := r.ContentLength
+		body := make([]byte, len)
+		r.Body.Read(body)
 
-	var request ResourceCreationRequest
-	json.Unmarshal(body, &request)
+		userName := r.Header.Get("User")
+		filePassword := r.Header.Get("Password")
+		fileName := r.Header.Get("FileName")
+		folderName := r.Header.Get("FolderName")
 
-	log.Printf(request.Data)
-	decompressed, err := gzip.NewReader(bytes.NewReader([]byte(request.Data)))
-	if err != nil {
-		log.Fatalln("Encoding gzip error: ", err)
+		resourceUuid := ResourceCreationPost(body, userName, filePassword, fileName, folderName, serverImpl.redisClient, serverImpl.minioClient)
+		w.Write([]byte(resourceUuid))
 	}
-	defer decompressed.Close()
-
-	decompressedData, err := io.ReadAll(decompressed)
-	if err != nil {
-		log.Fatalln("Reading decompressed data error: ", err)
-	}
-
-	document := string(decompressedData)
-	resultChannel := make(chan error)
-	log.Println(r.Header)
-	userName := r.Header.Get("User")
-	filePassword := r.Header.Get("Password")
-	fileName := r.PathValue("fileName")
-	folderName := r.PathValue("folderName")
-	fileName = folderName + "/" + fileName
-	go serverImpl.minioClient.UploadFile(userName, fileName, document, int64(utf8.RuneCountInString(document)), resultChannel)
-	select {
-	case err := <-resultChannel:
-		if err != nil {
-			log.Println("Error uploading the file: ", err)
-		}
-	}
-
-	resourceUuid := uuid.New()
-	go serverImpl.redisClient.UploadResourceMetaData(resourceUuid.String(), ResourceMetaData{
-		Path:     fileName,
-		Owner:    userName,
-		Password: filePassword,
-	})
-
-	log.Println("Uploaded resource: ", resourceUuid.String(), " Path: ", fileName)
 }
