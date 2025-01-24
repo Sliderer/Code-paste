@@ -2,7 +2,7 @@ import { Stack, useTheme } from "@mui/material";
 import ResourceInputField from "../../ui/atoms/ResourceInputField";
 import ResourceCreationSettings from "../../ui/moleculas/ResourceCreationSettings";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { languages } from "prismjs";
 import { HighlightingSyntax } from "../../helpers/HighlightingSyntax";
 import { ResourceCreationViewModel } from "../view_models/ResourceCreationViewModel";
@@ -23,8 +23,18 @@ const ResourceCreationPage = observer(
         language: "",
       });
 
+    const navigate = useNavigate();
+
     const theme = useTheme();
     const styles = useStyles(theme);
+
+    useEffect(() => {
+      if (viewModel.createdResource !== undefined) {
+        let resourceUuid = viewModel.createdResource;
+        viewModel.createdResource = undefined;
+        navigate(`/resource/${resourceUuid}`);
+      }
+    }, [viewModel.createdResource]);
 
     const onProgrammingLanguageChange = useCallback(
       (highlightSettings: HighlightingSyntax) => {
@@ -49,11 +59,6 @@ const ResourceCreationPage = observer(
     const onPasswordChange = useCallback((value: string) => {
       viewModel.setPassword(value);
     }, []);
-
-    const navigate = useNavigate();
-    if (viewModel.createdResource !== undefined) {
-      navigate(`/resource/${viewModel.createdResource}`)
-    }
 
     return (
       <Stack

@@ -2,6 +2,7 @@ import { makeObservable, observable } from "mobx";
 import ResourceModel from "../models/ResourceModel";
 import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 import ClientServerAPI from "../api/ClientServerAPI";
+import { alertClasses } from "@mui/material";
 
 export class ResourceDemonstrationViewModel {
   @observable isPasswordEntered = false;
@@ -25,7 +26,7 @@ export class ResourceDemonstrationViewModel {
           owner: this.resourceModel.owner,
         };
 
-        if (!data.data.isPrivate) {
+        if (data.data.isPrivate === false) {
           this.getResourceData("");
         }
       });
@@ -36,7 +37,11 @@ export class ResourceDemonstrationViewModel {
   };
 
   needToAskPassword() {
-    return this.resourceModel.isPrivate === false || this.isPasswordEntered;
+    if (this.isPasswordEntered === true) {
+      return false;
+    }
+
+    return this.resourceModel.isPrivate === true;
   }
 
   checkPassword = async (password: string) => {
@@ -47,12 +52,12 @@ export class ResourceDemonstrationViewModel {
     this.clientServerAPI
       .checkResourcePassword(this.resourceModel.resourceUuid, password)
       .then(async (data) => {
-        this.isPasswordEntered = true;
-        await this.getResourceData(password);
+        console.log('Result', data)
+        this.isPasswordEntered = data.data.Result;
+        if (data.data.Result) {
+          await this.getResourceData(password);
+        }
       })
-      .catch((_) => {
-        console.log("Incorrect password");
-      });
   };
 
   getResourceData = async (password: string) => {

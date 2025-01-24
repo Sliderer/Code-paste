@@ -17,11 +17,13 @@ func ResourceMetaDataGet(resourceUuid string, redisClient *RedisClient) Resource
 	}
 }
 
-func ResourcePasswordCheckGet(resourceUuid string, passwordToCheck string, redisClient *RedisClient) bool {
+func ResourcePasswordCheckGet(resourceUuid string, passwordToCheck string, redisClient *RedisClient) PredicateResponse {
 	hashedPassword := GetHash(passwordToCheck)
 	resourceMetaData := redisClient.GetResourceMetaData(resourceUuid)
 
-	return resourceMetaData.Password == hashedPassword
+	return PredicateResponse{
+		Result: resourceMetaData.Password == hashedPassword,
+	}
 }
 
 func ResourceDataGet(resourceUuid string, redisClient *RedisClient, minioClient *MinioClient) ([]byte, error) {

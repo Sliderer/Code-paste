@@ -20,17 +20,15 @@ func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *ht
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Max-Age", "15")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
 
 	if r.Method == "GET" {
 		resourceUuid := r.PathValue("resourceId")
 		passwordToCheck := r.Header.Get("Password")
-		checkResult := ResourcePasswordCheckGet(resourceUuid, passwordToCheck, serverImpl.redisClient)
-
-		if checkResult {
-			w.WriteHeader(http.StatusOK)
-		} else {
-			w.WriteHeader(http.StatusNotFound)
-		}
+		result := ResourcePasswordCheckGet(resourceUuid, passwordToCheck, serverImpl.redisClient)
+		resultJson, _ := json.Marshal(result)
+		w.WriteHeader(http.StatusOK)
+		w.Write(resultJson)
 	}
 }
 
@@ -38,6 +36,7 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Max-Age", "15")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
 
 	if r.Method == "GET" {
 		resourceUuid := r.PathValue("resourceId")

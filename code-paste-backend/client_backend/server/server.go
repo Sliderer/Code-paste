@@ -43,7 +43,7 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/upload_resource", server.serverImpl.UploadDocument)
 	http.HandleFunc("/get_resource/{resourceId}", server.serverImpl.GetResourceData)
 	http.HandleFunc("/get_resource_meta/{resourceId}", server.serverImpl.GetResourceMetaData)
-	http.HandleFunc("/check_password/{resourceId}", server.serverImpl.GetResourceMetaData)
+	http.HandleFunc("/check_password/{resourceId}", server.serverImpl.CheckResourcePassword)
 	err := http.ListenAndServe(":90", nil)
 	if err != nil {
 		log.Fatal(err)

@@ -44,13 +44,13 @@ const ResourceDemonstrationPage = observer(
       },
     ];
 
-    if (viewModel.resourceModel.isPrivate === undefined || viewModel.getResource().status === FetchingStatus.NotStarted) {
+    if (viewModel.resourceModel.isPrivate === undefined || viewModel.getResource().status === FetchingStatus.NotStarted && viewModel.isPasswordEntered) {
       return <LoadingPanel />;
     }
 
     return (
       <Box className={styles.basicPanel}>
-        {!viewModel.needToAskPassword ? (
+        {viewModel.needToAskPassword() ? (
           <ResourcePasswordPanel onCheckButtonClick={viewModel.checkPassword} />
         ) : (
           <ResourceDemonstrationPanel
