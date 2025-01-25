@@ -6,6 +6,7 @@ import (
 	. "client_backend/redis"
 	. "client_backend/responses"
 	"io"
+	"log"
 )
 
 func ResourceMetaDataGet(resourceUuid string, redisClient *RedisClient) ResourceMetaData {
@@ -14,6 +15,7 @@ func ResourceMetaDataGet(resourceUuid string, redisClient *RedisClient) Resource
 	return ResourceMetaData{
 		IsPrivate: resourceMetaData.HasPassword(),
 		Owner:     resourceMetaData.Owner,
+		Name:      resourceMetaData.Name,
 	}
 }
 
@@ -28,7 +30,9 @@ func ResourcePasswordCheckGet(resourceUuid string, passwordToCheck string, redis
 
 func ResourceDataGet(resourceUuid string, redisClient *RedisClient, minioClient *MinioClient) ([]byte, error) {
 	resourceMetaData := redisClient.GetResourceMetaData(resourceUuid)
-	octetData, err := minioClient.DownloadFile(resourceMetaData.Owner, resourceMetaData.Path)
+	resourceFullPath := resourceMetaData.Path + "/" + resourceMetaData.Name
+	log.Println(resourceFullPath)
+	octetData, err := minioClient.DownloadFile(resourceMetaData.Owner, resourceFullPath)
 
 	if err != nil {
 		return nil, err

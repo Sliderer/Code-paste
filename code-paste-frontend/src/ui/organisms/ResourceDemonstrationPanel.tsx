@@ -19,33 +19,26 @@ const ResourceDemonstrationPanel = ({
   const styles = useStyles(theme);
 
   return (
-    <Box>
-      {resource.status == FetchingStatus.InProgress && (
-        <LoadingPanel progress={0} />
-      )}
-      {resource.status == FetchingStatus.Finished && (
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Stack spacing={5}>
-            <Stack direction={"row"} spacing={4} justifyContent={"center"}>
-              {actions.map((action) => (
-                <ResourceActionButton action={action} />
-              ))}
-            </Stack>
-            <Box
-              className={styles.basicShadow}
-              sx={{
-                padding: 1,
-                borderRadius: 1,
-                height: "70vh",
-                width: "90vw",
-              }}
-            >
-              <Typography sx={{ color: "black" }}>{resource.text}</Typography>
-            </Box>
-          </Stack>
-        </Box>
-      )}
-    </Box>
+    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+    <Stack spacing={5}>
+      <Stack direction={"row"} spacing={4} justifyContent={"center"}>
+        {actions.map((action) => (
+          <ResourceActionButton action={action} />
+        ))}
+      </Stack>
+      <Box
+        className={styles.basicShadow}
+        sx={{
+          padding: 1,
+          borderRadius: 1,
+          height: "70vh",
+          width: "90vw",
+        }}
+      >
+        <Typography sx={{ color: "black" }}>{resource.text}</Typography>
+      </Box>
+    </Stack>
+  </Box>
   );
 };
 

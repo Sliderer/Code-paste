@@ -23,7 +23,7 @@ func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *ht
 	w.Header().Set("Access-Control-Allow-Headers", "*")
 
 	if r.Method == "GET" {
-		resourceUuid := r.PathValue("resourceId")
+		resourceUuid := r.PathValue("resourceUuid")
 		passwordToCheck := r.Header.Get("Password")
 		result := ResourcePasswordCheckGet(resourceUuid, passwordToCheck, serverImpl.redisClient)
 		resultJson, _ := json.Marshal(result)
@@ -39,7 +39,7 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 	w.Header().Set("Access-Control-Allow-Headers", "*")
 
 	if r.Method == "GET" {
-		resourceUuid := r.PathValue("resourceId")
+		resourceUuid := r.PathValue("resourceUuid")
 		resourceMetaData := ResourceMetaDataGet(resourceUuid, serverImpl.redisClient)
 		response, err := json.Marshal(resourceMetaData)
 
@@ -61,7 +61,7 @@ func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Req
 	w.Header().Set("Access-Control-Max-Age", "15")
 	w.Header().Set("Access-Control-Allow-Headers", "*")
 
-	resourceUuid := r.PathValue("resourceId")
+	resourceUuid := r.PathValue("resourceUuid")
 	textData, err := ResourceDataGet(resourceUuid, serverImpl.redisClient, serverImpl.minioClient)
 
 	if err != nil {

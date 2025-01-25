@@ -28,8 +28,9 @@ func ResourceCreationPost(body []byte, userName, filePassword, fileName, folderN
 	document := string(decompressedData)
 	resultChannel := make(chan error)
 
-	fileName = folderName + "/" + fileName
-	go minioClient.UploadFile(userName, fileName, document, int64(utf8.RuneCountInString(document)), resultChannel)
+	fileName += ".txt"
+	filePath := folderName + "/" + fileName
+	go minioClient.UploadFile(userName, filePath, document, int64(utf8.RuneCountInString(document)), resultChannel)
 	select {
 	case err := <-resultChannel:
 		if err != nil {
@@ -45,7 +46,8 @@ func ResourceCreationPost(body []byte, userName, filePassword, fileName, folderN
 	}
 
 	go redisClient.UploadResourceMetaData(resourceUuid, &ResourceMetaData{
-		Path:     fileName,
+		Name:     fileName,
+		Path:     folderName,
 		Owner:    userName,
 		Password: passwordHash,
 	})

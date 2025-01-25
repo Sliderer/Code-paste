@@ -41,9 +41,9 @@ func (server *ClientServer) InitFields() {
 func (server *ClientServer) StartServer() {
 	log.Print("Starting server")
 	http.HandleFunc("/upload_resource", server.serverImpl.UploadDocument)
-	http.HandleFunc("/get_resource/{resourceId}", server.serverImpl.GetResourceData)
-	http.HandleFunc("/get_resource_meta/{resourceId}", server.serverImpl.GetResourceMetaData)
-	http.HandleFunc("/check_password/{resourceId}", server.serverImpl.CheckResourcePassword)
+	http.HandleFunc("/get_resource/{resourceUuid}", server.serverImpl.GetResourceData)
+	http.HandleFunc("/get_resource_meta/{resourceUuid}", server.serverImpl.GetResourceMetaData)
+	http.HandleFunc("/check_password/{resourceUuid}", server.serverImpl.CheckResourcePassword)
 	err := http.ListenAndServe(":90", nil)
 	if err != nil {
 		log.Fatal(err)

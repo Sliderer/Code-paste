@@ -7,7 +7,7 @@ import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import ResourceDemonstrationPanel from "../../ui/organisms/ResourceDemonstrationPanel";
 import { ResourceAction } from "../../helpers/ResourceAction";
 import LoadingPanel from "../../ui/atoms/LoadingPanel";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 
 const ResourceDemonstrationPage = observer(
@@ -16,35 +16,27 @@ const ResourceDemonstrationPage = observer(
     const styles = useStyles(theme);
     const location = useLocation();
 
+    const [actions, setActions] = useState<ResourceAction[]>(
+      viewModel.getActions()
+    );
+
     useEffect(() => {
-      const resourceId = location.pathname.split("/").reverse()[0];
-      viewModel.setResourceId(resourceId);
+      const resourceUuid = location.pathname.split("/").reverse()[0];
+      viewModel.setResourceUuid(resourceUuid);
     }, []);
 
-    const actions: ResourceAction[] = [
-      {
-        title: "Автор",
-        action: () => {},
-      },
-      {
-        title: "В избранное",
-        action: () => {},
-      },
-      {
-        title: "Скачать",
-        action: () => {},
-      },
-      {
-        title: "Скопировать",
-        action: () => {},
-      },
-      {
-        title: "Поделиться",
-        action: () => {},
-      },
-    ];
+    useEffect(() => {
+      if (viewModel.resourceModel.resource.status == FetchingStatus.Finished) {
+        setActions(viewModel.getActions());
+      }
+    }, [viewModel.resourceModel]);
 
-    if (viewModel.resourceModel.isPrivate === undefined || viewModel.getResource().status === FetchingStatus.NotStarted && viewModel.isPasswordEntered) {
+    if (
+      viewModel.resourceModel.isPrivate === undefined ||
+      (viewModel.getResource().status === FetchingStatus.NotStarted &&
+        viewModel.isPasswordEntered) ||
+      viewModel.getResource().status === FetchingStatus.InProgress
+    ) {
       return <LoadingPanel />;
     }
 

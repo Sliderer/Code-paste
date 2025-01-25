@@ -1,7 +1,7 @@
 class ResourcePreviewModel {
     name: string = ''
     previewText: string = ''
-    resourceId: string = ''
+    resourceUuid: string = ''
     author: string = ''
 }
 

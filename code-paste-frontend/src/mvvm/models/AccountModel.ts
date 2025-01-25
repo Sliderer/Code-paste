@@ -8,43 +8,43 @@ class AccountModel {
         {
             name: 'text',
             previewText: 'weoifjweofih',
-            resourceId: '1',
+            resourceUuid: '1',
             author: 'Sliderer'
         },
         {
             name: 'text',
             previewText: 'weoifjweofih',
-            resourceId: '1',
+            resourceUuid: '1',
             author: 'Sliderer'
         },
         {
             name: 'text',
             previewText: 'weoifjweofih',
-            resourceId: '1',
+            resourceUuid: '1',
             author: 'Sliderer'
         },
         {
             name: 'text',
             previewText: 'weoifjweofih',
-            resourceId: '1',
+            resourceUuid: '1',
             author: 'Sliderer'
         },
         {
             name: 'text',
             previewText: 'weoifjweofih',
-            resourceId: '1',
+            resourceUuid: '1',
             author: 'Sliderer'
         },
         {
             name: 'text',
             previewText: 'weoifjweofih',
-            resourceId: '1',
+            resourceUuid: '1',
             author: 'Sliderer'
         },
         {
             name: 'text',
             previewText: 'weoifjweofih',
-            resourceId: '1',
+            resourceUuid: '1',
             author: 'Sliderer'
         },
     ]

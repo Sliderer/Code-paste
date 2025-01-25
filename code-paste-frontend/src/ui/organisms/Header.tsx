@@ -12,7 +12,6 @@ const Header = () => {
   const navigate = useNavigate();  
 
   const navigateToResourceCreationPage = () => {
-    console.log('redi')
     navigate(`/create_resource`)
   }
 

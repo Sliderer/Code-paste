@@ -24,7 +24,7 @@ const ResourcePreview = ({
         textDecoration: "none",
         fontFamily: "Montserrat Alternates",
       }}
-      to={`/resource/${resource.resourceId}`}
+      to={`/resource/${resource.resourceUuid}`}
     >
       <Box className={styles.basicShadow} sx={{ borderRadius: 2, padding: 1 }}>
         <Stack

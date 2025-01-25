@@ -1,7 +1,7 @@
 
 
 class ClientHttpAPI {
-    checkResourcePassword = async (resourceId: string, password: string) => {
+    checkResourcePassword = async (resourceUuid: string, password: string) => {
         return true;
     }
 }

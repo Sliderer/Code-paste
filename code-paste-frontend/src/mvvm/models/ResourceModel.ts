@@ -6,6 +6,7 @@ import {
 class ResourceModel {
   isPrivate: boolean | undefined = undefined;
   owner: string | undefined = undefined;
+  name: string | undefined = undefined;
   resource: ResourceFetchingStatus = {
     text: "",
     status: FetchingStatus.NotStarted,

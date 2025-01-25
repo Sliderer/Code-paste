@@ -5,6 +5,7 @@ import (
 )
 
 type ResourceMetaData struct {
+	Name     string `json:"Name"`
 	Path     string `json:"Path"`
 	Owner    string `json:"Owner"`
 	Password string `json:"Password"`
