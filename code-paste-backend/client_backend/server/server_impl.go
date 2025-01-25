@@ -3,6 +3,7 @@ package server
 import (
 	. "client_backend/kafka"
 	. "client_backend/minio"
+	. "client_backend/postgres"
 	. "client_backend/redis"
 	. "client_backend/server/handlers"
 	"encoding/json"
@@ -11,21 +12,28 @@ import (
 )
 
 type ServerImpl struct {
-	minioClient *MinioClient
-	redisClient *RedisClient
-	kafkaClient *KafkaClient
+	minioClient    *MinioClient
+	redisClient    *RedisClient
+	kafkaClient    *KafkaClient
+	postgresClient *PostgresClient
 }
 
-func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *http.Request) {
+func SetDefaultHeaders(w http.ResponseWriter) http.ResponseWriter {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Max-Age", "15")
 	w.Header().Set("Access-Control-Allow-Headers", "*")
 
+	return w
+}
+
+func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w)
+
 	if r.Method == "GET" {
 		resourceUuid := r.PathValue("resourceUuid")
 		passwordToCheck := r.Header.Get("Password")
-		result := ResourcePasswordCheckGet(resourceUuid, passwordToCheck, serverImpl.redisClient)
+		result := ResourcePasswordCheck(resourceUuid, passwordToCheck, serverImpl.redisClient)
 		resultJson, _ := json.Marshal(result)
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
@@ -33,14 +41,11 @@ func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *ht
 }
 
 func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Max-Age", "15")
-	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w = SetDefaultHeaders(w)
 
 	if r.Method == "GET" {
 		resourceUuid := r.PathValue("resourceUuid")
-		resourceMetaData := ResourceMetaDataGet(resourceUuid, serverImpl.redisClient)
+		resourceMetaData := GetResourceMetaData(resourceUuid, serverImpl.redisClient)
 		response, err := json.Marshal(resourceMetaData)
 
 		if err != nil {
@@ -56,13 +61,10 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 }
 
 func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Max-Age", "15")
-	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w = SetDefaultHeaders(w)
 
 	resourceUuid := r.PathValue("resourceUuid")
-	textData, err := ResourceDataGet(resourceUuid, serverImpl.redisClient, serverImpl.minioClient)
+	textData, err := GetResourceData(resourceUuid, serverImpl.redisClient, serverImpl.minioClient)
 
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
@@ -75,10 +77,7 @@ func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Req
 }
 
 func (serverImpl *ServerImpl) UploadDocument(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "*")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Max-Age", "15")
-	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w = SetDefaultHeaders(w)
 
 	if r.Method == "POST" {
 		len := r.ContentLength
@@ -90,7 +89,45 @@ func (serverImpl *ServerImpl) UploadDocument(w http.ResponseWriter, r *http.Requ
 		fileName := r.Header.Get("FileName")
 		folderName := r.Header.Get("FolderName")
 
-		resourceUuid := ResourceCreationPost(body, userName, filePassword, fileName, folderName, serverImpl.redisClient, serverImpl.minioClient)
+		resourceUuid := CreateResource(body, userName, filePassword, fileName, folderName, serverImpl.redisClient, serverImpl.minioClient)
 		w.Write([]byte(resourceUuid))
+	}
+}
+
+func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w)
+
+	if r.Method == "POST" {
+		userName := r.Header.Get("UserName")
+		email := r.Header.Get("Email")
+		password := r.Header.Get("Password")
+
+		err := CreateUser(userName, email, password, serverImpl.postgresClient)
+
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	}
+}
+
+func (serverImpl *ServerImpl) CheckAccountPassword(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w)
+
+	if r.Method == "GET" {
+		userName := r.Header.Get("UserName")
+		password := r.Header.Get("Password")
+
+		result, err := CheckAccountPassword(userName, password, serverImpl.postgresClient)
+
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		resultJson, _ := json.Marshal(result)
+		w.WriteHeader(http.StatusOK)
+		w.Write(resultJson)
 	}
 }

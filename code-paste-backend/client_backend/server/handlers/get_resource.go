@@ -4,31 +4,31 @@ import (
 	. "client_backend/lib"
 	. "client_backend/minio"
 	. "client_backend/redis"
-	. "client_backend/responses"
+	response "client_backend/responses"
 	"io"
 	"log"
 )
 
-func ResourceMetaDataGet(resourceUuid string, redisClient *RedisClient) ResourceMetaData {
+func GetResourceMetaData(resourceUuid string, redisClient *RedisClient) response.ResourceMetaData {
 	resourceMetaData := redisClient.GetResourceMetaData(resourceUuid)
 
-	return ResourceMetaData{
+	return response.ResourceMetaData{
 		IsPrivate: resourceMetaData.HasPassword(),
 		Owner:     resourceMetaData.Owner,
 		Name:      resourceMetaData.Name,
 	}
 }
 
-func ResourcePasswordCheckGet(resourceUuid string, passwordToCheck string, redisClient *RedisClient) PredicateResponse {
+func ResourcePasswordCheck(resourceUuid string, passwordToCheck string, redisClient *RedisClient) response.PredicateResponse {
 	hashedPassword := GetHash(passwordToCheck)
 	resourceMetaData := redisClient.GetResourceMetaData(resourceUuid)
 
-	return PredicateResponse{
+	return response.PredicateResponse{
 		Result: resourceMetaData.Password == hashedPassword,
 	}
 }
 
-func ResourceDataGet(resourceUuid string, redisClient *RedisClient, minioClient *MinioClient) ([]byte, error) {
+func GetResourceData(resourceUuid string, redisClient *RedisClient, minioClient *MinioClient) ([]byte, error) {
 	resourceMetaData := redisClient.GetResourceMetaData(resourceUuid)
 	resourceFullPath := resourceMetaData.Path + "/" + resourceMetaData.Name
 	log.Println(resourceFullPath)

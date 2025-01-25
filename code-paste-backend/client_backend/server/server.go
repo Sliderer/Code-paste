@@ -3,6 +3,7 @@ package server
 import (
 	. "client_backend/lib"
 	"client_backend/minio"
+	"client_backend/postgres"
 	"client_backend/redis"
 	"log"
 	"net/http"
@@ -32,10 +33,19 @@ func (server *ClientServer) InitFields() {
 				ClientName: "redisadmin",
 			},
 		},
+		postgresClient: &postgres.PostgresClient{
+			Settings: PostgresSettings{
+				Host:         "84.252.133.175",
+				User:         "postgre",
+				Password:     "postgre",
+				DatabaseName: "CodePaste",
+			},
+		},
 	}
 
 	server.serverImpl.minioClient.CreateClient()
 	server.serverImpl.redisClient.CreateClient()
+	server.serverImpl.postgresClient.OpenConnection()
 }
 
 func (server *ClientServer) StartServer() {
@@ -44,6 +54,9 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/get_resource/{resourceUuid}", server.serverImpl.GetResourceData)
 	http.HandleFunc("/get_resource_meta/{resourceUuid}", server.serverImpl.GetResourceMetaData)
 	http.HandleFunc("/check_password/{resourceUuid}", server.serverImpl.CheckResourcePassword)
+	http.HandleFunc("/create_user", server.serverImpl.CreateUser)
+	http.HandleFunc("/check_account_password", server.serverImpl.CheckAccountPassword)
+
 	err := http.ListenAndServe(":90", nil)
 	if err != nil {
 		log.Fatal(err)

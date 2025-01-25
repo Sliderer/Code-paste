@@ -1,3 +1,7 @@
 export const getCurrentNickname = () => {
-    return sessionStorage.getItem('account_nickname');
+    return sessionStorage.getItem('user_name');
+}
+
+export const setCurrentNickname = (userName: string) => {
+    sessionStorage.setItem('user_name', userName);
 }

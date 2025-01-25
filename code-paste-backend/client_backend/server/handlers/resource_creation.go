@@ -13,7 +13,7 @@ import (
 	"unicode/utf8"
 )
 
-func ResourceCreationPost(body []byte, userName, filePassword, fileName, folderName string, redisClient *RedisClient, minioClient *MinioClient) string {
+func CreateResource(body []byte, userName, filePassword, fileName, folderName string, redisClient *RedisClient, minioClient *MinioClient) string {
 	decompressed, err := gzip.NewReader(bytes.NewReader(body))
 	if err != nil {
 		log.Fatalln("Encoding gzip error: ", err)
