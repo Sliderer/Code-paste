@@ -5,6 +5,7 @@ import (
 	"client_backend/minio"
 	"client_backend/postgres"
 	"client_backend/redis"
+	. "client_backend/server/handlers"
 	"log"
 	"net/http"
 
@@ -18,34 +19,37 @@ type ClientServer struct {
 
 func (server *ClientServer) InitFields() {
 	server.serverImpl = ServerImpl{
-		minioClient: &minio.MinioClient{
-			Settings: MinioSettings{
-				Endpoint:        "84.252.133.175:9000",
-				AccessKeyID:     "minioadmin",
-				SecretAccessKey: "minioadmin",
-				UseSSL:          false,
+		Context: &HandleContext{
+			MinioClient: &minio.MinioClient{
+				Settings: MinioSettings{
+					Endpoint:        "84.252.133.175:9000",
+					AccessKeyID:     "minioadmin",
+					SecretAccessKey: "minioadmin",
+					UseSSL:          false,
+				},
 			},
-		},
-		redisClient: &redis.RedisClient{
-			Settings: redisOriginal.Options{
-				Addr:       "84.252.133.175:6379",
-				Password:   "redisadmin",
-				ClientName: "redisadmin",
+			RedisClient: &redis.RedisClient{
+				Settings: redisOriginal.Options{
+					Addr:       "84.252.133.175:6379",
+					Password:   "redisadmin",
+					ClientName: "redisadmin",
+				},
 			},
-		},
-		postgresClient: &postgres.PostgresClient{
-			Settings: PostgresSettings{
-				Host:         "84.252.133.175",
-				User:         "postgre",
-				Password:     "postgre",
-				DatabaseName: "CodePaste",
+			PostgresClient: &postgres.PostgresClient{
+				Settings: PostgresSettings{
+					Host:         "84.252.133.175",
+					User:         "postgre",
+					Password:     "postgre",
+					DatabaseName: "CodePaste",
+				},
+			},
+			SessionStore: &SessionStore{
+				Key: []byte("some hash"),
 			},
 		},
 	}
 
-	server.serverImpl.minioClient.CreateClient()
-	server.serverImpl.redisClient.CreateClient()
-	server.serverImpl.postgresClient.OpenConnection()
+	server.serverImpl.Context.Initialize()
 }
 
 func (server *ClientServer) StartServer() {
@@ -56,6 +60,7 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/check_password/{resourceUuid}", server.serverImpl.CheckResourcePassword)
 	http.HandleFunc("/create_user", server.serverImpl.CreateUser)
 	http.HandleFunc("/check_account_password", server.serverImpl.CheckAccountPassword)
+	http.HandleFunc("/get_resources", server.serverImpl.GetUserResources)
 
 	err := http.ListenAndServe(":90", nil)
 	if err != nil {

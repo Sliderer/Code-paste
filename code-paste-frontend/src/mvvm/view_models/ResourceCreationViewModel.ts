@@ -1,5 +1,5 @@
 import crypto from "crypto-browserify";
-import { getCurrentNickname } from "../../helpers/SessionController";
+import { getCurrentId, getCurrentNickname } from "../../helpers/SessionController";
 import { ZlibEncode } from "../../helpers/ZlibModule";
 import ClientServerAPI from "../api/ClientServerAPI";
 
@@ -43,9 +43,11 @@ export class ResourceCreationViewModel {
 
   async uploadResource() {
     const compressedText = await ZlibEncode(this.model.text);
+    let userId = getCurrentId();
     let userName = getCurrentNickname();
 
-    if (!userName) {
+    if (userId === null) {
+      userId = "temp";
       userName = "temp";
     }
     let folderPath = this.model.folderPath;
@@ -55,6 +57,7 @@ export class ResourceCreationViewModel {
 
     this.clientAPI
       .uploadDocument(
+        userId!,
         userName!,
         this.model.fileName,
         this.model.password,

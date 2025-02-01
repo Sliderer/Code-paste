@@ -2,37 +2,38 @@ package handlers
 
 import (
 	. "client_backend/lib"
-	. "client_backend/minio"
-	. "client_backend/redis"
+	. "client_backend/models"
+	. "client_backend/postgres/models"
 	response "client_backend/responses"
 	"io"
 	"log"
+	"strings"
 )
 
-func GetResourceMetaData(resourceUuid string, redisClient *RedisClient) response.ResourceMetaData {
-	resourceMetaData := redisClient.GetResourceMetaData(resourceUuid)
+func GetResourceMetaData(resourceUuid string, context *HandleContext) response.ResourceMetaDataResponse {
+	resourceMetaData := context.RedisClient.GetResourceMetaData(resourceUuid)
 
-	return response.ResourceMetaData{
+	return response.ResourceMetaDataResponse{
 		IsPrivate: resourceMetaData.HasPassword(),
 		Owner:     resourceMetaData.Owner,
-		Name:      resourceMetaData.Name,
+		Name:      resourceMetaData.Title,
 	}
 }
 
-func ResourcePasswordCheck(resourceUuid string, passwordToCheck string, redisClient *RedisClient) response.PredicateResponse {
+func ResourcePasswordCheck(resourceUuid string, passwordToCheck string, context *HandleContext) response.PredicateResponse {
 	hashedPassword := GetHash(passwordToCheck)
-	resourceMetaData := redisClient.GetResourceMetaData(resourceUuid)
+	resourceMetaData := context.RedisClient.GetResourceMetaData(resourceUuid)
 
 	return response.PredicateResponse{
 		Result: resourceMetaData.Password == hashedPassword,
 	}
 }
 
-func GetResourceData(resourceUuid string, redisClient *RedisClient, minioClient *MinioClient) ([]byte, error) {
-	resourceMetaData := redisClient.GetResourceMetaData(resourceUuid)
-	resourceFullPath := resourceMetaData.Path + "/" + resourceMetaData.Name
-	log.Println(resourceFullPath)
-	octetData, err := minioClient.DownloadFile(resourceMetaData.Owner, resourceFullPath)
+func GetResourceData(resourceUuid string, context *HandleContext) ([]byte, error) {
+	resourceMetaData := context.RedisClient.GetResourceMetaData(resourceUuid)
+	resourceFullPath := resourceMetaData.Path + "/" + resourceMetaData.Title
+
+	octetData, err := context.MinioClient.DownloadFile(resourceMetaData.Owner, resourceFullPath)
 
 	if err != nil {
 		return nil, err
@@ -44,4 +45,26 @@ func GetResourceData(resourceUuid string, redisClient *RedisClient, minioClient 
 	}
 
 	return textData, nil
+}
+
+func GetUserResources(userId string, offset int, context *HandleContext) ([]ResourcePreview, error) {
+	var userResources []UserResources
+
+	result := context.PostgresClient.Database.Offset(offset).Limit(1).Select("resource_id").Where("user_id = ?", userId).Find(&userResources)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	resourcePreviews := make([]ResourcePreview, len(userResources))
+	for index, resource := range userResources {
+		log.Println("Found resource: ", resource.ResourceId)
+		resourceMetaData := context.RedisClient.GetResourceMetaData(resource.ResourceId)
+		resourcePreviews[index] = ResourcePreview{
+			Title:   resourceMetaData.Title[:strings.LastIndex(resourceMetaData.Title, ".")],
+			Preview: resourceMetaData.Preview,
+		}
+	}
+
+	return resourcePreviews, nil
 }

@@ -1,6 +1,6 @@
 package responses
 
-type ResourceMetaData struct {
+type ResourceMetaDataResponse struct {
 	IsPrivate bool
 	Owner     string
 	Name      string

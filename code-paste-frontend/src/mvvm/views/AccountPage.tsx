@@ -6,6 +6,9 @@ import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import ResourcePreviewPanel from "../../ui/moleculas/ResourcePreviewPanel";
 import { ResourcePreviewProps } from "../../ui/atoms/ResourcePreview";
+import CurrentUserAccount from "../../ui/organisms/CurrentUserAccount";
+import OtherUserAccount from "../../ui/organisms/OtherUserAccount";
+import { useEffect } from "react";
 
 const AccountPage = observer(
   ({ viewModel }: { viewModel: AccountViewModel }) => {
@@ -16,39 +19,32 @@ const AccountPage = observer(
     const nickname = location.pathname.split("/").reverse()[0];
 
     const resourcePreviewProps: ResourcePreviewProps = {
-      showAuthor: false
-    }
+      showAuthor: false,
+    };
+
+    useEffect(() => {
+      if (viewModel.account.resourcesList.length === 0) {
+        viewModel.getUsersResources();
+      }
+    }, []);
 
     return (
       <Box className={styles.basicPanel} sx={{}}>
         <Stack spacing={10} sx={{ justifyContent: "center", width: "100%" }}>
-          <Stack
-            direction={"row"}
-            spacing={10}
-            justifyContent={"center"}
-            alignItems={"center"}
-            sx={{ display: "flex" }}
-          >
-            <Typography
-              className={styles.headerStyle}
-              sx={{ fontSize: 50, fontWeight: "bold" }}
-            >
-              {nickname}
-            </Typography>
-            <Typography>E-mail</Typography>
-            <Typography>Telegram</Typography>
-            <Button
-              className={styles.publishButton}
-              sx={{
-                background: theme.palette.primary.main,
-                color: theme.palette.primary.dark,
-                borderRadius: 2,
-              }}
-            >
-              Подписаться на публикации
-            </Button>
-          </Stack>
-          <ResourcePreviewPanel resources={viewModel.getUsersResources()} resourcePreviewProps={resourcePreviewProps}/>
+          {currentNickname !== nickname ? (
+            <OtherUserAccount nickname={nickname} />
+          ) : (
+            <CurrentUserAccount
+              nickname={nickname}
+              email={"email"}
+              telegram="telegram"
+            />
+          )}
+
+          <ResourcePreviewPanel
+            resources={viewModel.account.resourcesList}
+            resourcePreviewProps={resourcePreviewProps}
+          />
         </Stack>
       </Box>
     );

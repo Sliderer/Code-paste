@@ -3,17 +3,17 @@ package handlers
 import (
 	"bytes"
 	. "client_backend/lib"
-	. "client_backend/minio"
 	. "client_backend/models"
-	. "client_backend/redis"
+	. "client_backend/postgres/models"
 	"compress/gzip"
 	"io"
 	"log"
+	"strings"
 	"time"
 	"unicode/utf8"
 )
 
-func CreateResource(body []byte, userName, filePassword, fileName, folderName string, redisClient *RedisClient, minioClient *MinioClient) string {
+func CreateResource(body []byte, userId, userName, filePassword, fileName, folderName string, context *HandleContext) string {
 	decompressed, err := gzip.NewReader(bytes.NewReader(body))
 	if err != nil {
 		log.Fatalln("Encoding gzip error: ", err)
@@ -30,7 +30,9 @@ func CreateResource(body []byte, userName, filePassword, fileName, folderName st
 
 	fileName += ".txt"
 	filePath := folderName + "/" + fileName
-	go minioClient.UploadFile(userName, filePath, document, int64(utf8.RuneCountInString(document)), resultChannel)
+	userName = strings.ToLower(userName)
+
+	go context.MinioClient.UploadFile(userName, filePath, document, int64(utf8.RuneCountInString(document)), resultChannel)
 	select {
 	case err := <-resultChannel:
 		if err != nil {
@@ -38,18 +40,24 @@ func CreateResource(body []byte, userName, filePassword, fileName, folderName st
 		}
 	}
 
-	hashString := userName + fileName + time.Now().String()
+	hashString := userId + fileName + time.Now().String()
 	resourceUuid := GetHash(hashString)
 	passwordHash := ""
 	if len(filePassword) > 0 {
 		passwordHash = GetHash(filePassword)
 	}
 
-	go redisClient.UploadResourceMetaData(resourceUuid, &ResourceMetaData{
-		Name:     fileName,
+	context.RedisClient.UploadResourceMetaData(resourceUuid, &ResourceMetaData{
+		Title:     fileName,
 		Path:     folderName,
 		Owner:    userName,
 		Password: passwordHash,
+		Preview: document[:min(len(document), 100)],
+	})
+
+	context.PostgresClient.Database.Create(&UserResources{
+		UserId:     userId,
+		ResourceId: resourceUuid,
 	})
 
 	return resourceUuid

@@ -2,35 +2,31 @@ package handlers
 
 import (
 	. "client_backend/lib"
-	. "client_backend/postgres"
 	. "client_backend/postgres/models"
 	response "client_backend/responses"
-	"log"
 )
 
-func CreateUser(userName, email, password string, postgresClient *PostgresClient) error {
-	log.Println(userName)
+func CreateUser(userName, email, password string, context *HandleContext) (string, error) {
 	hashedPassword := GetHash(password)
 	userId := GetHash(userName + email)
-	result := postgresClient.Database.Create(&User{
+	result := context.PostgresClient.Database.Create(&User{
 		Id:       userId,
 		Name:     userName,
 		Email:    email,
 		Password: hashedPassword,
 	})
 
-	return result.Error
+	return userId, result.Error
 }
 
-func CheckAccountPassword(userName, password string, postgresClient *PostgresClient) (response.PredicateResponse, error) {
+func CheckAccountPassword(userName, password string, context *HandleContext) (response.PredicateResponse, error) {
 	hashedPassword := GetHash(password)
-	result := postgresClient.Database.Take(&User{
-		Name:     userName,
-		Password: hashedPassword,
-	})
+	var user User
+	result := context.PostgresClient.Database.Where("name = ? AND password = ?", userName, hashedPassword).Take(&user)
 
 	return response.PredicateResponse{
 		Result: result.RowsAffected > 0,
+		UserId: user.Id,
 	}, result.Error
 }
 

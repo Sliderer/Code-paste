@@ -5,10 +5,11 @@ import (
 )
 
 type ResourceMetaData struct {
-	Name     string `json:"Name"`
+	Title     string `json:"Title"`
 	Path     string `json:"Path"`
 	Owner    string `json:"Owner"`
 	Password string `json:"Password"`
+	Preview  string `json:"Preview"`
 }
 
 func (i ResourceMetaData) MarshalBinary() ([]byte, error) {

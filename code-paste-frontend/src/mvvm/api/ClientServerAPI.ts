@@ -6,6 +6,7 @@ class ClientServerAPI {
   }
 
   async uploadDocument(
+    userId: string,
     userName: string,
     fileName: string,
     password: string,
@@ -13,8 +14,10 @@ class ClientServerAPI {
     data: Uint8Array
   ) {
     let promise = await axios.post(`/upload_resource`, data, {
+      withCredentials: true,
       headers: {
-        User: userName,
+        UserId: userId,
+        UserName: userName,
         Password: password,
         FileName: fileName,
         FolderName: folderName,
@@ -25,13 +28,14 @@ class ClientServerAPI {
   }
 
   async getResourceMetaData(resourceUuid: string) {
-    let promise = await axios.get(`/get_resource_meta/${resourceUuid}`);
+    let promise = await axios.get(`/get_resource_meta/${resourceUuid}`, {      withCredentials: true,});
 
     return promise;
   }
 
   async checkResourcePassword(resourceUuid: string, password: string) {
     let promise = await axios.get(`/check_password/${resourceUuid}`, {
+      withCredentials: true,
       headers: {
         Password: password,
       },
@@ -42,6 +46,7 @@ class ClientServerAPI {
 
   async getResourceData(resourceUuid: string, password: string) {
     let promise = await axios.get(`/get_resource/${resourceUuid}`, {
+      withCredentials: true,
       headers: {
         Password: password,
       },
@@ -52,6 +57,7 @@ class ClientServerAPI {
 
   async createUser(userName: string, email: string, password: string) {
     let promise = await axios.post(`/create_user`, {}, {
+      withCredentials: true,
       headers: {
         UserName: userName,
         Password: password,
@@ -65,10 +71,23 @@ class ClientServerAPI {
 
   async checkPassword(userName: string, password: string) {
     let promise = await axios.get(`/check_account_password`, {
+      withCredentials: true,
       headers: {
         UserName: userName,
         Password: password,
       },
+    });
+
+    return promise;
+  }
+
+  async getUserResources(userId: string, offset: number) {
+    let promise = await axios.get(`/get_resources`, {
+      withCredentials: true,
+      headers: {
+        Offset: offset,
+        UserId: userId
+      }
     });
 
     return promise;
