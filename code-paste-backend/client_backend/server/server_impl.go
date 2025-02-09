@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type ServerImpl struct {
@@ -43,7 +44,8 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 
 	if r.Method == "GET" {
 		resourceUuid := r.PathValue("resourceUuid")
-		resourceMetaData := GetResourceMetaData(resourceUuid, serverImpl.Context)
+		session, _ := serverImpl.Context.SessionStore.GetSession(r)
+		resourceMetaData := GetResourceMetaData(resourceUuid, strings.ToLower(session.GetUserName()), serverImpl.Context)
 		response, err := json.Marshal(resourceMetaData)
 
 		if err != nil {
@@ -170,5 +172,16 @@ func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Re
 		})
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
+	}
+}
+
+func (serverImpl *ServerImpl) Logout(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w)
+
+	if r.Method == "GET" {
+		session, _ := serverImpl.Context.SessionStore.GetSession(r)
+		session.SetAuthenticated(false)
+		session.SetUserName("")
+		w.WriteHeader(http.StatusOK)
 	}
 }

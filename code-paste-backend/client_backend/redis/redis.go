@@ -29,7 +29,7 @@ func (redisClient *RedisClient) GetResourceMetaData(uuid string) ResourceMetaDat
 	err := json.Unmarshal([]byte(redisClient.Client.Get(context.Background(), uuid).Val()), &data)
 
 	if err != nil {
-		log.Println("Error getting resource metadata: ", err)
+		log.Println("Error getting resource metadata redis: ", err)
 	}
 	return data
 }

@@ -1,9 +1,7 @@
 import { makeObservable, observable } from "mobx";
 import ClientServerAPI from "../api/ClientServerAPI";
-import {
-  setCurrentId,
-  setCurrentNickname,
-} from "../../helpers/SessionController";
+import customSesionStorage from "../../helpers/SessionController";
+
 
 export class EnterViewModel {
   private clientServerAPI: ClientServerAPI;
@@ -18,8 +16,8 @@ export class EnterViewModel {
     this.clientServerAPI.checkPassword(userName, password).then((data) => {
       if (data.data.Result) {
         this.userName = userName;
-        setCurrentNickname(userName);
-        setCurrentId(data.data.UserId);
+        customSesionStorage.getUserName().setValue(userName);
+        customSesionStorage.getUserId().setValue(data.data.UserId);
       }
     });
   }

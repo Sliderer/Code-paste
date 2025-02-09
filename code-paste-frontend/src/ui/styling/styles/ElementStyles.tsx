@@ -39,6 +39,12 @@ function cunstructStyles(theme: Theme) {
         ...basicStyles.basicPanel,
     };
 
+    const panelWithShadow = {
+        ...basicStyles.basicShadow,
+        ...basicStyles.basicPanel,
+        borderRadius: 10
+    }
+
     const settingsPanel = {
         ...basicStyles.basicShadow,
         display: "block",
@@ -124,7 +130,8 @@ function cunstructStyles(theme: Theme) {
         radioButton: radioButton,
         settingsTextInput: settingsTextInput,
         selectPanel: selectPanel,
-        selectMenuItem: selectMenuItem
+        selectMenuItem: selectMenuItem,
+        panelWithShadow: panelWithShadow
     }
 }
 

@@ -16,7 +16,6 @@ const ResourcePreview = ({
 }) => {
   const theme = useTheme();
   const styles = useStyles(theme);
-
   return (
     <Link
       style={{

@@ -1,11 +1,10 @@
-import crypto from "crypto-browserify";
-import { getCurrentId, getCurrentNickname } from "../../helpers/SessionController";
 import { ZlibEncode } from "../../helpers/ZlibModule";
 import ClientServerAPI from "../api/ClientServerAPI";
 
 import ResourceCreationModel from "../models/ResourceCreationModel";
 import { makeObservable, observable } from "mobx";
 import { HighlightSharp } from "@mui/icons-material";
+import customSesionStorage from "../../helpers/SessionController";
 
 export class ResourceCreationViewModel {
   @observable createdResource: string | undefined = undefined;
@@ -43,8 +42,8 @@ export class ResourceCreationViewModel {
 
   async uploadResource() {
     const compressedText = await ZlibEncode(this.model.text);
-    let userId = getCurrentId();
-    let userName = getCurrentNickname();
+    let userId = customSesionStorage.getUserId().getValue();
+    let userName = customSesionStorage.getUserName().getValue();
 
     if (userId === null) {
       userId = "temp";

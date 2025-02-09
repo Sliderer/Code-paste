@@ -3,15 +3,25 @@ import {
   ResourceFetchingStatus,
 } from "../../helpers/ResourceFetchingStatus";
 
-class ResourceModel {
-  isPrivate: boolean | undefined = undefined;
-  owner: string | undefined = undefined;
-  name: string | undefined = undefined;
-  resource: ResourceFetchingStatus = {
-    text: "",
-    status: FetchingStatus.NotStarted,
-  };
-  resourceUuid: string | undefined = undefined;
+type ResourceModel = {
+  isPrivate: boolean | undefined;
+  owner: string | undefined;
+  name: string | undefined;
+  resource: ResourceFetchingStatus;
+  resourceUuid: string | undefined;
+}
+
+export const getDefaultResourceModel = () : ResourceModel => {
+  return {
+    isPrivate: undefined,
+    owner: undefined,
+    name: undefined,
+    resource: {
+      text: '',
+      status: FetchingStatus.NotStarted
+    },
+    resourceUuid: undefined
+  }
 }
 
 export default ResourceModel;

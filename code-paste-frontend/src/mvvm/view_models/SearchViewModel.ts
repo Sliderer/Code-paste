@@ -10,7 +10,7 @@ export class SearchViewModel {
     }
 
     getUsersResources = () => {
-        return this.account.resourcesList;
+        return [];
     }
 }
 

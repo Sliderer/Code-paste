@@ -1,15 +1,18 @@
 import { makeObservable, observable } from "mobx";
-import ResourceModel from "../models/ResourceModel";
+import ResourceModel, {
+  getDefaultResourceModel,
+} from "../models/ResourceModel";
 import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 import ClientServerAPI from "../api/ClientServerAPI";
-import { getCurrentNickname } from "../../helpers/SessionController";
-
+import customSesionStorage from "../../helpers/SessionController";
 export class ResourceDemonstrationViewModel {
   @observable isPasswordEntered = false;
-  @observable resourceModel: ResourceModel = new ResourceModel();
+  @observable inSharingMode = false;
+  @observable resourceModel: ResourceModel;
   clientServerAPI: ClientServerAPI;
 
   constructor() {
+    this.resourceModel = getDefaultResourceModel();
     this.clientServerAPI = new ClientServerAPI();
     makeObservable(this);
   }
@@ -20,14 +23,16 @@ export class ResourceDemonstrationViewModel {
       .getResourceMetaData(resourceUuid)
       .then(async (data) => {
         this.resourceModel = {
-          isPrivate: data.data.IsPrivate,
+          isPrivate: !data.data.IsPrivateForCurrentUser
+            ? false
+            : data.data.IsPrivate,
           name: data.data.Name,
           resource: this.resourceModel.resource,
           resourceUuid: this.resourceModel.resourceUuid,
           owner: this.resourceModel.owner,
         };
 
-        if (data.data.IsPrivate === false) {
+        if (this.resourceModel.isPrivate === false) {
           this.getResourceData("");
         }
       })
@@ -36,8 +41,16 @@ export class ResourceDemonstrationViewModel {
       });
   };
 
+  clearResource = () => {
+    this.resourceModel = getDefaultResourceModel();
+  };
+
   getResource = () => {
-    return this.resourceModel.resource;
+    return this.resourceModel.resource!;
+  };
+
+  disableShareMode = () => {
+    this.inSharingMode = false;
   };
 
   getActions = () => {
@@ -51,23 +64,26 @@ export class ResourceDemonstrationViewModel {
       {
         title: "Скопировать",
         action: async () => {
-          await navigator.clipboard.writeText(this.resourceModel.resource.text);
+          await navigator.clipboard.writeText(
+            this.resourceModel.resource!.text
+          );
         },
       },
       {
         title: "Поделиться",
-        action: () => {},
+        action: () => {
+          this.inSharingMode = true;
+        },
       },
     ];
 
-    if (getCurrentNickname() !== null) {
+    if (customSesionStorage.getUserName().getValue() !== null) {
       actions.push({
         title: "В избранное",
         action: () => {},
       });
     }
 
-    console.log(this.resourceModel.owner);
     if (this.resourceModel.owner && this.resourceModel.owner !== "temp") {
       actions.push({
         title: "Автор",
@@ -124,7 +140,6 @@ export class ResourceDemonstrationViewModel {
       resourceUuid: this.resourceModel.resourceUuid,
       owner: this.resourceModel.owner,
     };
-
     this.clientServerAPI
       .getResourceData(this.resourceModel.resourceUuid!, password)
       .then((data) => {

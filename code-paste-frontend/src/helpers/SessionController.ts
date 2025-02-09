@@ -1,15 +1,41 @@
-export const getCurrentNickname = () => {
-    return sessionStorage.getItem('user_name');
+class StorageItem {
+  private itemName: string;
+
+  constructor(itemName: string) {
+    this.itemName = itemName;
+  }
+
+  setValue(value: string) {
+    sessionStorage.setItem(this.itemName, value);
+  }
+
+  getValue() {
+    return sessionStorage.getItem(this.itemName);
+  }
+
+  removeValue() {
+    return sessionStorage.removeItem(this.itemName);
+  }
 }
 
-export const setCurrentNickname = (userName: string) => {
-    sessionStorage.setItem('user_name', userName);
+class CustomSesionStorage {
+  private userName = 'user_name';
+  private userId = 'user_id';
+
+  private storageItems = new Map<string, StorageItem>([
+    [this.userName, new StorageItem(this.userName)],
+    [this.userId, new StorageItem(this.userId)],
+  ]);
+
+  getUserName() : StorageItem {
+    return this.storageItems.get(this.userName)!
+  }
+
+  getUserId() : StorageItem {
+    return this.storageItems.get(this.userId)!
+  }
 }
 
-export const setCurrentId = (userId: string) => {
-    sessionStorage.setItem('user_id', userId);
-}
+const customSesionStorage = new CustomSesionStorage();
 
-export const getCurrentId = () => {
-    return sessionStorage.getItem('user_id');
-}
+export default customSesionStorage;

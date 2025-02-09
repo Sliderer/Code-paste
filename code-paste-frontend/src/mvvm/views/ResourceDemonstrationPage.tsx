@@ -1,4 +1,4 @@
-import { Box, Container, useTheme } from "@mui/material";
+import { Box, Container, Stack, useTheme } from "@mui/material";
 import { observer } from "mobx-react";
 import { useParams, RoutesProps, useLocation } from "react-router-dom";
 import { ResourceDemonstrationViewModel } from "../view_models/ResourceDemonstrationViewModel";
@@ -9,6 +9,9 @@ import { ResourceAction } from "../../helpers/ResourceAction";
 import LoadingPanel from "../../ui/atoms/LoadingPanel";
 import { useEffect, useState } from "react";
 import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
+import { createPortal } from "react-dom";
+import Popup from "reactjs-popup";
+import SharePopup from "../../ui/moleculas/SharePopup";
 
 const ResourceDemonstrationPage = observer(
   ({ viewModel }: { viewModel: ResourceDemonstrationViewModel }) => {
@@ -20,13 +23,19 @@ const ResourceDemonstrationPage = observer(
       viewModel.getActions()
     );
 
+    const clearPage = () => {
+      viewModel.clearResource();
+      window.removeEventListener("popstate", clearPage);
+    };
+
     useEffect(() => {
       const resourceUuid = location.pathname.split("/").reverse()[0];
       viewModel.setResourceUuid(resourceUuid);
+      window.addEventListener("popstate", clearPage);
     }, []);
 
     useEffect(() => {
-      if (viewModel.resourceModel.resource.status == FetchingStatus.Finished) {
+      if (viewModel.resourceModel.resource!.status == FetchingStatus.Finished) {
         setActions(viewModel.getActions());
       }
     }, [viewModel.resourceModel]);
@@ -42,7 +51,12 @@ const ResourceDemonstrationPage = observer(
 
     return (
       <Box className={styles.basicPanel}>
-        {viewModel.needToAskPassword() ? (
+        {viewModel.inSharingMode ? (
+          <SharePopup
+            resourceUuid={viewModel.resourceModel.resourceUuid!}
+            goBack={viewModel.disableShareMode}
+          />
+        ) : viewModel.needToAskPassword() ? (
           <ResourcePasswordPanel onCheckButtonClick={viewModel.checkPassword} />
         ) : (
           <ResourceDemonstrationPanel

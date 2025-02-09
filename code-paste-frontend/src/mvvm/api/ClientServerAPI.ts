@@ -28,7 +28,9 @@ class ClientServerAPI {
   }
 
   async getResourceMetaData(resourceUuid: string) {
-    let promise = await axios.get(`/get_resource_meta/${resourceUuid}`, {      withCredentials: true,});
+    let promise = await axios.get(`/get_resource_meta/${resourceUuid}`, {
+      withCredentials: true,
+    });
 
     return promise;
   }
@@ -56,18 +58,21 @@ class ClientServerAPI {
   }
 
   async createUser(userName: string, email: string, password: string) {
-    let promise = await axios.post(`/create_user`, {}, {
-      withCredentials: true,
-      headers: {
-        UserName: userName,
-        Password: password,
-        Email: email,
-      },
-    });
+    let promise = await axios.post(
+      `/create_user`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          UserName: userName,
+          Password: password,
+          Email: email,
+        },
+      }
+    );
 
     return promise;
   }
-
 
   async checkPassword(userName: string, password: string) {
     let promise = await axios.get(`/check_account_password`, {
@@ -86,8 +91,16 @@ class ClientServerAPI {
       withCredentials: true,
       headers: {
         Offset: offset,
-        UserId: userId
-      }
+        UserId: userId,
+      },
+    });
+
+    return promise;
+  }
+
+  async logOut() {
+    let promise = await axios.get(`/logout`, {
+      withCredentials: true,
     });
 
     return promise;

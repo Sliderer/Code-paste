@@ -1,13 +1,13 @@
-import { Box, Stack, Typography, useTheme } from "@mui/material";
+import { Stack, useTheme } from "@mui/material";
 import HeaderProfilePanelIcon from "../atoms/header/HeaderProfilePanelIcon";
 import { useStyles } from "../styling/styles/ElementStyles";
 import { Link } from "react-router-dom";
-import { getCurrentNickname } from "../../helpers/SessionController";
+import customSesionStorage from "../../helpers/SessionController";
 
 const HeaderProfilePanel = () => {
   const theme = useTheme();
   const styles = useStyles(theme);
-  const nickname = getCurrentNickname();
+  const nickname = customSesionStorage.getUserName().getValue();
   
   return (
     <Stack direction={"row"} sx={{ display: "flex", alignItems: "center" }}>

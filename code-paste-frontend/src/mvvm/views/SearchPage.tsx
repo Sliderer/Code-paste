@@ -1,17 +1,17 @@
 import { observer } from "mobx-react";
-import { getCurrentNickname } from "../../helpers/SessionController";
 import { useLocation } from "react-router-dom";
-import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Stack, useTheme } from "@mui/material";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import ResourcePreviewPanel from "../../ui/moleculas/ResourcePreviewPanel";
 import { SearchViewModel } from "../view_models/SearchViewModel";
 import { ResourcePreviewProps } from "../../ui/atoms/ResourcePreview";
+import customSesionStorage from "../../helpers/SessionController";
 
 const SearchPage = observer(
   ({ viewModel }: { viewModel: SearchViewModel }) => {
     const theme = useTheme();
     const styles = useStyles(theme);
-    const currentNickname = getCurrentNickname();
+    const currentNickname = customSesionStorage.getUserName().getValue();
     const location = useLocation();
     const nickname = location.pathname.split("/").reverse()[0];
 

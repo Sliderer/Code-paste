@@ -1,32 +1,38 @@
 import { observer } from "mobx-react";
 import { AccountViewModel } from "../view_models/AccountViewModel";
-import { getCurrentNickname } from "../../helpers/SessionController";
 import { useLocation } from "react-router-dom";
-import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Button, Stack, useTheme } from "@mui/material";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import ResourcePreviewPanel from "../../ui/moleculas/ResourcePreviewPanel";
 import { ResourcePreviewProps } from "../../ui/atoms/ResourcePreview";
 import CurrentUserAccount from "../../ui/organisms/CurrentUserAccount";
 import OtherUserAccount from "../../ui/organisms/OtherUserAccount";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import customSesionStorage from "../../helpers/SessionController";
 
 const AccountPage = observer(
   ({ viewModel }: { viewModel: AccountViewModel }) => {
     const theme = useTheme();
     const styles = useStyles(theme);
-    const currentNickname = getCurrentNickname();
+    const currentNickname = customSesionStorage.getUserName().getValue();
     const location = useLocation();
     const nickname = location.pathname.split("/").reverse()[0];
+    const [reloadTrigger, setReloadTrigger] = useState(0);
 
     const resourcePreviewProps: ResourcePreviewProps = {
       showAuthor: false,
     };
 
     useEffect(() => {
-      if (viewModel.account.resourcesList.length === 0) {
+      if (viewModel.resourcesList.length === 0) {
         viewModel.getUsersResources();
       }
     }, []);
+
+    const logout = () => {
+      viewModel.logOut();
+      window.location.reload();
+    }
 
     return (
       <Box className={styles.basicPanel} sx={{}}>
@@ -38,13 +44,15 @@ const AccountPage = observer(
               nickname={nickname}
               email={"email"}
               telegram="telegram"
+              logOut={viewModel.logOut}
             />
           )}
 
           <ResourcePreviewPanel
-            resources={viewModel.account.resourcesList}
+            resources={viewModel.resourcesList}
             resourcePreviewProps={resourcePreviewProps}
           />
+          <Button onClick={logout}>Еще</Button>
         </Stack>
       </Box>
     );

@@ -10,6 +10,14 @@ type ClientSession struct {
 	Session *Session
 }
 
+func getSessionValue[T any](session *Session, key string) T {
+	if !session.Values["IsAuthenticated"].(bool) {
+		var emptyResult T
+		return emptyResult
+	}
+	return session.Values[key].(T)
+}
+
 func (session *ClientSession) Save(r *http.Request, w http.ResponseWriter) {
 	session.Session.Save(r, w)
 }
@@ -23,7 +31,7 @@ func (session *ClientSession) SetAuthenticated(value bool) {
 }
 
 func (session *ClientSession) GetUserName() string {
-	return session.Session.Values["UserName"].(string)
+	return getSessionValue[string](session.Session, "UserName")
 }
 
 func (session *ClientSession) SetUserName(value string) {

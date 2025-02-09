@@ -1,20 +1,16 @@
-import { extendObservable, makeObservable, observable } from "mobx";
-import ResourcePreviewModel from "./ResourcePreviewModel";
-import { getCurrentId, getCurrentNickname } from "../../helpers/SessionController";
+import customSesionStorage from "../../helpers/SessionController";
 
 class AccountModel {
     id: string = ''
     nickname: string = ''
     email: string = ''
     telegram: string = ''
-    resourcesList: ResourcePreviewModel[] = []
 
     constructor() {
-        extendObservable(this, {
-            resourcesList: this.resourcesList
-        });
-        this.id = getCurrentId()!;
-        this.nickname = getCurrentNickname()!;
+        const id = customSesionStorage.getUserId().getValue();
+        const nickname = customSesionStorage.getUserName().getValue();
+        this.id = id ? id : '';
+        this.nickname = nickname ? nickname : '';
     }
 }
 

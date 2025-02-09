@@ -10,13 +10,13 @@ import (
 	"strings"
 )
 
-func GetResourceMetaData(resourceUuid string, context *HandleContext) response.ResourceMetaDataResponse {
+func GetResourceMetaData(resourceUuid, requestSenderName string, context *HandleContext) response.ResourceMetaDataResponse {
 	resourceMetaData := context.RedisClient.GetResourceMetaData(resourceUuid)
-
 	return response.ResourceMetaDataResponse{
-		IsPrivate: resourceMetaData.HasPassword(),
-		Owner:     resourceMetaData.Owner,
-		Name:      resourceMetaData.Title,
+		IsPrivate:               resourceMetaData.HasPassword(),
+		IsPrivateForCurrentUser: resourceMetaData.Owner != requestSenderName,
+		Owner:                   resourceMetaData.Owner,
+		Name:                    resourceMetaData.Title,
 	}
 }
 
@@ -50,7 +50,7 @@ func GetResourceData(resourceUuid string, context *HandleContext) ([]byte, error
 func GetUserResources(userId string, offset int, context *HandleContext) ([]ResourcePreview, error) {
 	var userResources []UserResources
 
-	result := context.PostgresClient.Database.Offset(offset).Limit(1).Select("resource_id").Where("user_id = ?", userId).Find(&userResources)
+	result := context.PostgresClient.Database.Offset(offset).Limit(30).Select("resource_id").Where("user_id = ?", userId).Find(&userResources)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -61,8 +61,10 @@ func GetUserResources(userId string, offset int, context *HandleContext) ([]Reso
 		log.Println("Found resource: ", resource.ResourceId)
 		resourceMetaData := context.RedisClient.GetResourceMetaData(resource.ResourceId)
 		resourcePreviews[index] = ResourcePreview{
-			Title:   resourceMetaData.Title[:strings.LastIndex(resourceMetaData.Title, ".")],
-			Preview: resourceMetaData.Preview,
+			Title:        resourceMetaData.Title[:strings.LastIndex(resourceMetaData.Title, ".")],
+			Preview:      resourceMetaData.Preview,
+			ResourceUuid: resource.ResourceId,
+			Author:       resourceMetaData.Owner,
 		}
 	}
 

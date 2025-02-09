@@ -1,7 +1,7 @@
-import { Stack, Typography, useTheme } from "@mui/material";
+import { Button, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../styling/styles/ElementStyles";
 
-const CurrentUserAccount = ({nickname, email, telegram} : {nickname: string, email: string, telegram: string}) => {
+const CurrentUserAccount = ({nickname, email, telegram, logOut} : {nickname: string, email: string, telegram: string, logOut: () => void}) => {
   const theme = useTheme();
   const styles = useStyles(theme);
   return (
@@ -21,6 +21,7 @@ const CurrentUserAccount = ({nickname, email, telegram} : {nickname: string, ema
         </Typography>
         <Typography>E-mail</Typography>
         <Typography>Telegram</Typography>
+        <Button className={styles.createResourcePanel} onClick={logOut}>Выйти</Button>
       </Stack>
     </>
   );
