@@ -25,6 +25,7 @@ const AccountPage = observer(
 
     useEffect(() => {
       if (viewModel.resourcesList.length === 0) {
+        console.log('sending')
         viewModel.getUsersResources();
       }
     }, []);
@@ -44,7 +45,7 @@ const AccountPage = observer(
               nickname={nickname}
               email={"email"}
               telegram="telegram"
-              logOut={viewModel.logOut}
+              logOut={logout}
             />
           )}
 
@@ -52,7 +53,7 @@ const AccountPage = observer(
             resources={viewModel.resourcesList}
             resourcePreviewProps={resourcePreviewProps}
           />
-          <Button onClick={logout}>Еще</Button>
+          <Button onClick={viewModel.getUsersResources}>Еще</Button>
         </Stack>
       </Box>
     );

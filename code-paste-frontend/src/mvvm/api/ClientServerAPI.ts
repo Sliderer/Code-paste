@@ -87,6 +87,7 @@ class ClientServerAPI {
   }
 
   async getUserResources(userId: string, offset: number) {
+    console.log(userId, offset)
     let promise = await axios.get(`/get_resources`, {
       withCredentials: true,
       headers: {

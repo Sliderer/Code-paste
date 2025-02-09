@@ -65,7 +65,7 @@ export class ResourceCreationViewModel {
       )
       .then((data) => {
         this.createdResource = data.data;
-        console.log(data.data);
+        this.model = new ResourceCreationModel();
       });
   }
 }

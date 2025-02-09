@@ -29,7 +29,7 @@ const EnterPage = observer(({ viewModel }: { viewModel: EnterViewModel }) => {
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
         backgroundClip: "0px",
-        minHeight: "100vh",
+        height: "100vh",
       }}
     >
       <Box className={styles.centerPanel}>

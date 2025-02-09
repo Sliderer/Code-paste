@@ -5,15 +5,15 @@ import ResourcePreviewModel from "../models/ResourcePreviewModel";
 import customSessionStorage from "../../helpers/SessionController";
 
 export class AccountViewModel {
-  @observable account: AccountModel;
+  @observable account: AccountModel | undefined = undefined;
   @observable.shallow resourcesList: ResourcePreviewModel[] = [];
   private clientServerAPI: ClientServerAPI;
   private loadedResourcesCount = 0;
 
   constructor() {
-    makeObservable(this);
     this.clientServerAPI = new ClientServerAPI();
-    this.account = new AccountModel();
+
+    makeObservable(this);
   }
 
   logOut = () => {
@@ -26,6 +26,10 @@ export class AccountViewModel {
   }
 
   getUsersResources = () => {
+    if (this.account === undefined) {
+      this.account = new AccountModel();
+    }
+
     this.clientServerAPI
       .getUserResources(this.account.id, this.loadedResourcesCount)
       .then((data) => {

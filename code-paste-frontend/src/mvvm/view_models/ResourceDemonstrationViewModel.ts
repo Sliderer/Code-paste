@@ -22,6 +22,7 @@ export class ResourceDemonstrationViewModel {
     this.clientServerAPI
       .getResourceMetaData(resourceUuid)
       .then(async (data) => {
+        console.log(data.data)
         this.resourceModel = {
           isPrivate: !data.data.IsPrivateForCurrentUser
             ? false
