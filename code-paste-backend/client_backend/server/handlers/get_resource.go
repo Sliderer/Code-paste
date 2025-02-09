@@ -6,31 +6,39 @@ import (
 	. "client_backend/postgres/models"
 	response "client_backend/responses"
 	"io"
-	"log"
 	"strings"
 )
 
-func GetResourceMetaData(resourceUuid, requestSenderName string, context *HandleContext) response.ResourceMetaDataResponse {
-	resourceMetaData := context.RedisClient.GetResourceMetaData(resourceUuid)
+func GetResourceMetaData(resourceUuid, requestSenderName string, context *HandleContext) (response.ResourceMetaDataResponse, error) {
+	resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
+	if err != nil {
+		return response.ResourceMetaDataResponse{}, err
+	}
+
 	return response.ResourceMetaDataResponse{
 		IsPrivate:               resourceMetaData.HasPassword(),
-		IsPrivateForCurrentUser: resourceMetaData.Owner != requestSenderName,
+		IsPrivateForCurrentUser: resourceMetaData.Owner != GetUserBucketName(requestSenderName),
 		Owner:                   resourceMetaData.Owner,
 		Name:                    resourceMetaData.Title,
-	}
+	}, nil
 }
 
-func ResourcePasswordCheck(resourceUuid string, passwordToCheck string, context *HandleContext) response.PredicateResponse {
+func ResourcePasswordCheck(resourceUuid string, passwordToCheck string, context *HandleContext) (response.PredicateResponse, error) {
 	hashedPassword := GetHash(passwordToCheck)
-	resourceMetaData := context.RedisClient.GetResourceMetaData(resourceUuid)
-
+	resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
+	if err != nil {
+		return response.PredicateResponse{}, err
+	}
 	return response.PredicateResponse{
 		Result: resourceMetaData.Password == hashedPassword,
-	}
+	}, nil
 }
 
 func GetResourceData(resourceUuid string, context *HandleContext) ([]byte, error) {
-	resourceMetaData := context.RedisClient.GetResourceMetaData(resourceUuid)
+	resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
+	if err != nil {
+		return nil, err
+	}
 	resourceFullPath := resourceMetaData.Path + "/" + resourceMetaData.Title
 
 	octetData, err := context.MinioClient.DownloadFile(resourceMetaData.Owner, resourceFullPath)
@@ -58,8 +66,12 @@ func GetUserResources(userId string, offset int, context *HandleContext) ([]Reso
 
 	resourcePreviews := make([]ResourcePreview, len(userResources))
 	for index, resource := range userResources {
-		log.Println("Found resource: ", resource.ResourceId)
-		resourceMetaData := context.RedisClient.GetResourceMetaData(resource.ResourceId)
+
+		resourceMetaData, err := context.RedisClient.GetResourceMetaData(resource.ResourceId)
+		if err != nil {
+			return nil, err
+		}
+
 		resourcePreviews[index] = ResourcePreview{
 			Title:        resourceMetaData.Title[:strings.LastIndex(resourceMetaData.Title, ".")],
 			Preview:      resourceMetaData.Preview,

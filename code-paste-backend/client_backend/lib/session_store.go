@@ -16,6 +16,7 @@ func (sessionStore *SessionStore) CreateCookieStore() {
 }
 
 func (sessionStore *SessionStore) GetSession(request *http.Request) (*ClientSession, error) {
-	session, err := sessionStore.store.Get(request, "sessionId")
+	session, err := sessionStore.store.Get(request, "session_id")
+
 	return &ClientSession{Session: session}, err
 }

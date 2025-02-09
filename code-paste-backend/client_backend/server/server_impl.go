@@ -4,10 +4,8 @@ import (
 	. "client_backend/responses"
 	. "client_backend/server/handlers"
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type ServerImpl struct {
@@ -30,7 +28,11 @@ func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *ht
 	if r.Method == "GET" {
 		resourceUuid := r.PathValue("resourceUuid")
 		passwordToCheck := r.Header.Get("Password")
-		result := ResourcePasswordCheck(resourceUuid, passwordToCheck, serverImpl.Context)
+		result, err := ResourcePasswordCheck(resourceUuid, passwordToCheck, serverImpl.Context)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		resultJson, _ := json.Marshal(result)
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
@@ -44,12 +46,18 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 
 	if r.Method == "GET" {
 		resourceUuid := r.PathValue("resourceUuid")
+
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
-		resourceMetaData := GetResourceMetaData(resourceUuid, strings.ToLower(session.GetUserName()), serverImpl.Context)
+
+		resourceMetaData, err := GetResourceMetaData(resourceUuid, session.GetUserName(), serverImpl.Context)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		response, err := json.Marshal(resourceMetaData)
 
 		if err != nil {
-			log.Println("Error getting resource metadata: ", err)
+
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -111,7 +119,7 @@ func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request)
 		userId, err := CreateUser(userName, email, password, serverImpl.Context)
 
 		if err != nil {
-			log.Println("Error creating user: ", err)
+
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -162,7 +170,7 @@ func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Re
 
 		resourcesPreview, err := GetUserResources(userId, offset, serverImpl.Context)
 		if err != nil {
-			log.Println("Can not get user resources: ", err)
+
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -170,6 +178,7 @@ func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Re
 		resultJson, _ := json.Marshal(&UserResources{
 			Resources: resourcesPreview,
 		})
+
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
 	}
@@ -182,6 +191,7 @@ func (serverImpl *ServerImpl) Logout(w http.ResponseWriter, r *http.Request) {
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
 		session.SetAuthenticated(false)
 		session.SetUserName("")
+		session.Save(r, w)
 		w.WriteHeader(http.StatusOK)
 	}
 }

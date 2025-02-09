@@ -8,7 +8,6 @@ import (
 	"compress/gzip"
 	"io"
 	"log"
-	"strings"
 	"time"
 	"unicode/utf8"
 )
@@ -30,13 +29,13 @@ func CreateResource(body []byte, userId, userName, filePassword, fileName, folde
 
 	fileName += ".txt"
 	filePath := folderName + "/" + fileName
-	userName = strings.ToLower(userName)
+	userName = GetUserBucketName(userName)
 
 	go context.MinioClient.UploadFile(userName, filePath, document, int64(utf8.RuneCountInString(document)), resultChannel)
 	select {
 	case err := <-resultChannel:
 		if err != nil {
-			log.Println("Error uploading the file: ", err)
+
 		}
 	}
 
@@ -48,11 +47,11 @@ func CreateResource(body []byte, userId, userName, filePassword, fileName, folde
 	}
 
 	context.RedisClient.UploadResourceMetaData(resourceUuid, &ResourceMetaData{
-		Title:     fileName,
+		Title:    fileName,
 		Path:     folderName,
 		Owner:    userName,
 		Password: passwordHash,
-		Preview: document[:min(len(document), 100)],
+		Preview:  document[:min(len(document), 100)],
 	})
 
 	context.PostgresClient.Database.Create(&UserResources{

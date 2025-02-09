@@ -4,7 +4,6 @@ import (
 	. "client_backend/models"
 	"context"
 	"encoding/json"
-	"log"
 
 	redis "github.com/redis/go-redis/v9"
 )
@@ -23,13 +22,13 @@ func (redisClient *RedisClient) UploadResourceMetaData(uuid string, metaData *Re
 	redisClient.Client.Set(context.Background(), uuid, metaData, 0)
 }
 
-func (redisClient *RedisClient) GetResourceMetaData(uuid string) ResourceMetaData {
+func (redisClient *RedisClient) GetResourceMetaData(uuid string) (ResourceMetaData, error) {
 	var data ResourceMetaData
-	log.Println(redisClient.Client.Get(context.Background(), uuid).Val())
-	err := json.Unmarshal([]byte(redisClient.Client.Get(context.Background(), uuid).Val()), &data)
+	resultString := redisClient.Client.Get(context.Background(), uuid).Val()
+	err := json.Unmarshal([]byte(resultString), &data)
 
 	if err != nil {
-		log.Println("Error getting resource metadata redis: ", err)
+
 	}
-	return data
+	return data, err
 }

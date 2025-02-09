@@ -53,7 +53,7 @@ func (server *ClientServer) InitFields() {
 }
 
 func (server *ClientServer) StartServer() {
-	log.Print("Starting server")
+
 	http.HandleFunc("/upload_resource", server.serverImpl.UploadDocument)
 	http.HandleFunc("/get_resource/{resourceUuid}", server.serverImpl.GetResourceData)
 	http.HandleFunc("/get_resource_meta/{resourceUuid}", server.serverImpl.GetResourceMetaData)

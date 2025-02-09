@@ -52,7 +52,7 @@ func (minioClient *MinioClient) DownloadFile(bucketName, filePath string) (io.Re
 	options.Header().Add("Content-Type", "plain/text")
 	result, err := minioClient.client.GetObject(context.Background(), bucketName, filePath, options)
 	if err != nil {
-		log.Print("Error downloading resource: ", err)
+
 	}
 
 	return result, nil

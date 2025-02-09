@@ -11,7 +11,8 @@ type ClientSession struct {
 }
 
 func getSessionValue[T any](session *Session, key string) T {
-	if !session.Values["IsAuthenticated"].(bool) {
+	isAuthenticated, exists := session.Values["IsAuthenticated"]
+	if !exists || !isAuthenticated.(bool) {
 		var emptyResult T
 		return emptyResult
 	}
