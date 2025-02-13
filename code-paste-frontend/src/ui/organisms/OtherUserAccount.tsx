@@ -1,7 +1,7 @@
 import { Button, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../styling/styles/ElementStyles";
 
-const OtherUserAccount = ({nickname} : {nickname: string}) => {
+const OtherUserAccount = ({nickname, subscribeOnPublications} : {nickname: string, subscribeOnPublications: (publisher: string) => void}) => {
   const theme = useTheme();
   const styles = useStyles(theme);
   return (
@@ -26,6 +26,7 @@ const OtherUserAccount = ({nickname} : {nickname: string}) => {
             color: theme.palette.primary.dark,
             borderRadius: 2,
           }}
+          onClick={() => subscribeOnPublications(nickname)}
         >
           Подписаться на публикации
         </Button>

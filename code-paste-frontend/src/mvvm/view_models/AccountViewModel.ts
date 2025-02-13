@@ -7,40 +7,62 @@ import customSessionStorage from "../../helpers/SessionController";
 export class AccountViewModel {
   @observable account: AccountModel | undefined = undefined;
   @observable.shallow resourcesList: ResourcePreviewModel[] = [];
+  @observable redirectToEnder: boolean = false;
   private clientServerAPI: ClientServerAPI;
   private loadedResourcesCount = 0;
 
   constructor() {
     this.clientServerAPI = new ClientServerAPI();
-
     makeObservable(this);
   }
 
   logOut = () => {
-    this.clientServerAPI.logOut().then(
-      _ => {
-        customSessionStorage.getUserId().removeValue();
-        customSessionStorage.getUserName().removeValue();
-      }
-    );
-  }
+    this.clientServerAPI.logOut().then((_) => {
+      customSessionStorage.getUserId().removeValue();
+      customSessionStorage.getUserName().removeValue();
+    });
+  };
+
+  subscribeOnPublications = (publisher: string) => {
+    if (customSessionStorage.getUserId().getValue() == null) {
+      this.redirectToEnder = true;
+    }
+  };
+
+  getUserMetaData = (userName: string) => {
+    this.clientServerAPI.getUserMetaData(userName).then((data) => {
+      this.account = {
+        id: data.data.UserId,
+        userName: userName,
+      };
+      this.getUsersResources();
+    });
+  };
 
   getUsersResources = () => {
-    if (this.account === undefined) {
-      this.account = new AccountModel();
-    }
-
     this.clientServerAPI
-      .getUserResources(this.account.id, this.loadedResourcesCount)
+      .getUserResources(this.account!.id, this.loadedResourcesCount)
       .then((data) => {
-        data.data.Resources.map((resource:  { Title: string; Preview: string, ResourceUuid: string, Author: string }) => {
-          this.refresh(resource);
-        });
+        data.data.Resources.map(
+          (resource: {
+            Title: string;
+            Preview: string;
+            ResourceUuid: string;
+            Author: string;
+          }) => {
+            this.refresh(resource);
+          }
+        );
         this.loadedResourcesCount += data.data.Resources.length;
       });
   };
 
-  @action refresh(resource: { Title: string; Preview: string, ResourceUuid: string, Author: string }) {
+  @action refresh(resource: {
+    Title: string;
+    Preview: string;
+    ResourceUuid: string;
+    Author: string;
+  }) {
     this.resourcesList = [
       ...this.resourcesList,
       {

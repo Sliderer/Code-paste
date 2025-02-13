@@ -1,9 +1,11 @@
 package server
 
 import (
+	"client_backend/responses"
 	. "client_backend/responses"
 	. "client_backend/server/handlers"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -170,7 +172,6 @@ func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Re
 
 		resourcesPreview, err := GetUserResources(userId, offset, serverImpl.Context)
 		if err != nil {
-
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -181,6 +182,8 @@ func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Re
 
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
+	} else {
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
@@ -193,5 +196,26 @@ func (serverImpl *ServerImpl) Logout(w http.ResponseWriter, r *http.Request) {
 		session.SetUserName("")
 		session.Save(r, w)
 		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func (serverImpl *ServerImpl) GetUserMetadata(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w)
+
+	if r.Method == "GET" {
+		userName := r.Header.Get("UserName")
+		userId, err := GetUserMetaData(userName, serverImpl.Context)
+		if err != nil {
+			log.Println("Can not get user metadata: ", err)
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		resultJson, _ := json.Marshal(&responses.UserMetaData{
+			UserId: userId,
+		})
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(resultJson)
 	}
 }

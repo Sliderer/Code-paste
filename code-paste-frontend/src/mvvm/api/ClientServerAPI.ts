@@ -87,7 +87,6 @@ class ClientServerAPI {
   }
 
   async getUserResources(userId: string, offset: number) {
-    console.log(userId, offset)
     let promise = await axios.get(`/get_resources`, {
       withCredentials: true,
       headers: {
@@ -102,6 +101,17 @@ class ClientServerAPI {
   async logOut() {
     let promise = await axios.get(`/logout`, {
       withCredentials: true,
+    });
+
+    return promise;
+  }
+
+  async getUserMetaData(userName: string) {
+    let promise = await axios.get(`/get_user_metadata`, {
+      withCredentials: true,
+      headers: {
+        UserName: userName
+      },
     });
 
     return promise;

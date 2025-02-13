@@ -62,6 +62,7 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/check_account_password", server.serverImpl.CheckAccountPassword)
 	http.HandleFunc("/get_resources", server.serverImpl.GetUserResources)
 	http.HandleFunc("/logout", server.serverImpl.Logout)
+	http.HandleFunc("/get_user_metadata", server.serverImpl.GetUserMetadata)
 
 	err := http.ListenAndServe(":90", nil)
 	if err != nil {

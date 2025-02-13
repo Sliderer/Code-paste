@@ -6,6 +6,7 @@ import (
 	. "client_backend/postgres/models"
 	response "client_backend/responses"
 	"io"
+	"log"
 	"strings"
 )
 
@@ -61,6 +62,7 @@ func GetUserResources(userId string, offset int, context *HandleContext) ([]Reso
 	result := context.PostgresClient.Database.Offset(offset).Limit(30).Select("resource_id").Where("user_id = ?", userId).Find(&userResources)
 
 	if result.Error != nil {
+		log.Println("Error in db: ", result.Error)
 		return nil, result.Error
 	}
 
@@ -69,6 +71,7 @@ func GetUserResources(userId string, offset int, context *HandleContext) ([]Reso
 
 		resourceMetaData, err := context.RedisClient.GetResourceMetaData(resource.ResourceId)
 		if err != nil {
+			log.Println("Error in redis: ", err)
 			return nil, err
 		}
 

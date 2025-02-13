@@ -1,6 +1,8 @@
 package notificators
 
-import "net/smtp"
+import (
+	"net/smtp"
+)
 
 type EmailNotificator struct {
 	OurAddress    string
@@ -19,6 +21,7 @@ func (notificator *EmailNotificator) Notificate(message, reciever string) error 
 	recievers := []string{
 		reciever,
 	}
+
 	err := smtp.SendMail(notificator.ServerAddress, notificator.Auth, notificator.OurAddress, recievers, []byte(message))
 	return err
 }

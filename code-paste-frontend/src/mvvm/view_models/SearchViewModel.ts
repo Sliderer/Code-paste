@@ -2,11 +2,10 @@ import { makeObservable, observable } from "mobx";
 import AccountModel from "../models/AccountModel";
 
 export class SearchViewModel {
-    @observable account: AccountModel;
+    @observable account: AccountModel | undefined = undefined;
 
     constructor() {
         makeObservable(this);
-        this.account = new AccountModel();
     }
 
     getUsersResources = () => {
