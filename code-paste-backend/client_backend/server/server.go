@@ -63,6 +63,8 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/get_resources", server.serverImpl.GetUserResources)
 	http.HandleFunc("/logout", server.serverImpl.Logout)
 	http.HandleFunc("/get_user_metadata", server.serverImpl.GetUserMetadata)
+	http.HandleFunc("/update_user_contacts", server.serverImpl.UpdateUserContacts)
+	http.HandleFunc("/like_resource", server.serverImpl.LikeResource)
 
 	err := http.ListenAndServe(":90", nil)
 	if err != nil {

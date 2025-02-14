@@ -22,6 +22,6 @@ func (postgresClient *PostgresClient) OpenConnection() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	database.AutoMigrate(&User{}, &Subscribtions{}, &UserResources{})
+	database.AutoMigrate(&User{}, &Subscribtions{}, &UserResources{}, &LikedResources{})
 	postgresClient.Database = database
 }

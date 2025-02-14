@@ -9,7 +9,7 @@ export class ResourceDemonstrationViewModel {
   @observable isPasswordEntered = false;
   @observable inSharingMode = false;
   @observable resourceModel: ResourceModel;
-  clientServerAPI: ClientServerAPI;
+  private clientServerAPI: ClientServerAPI;
 
   constructor() {
     this.resourceModel = getDefaultResourceModel();
@@ -22,7 +22,7 @@ export class ResourceDemonstrationViewModel {
     this.clientServerAPI
       .getResourceMetaData(resourceUuid)
       .then(async (data) => {
-        console.log(data.data)
+        console.log(data.data);
         this.resourceModel = {
           isPrivate: !data.data.IsPrivateForCurrentUser
             ? false
@@ -81,7 +81,12 @@ export class ResourceDemonstrationViewModel {
     if (customSesionStorage.getUserName().getValue() !== null) {
       actions.push({
         title: "В избранное",
-        action: () => {},
+        action: () => {
+          this.clientServerAPI.likeResource(
+            customSesionStorage.getUserId().getValue()!,
+            this.resourceModel.resourceUuid!,
+          );
+        },
       });
     }
 

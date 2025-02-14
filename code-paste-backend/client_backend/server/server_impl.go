@@ -1,7 +1,7 @@
 package server
 
 import (
-	"client_backend/responses"
+	. "client_backend/requests"
 	. "client_backend/responses"
 	. "client_backend/server/handlers"
 	"encoding/json"
@@ -18,7 +18,7 @@ func SetDefaultHeaders(w http.ResponseWriter) http.ResponseWriter {
 	w.Header().Set("Content-Type", "*")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	w.Header().Set("Access-Control-Max-Age", "15")
-	w.Header().Set("Access-Control-Allow-Headers", "content-type, userId, offset, username, email, password, foldername, user, filename, cookie")
+	w.Header().Set("Access-Control-Allow-Headers", "content-type, userId, value, field, offset, username, email, password, foldername, user, filename, cookie")
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 	return w
@@ -204,18 +204,57 @@ func (serverImpl *ServerImpl) GetUserMetadata(w http.ResponseWriter, r *http.Req
 
 	if r.Method == "GET" {
 		userName := r.Header.Get("UserName")
-		userId, err := GetUserMetaData(userName, serverImpl.Context)
+		userMetaData, err := GetUserMetaData(userName, serverImpl.Context)
 		if err != nil {
 			log.Println("Can not get user metadata: ", err)
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 
-		resultJson, _ := json.Marshal(&responses.UserMetaData{
-			UserId: userId,
-		})
+		resultJson, _ := json.Marshal(userMetaData)
 
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
+	}
+}
+
+func (serverImpl *ServerImpl) UpdateUserContacts(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w)
+
+	if r.Method == "POST" {
+		log.Println(r.Header)
+		userId := r.Header.Get("UserId")
+		value := r.Header.Get("Value")
+		field := r.Header.Get("Field")
+		err := UpdateUserContacts(userId, value, field, serverImpl.Context)
+
+		if err != nil {
+			log.Println("Error updating user contacts: ", err)
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}
+
+func (serverImpl *ServerImpl) LikeResource(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w)
+
+	if r.Method == "POST" {
+		len := r.ContentLength
+		body := make([]byte, len)
+		r.Body.Read(body)
+		log.Println(string(body))
+		var requestBody LikeResourceRequest
+		json.Unmarshal(body, &requestBody)
+
+		err := LikeResource(requestBody, serverImpl.Context)
+
+		if err != nil {
+			log.Println("Error updating user contacts: ", err)
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusOK)
+		}
 	}
 }

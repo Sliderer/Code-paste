@@ -1,8 +1,23 @@
 import { Button, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../styling/styles/ElementStyles";
 import ChangableText from "../atoms/ChangableText";
+import ValidationResult from "../../helpers/ValidationResult";
 
-const CurrentUserAccount = ({nickname, email, telegram, logOut} : {nickname: string, email: string, telegram: string, logOut: () => void}) => {
+const CurrentUserAccount = ({
+  nickname,
+  email,
+  telegram,
+  logOut,
+  updateContact,
+  validateContact,
+}: {
+  nickname: string;
+  email: string;
+  telegram: string;
+  logOut: () => void;
+  updateContact: (value: string, field: string) => void;
+  validateContact: (value: string, field: string) => ValidationResult;
+}) => {
   const theme = useTheme();
   const styles = useStyles(theme);
   return (
@@ -11,18 +26,36 @@ const CurrentUserAccount = ({nickname, email, telegram, logOut} : {nickname: str
         direction={"row"}
         spacing={10}
         justifyContent={"center"}
-        alignItems={"center"}
+        alignItems={"top"}
+        alignContent={"top"}
+        textAlign={"left"}
         sx={{ display: "flex" }}
       >
-        <Typography
-          className={styles.headerStyle}
-          sx={{ fontSize: 50, fontWeight: "bold" }}
-        >
-          {nickname}
-        </Typography>
-        <ChangableText defaultText="email" validate={(value: string) => { return true;}} onChange={(value: string) => {}}/>
-        <ChangableText defaultText="telegram" validate={(value: string) => { return true;}} onChange={(value: string) => {}}/>
-        <Button className={styles.createResourcePanel} onClick={logOut}>Выйти</Button>
+        <Stack>
+          <Stack direction={"row"} spacing={10}>
+            <Typography
+              className={styles.headerStyle}
+              sx={{ textAlign: "top", fontSize: 50, fontWeight: "bold" }}
+            >
+              {nickname}
+            </Typography>
+
+            <Button className={styles.createResourcePanel} onClick={logOut}>
+              Выйти
+            </Button>
+          </Stack>
+
+          <ChangableText
+            defaultText={email}
+            validate={(value: string) => validateContact(value, "email")}
+            onChange={(value: string) => updateContact(value, "email")}
+          />
+          <ChangableText
+            defaultText={telegram}
+            validate={(value: string) => validateContact(value, "telegram")}
+            onChange={(value: string) => updateContact(value, "telegram")}
+          />
+        </Stack>
       </Stack>
     </>
   );

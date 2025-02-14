@@ -3,6 +3,7 @@ import AccountModel from "../models/AccountModel";
 import ClientServerAPI from "../api/ClientServerAPI";
 import ResourcePreviewModel from "../models/ResourcePreviewModel";
 import customSessionStorage from "../../helpers/SessionController";
+import ValidationResult from "../../helpers/ValidationResult";
 
 export class AccountViewModel {
   @observable account: AccountModel | undefined = undefined;
@@ -34,10 +35,28 @@ export class AccountViewModel {
       this.account = {
         id: data.data.UserId,
         userName: userName,
+        email: data.data.Email,
+        telegram: data.data.Telegram
       };
       this.getUsersResources();
     });
   };
+
+  updateContact = (value: string, field: string) => {
+    this.clientServerAPI.updateUserContacts(this.account!.id, value, field).then(
+      _ => {
+        console.log('contacts updated')
+      }
+    )
+  }
+
+  validateContact = (value: string, field: string) : ValidationResult => {
+    if (field === "email") {
+      return this.validateEmail(value);
+    } else {
+      return this.validateTelegram(value);
+    }
+  }
 
   getUsersResources = () => {
     this.clientServerAPI
@@ -72,6 +91,34 @@ export class AccountViewModel {
         author: resource.Author,
       },
     ];
+  }
+
+  private validateEmail = (value: string) : ValidationResult => {
+    if (value.length === 0) {
+      return {
+        result: false,
+        error: "Поле не может быть пустым"
+      }
+    }
+
+    return {
+      result: true,
+      error: ""
+    }
+  }
+
+  private validateTelegram = (value: string) : ValidationResult => {
+    if (value.length === 0) {
+      return {
+        result: false,
+        error: "Поле не может быть пустым"
+      }
+    }
+
+    return {
+      result: true,
+      error: ""
+    }
   }
 }
 

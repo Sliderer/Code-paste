@@ -110,9 +110,41 @@ class ClientServerAPI {
     let promise = await axios.get(`/get_user_metadata`, {
       withCredentials: true,
       headers: {
-        UserName: userName
+        UserName: userName,
       },
     });
+
+    return promise;
+  }
+
+  async updateUserContacts(userId: string, value: string, field: string) {
+    let promise = await axios.post(
+      `/update_user_contacts`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          UserId: userId,
+          Value: value,
+          Field: field,
+        },
+      }
+    );
+
+    return promise;
+  }
+
+  async likeResource(userId: string, resourceUuid: string) {
+    let promise = await axios.post(
+      `/like_resource`,
+      {
+        UserId: userId,
+        ResourceUuid: resourceUuid,
+      },
+      {
+        withCredentials: true,
+      }
+    );
 
     return promise;
   }

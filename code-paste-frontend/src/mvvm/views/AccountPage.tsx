@@ -25,15 +25,7 @@ const AccountPage = observer(
 
     useEffect(() => {
       if (viewModel.account === undefined) {
-        if (currentNickname !== nickname) {
-          viewModel.getUserMetaData(nickname);
-        } else {
-          viewModel.account = {
-            userName: currentNickname,
-            id: customSesionStorage.getUserId().getValue()!
-          }
-          viewModel.getUsersResources();
-        }
+        viewModel.getUserMetaData(nickname);
       }
     }, []);
 
@@ -49,6 +41,10 @@ const AccountPage = observer(
       }
     }, [viewModel.redirectToEnder])
 
+    if (viewModel.account === undefined) {
+      return <></>
+    }
+
     return (
       <Box className={styles.basicPanel} sx={{}}>
         <Stack spacing={10} sx={{ justifyContent: "center", width: "100%" }}>
@@ -57,9 +53,11 @@ const AccountPage = observer(
           ) : (
             <CurrentUserAccount
               nickname={nickname}
-              email={"email"}
-              telegram="telegram"
+              email={viewModel.account!.email}
+              telegram={viewModel.account!.telegram}
               logOut={logout}
+              validateContact={viewModel.validateContact}
+              updateContact={viewModel.updateContact}
             />
           )}
 

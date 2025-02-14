@@ -1,5 +1,7 @@
 package responses
 
 type UserMetaData struct {
-	UserId string
+	UserId   string
+	Email    string
+	Telegram string
 }
