@@ -27,9 +27,12 @@ class ClientServerAPI {
     return promise;
   }
 
-  async getResourceMetaData(resourceUuid: string) {
+  async getResourceMetaData(userId: string, resourceUuid: string) {
     let promise = await axios.get(`/get_resource_meta/${resourceUuid}`, {
       withCredentials: true,
+      headers: {
+        UserId: userId,
+      },
     });
 
     return promise;

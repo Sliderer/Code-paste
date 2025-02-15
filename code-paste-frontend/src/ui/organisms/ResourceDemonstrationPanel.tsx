@@ -12,18 +12,17 @@ const ResourceDemonstrationPanel = ({
   resource,
   actions,
 }: {
-  resource: ResourceFetchingStatus;
-  actions: ResourceAction[];
+  resource: ResourceFetchingStatus,
+  actions: ResourceAction[]
 }) => {
   const theme = useTheme();
   const styles = useStyles(theme);
-
   return (
     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
     <Stack spacing={5}>
       <Stack direction={"row"} spacing={4} justifyContent={"center"}>
-        {actions.map((action) => (
-          <ResourceActionButton action={action} />
+        {actions.map((action, index) => (
+          <ResourceActionButton key={index} action={action} />
         ))}
       </Stack>
       <Box

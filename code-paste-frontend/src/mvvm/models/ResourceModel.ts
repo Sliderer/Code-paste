@@ -9,19 +9,21 @@ type ResourceModel = {
   name: string | undefined;
   resource: ResourceFetchingStatus;
   resourceUuid: string | undefined;
-}
+  isLiked: boolean;
+};
 
-export const getDefaultResourceModel = () : ResourceModel => {
+export const getDefaultResourceModel = (): ResourceModel => {
   return {
     isPrivate: undefined,
     owner: undefined,
     name: undefined,
     resource: {
-      text: '',
-      status: FetchingStatus.NotStarted
+      text: "",
+      status: FetchingStatus.NotStarted,
     },
-    resourceUuid: undefined
-  }
-}
+    resourceUuid: undefined,
+    isLiked: false
+  };
+};
 
 export default ResourceModel;

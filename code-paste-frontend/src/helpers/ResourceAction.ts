@@ -1,4 +1,5 @@
 export type ResourceAction = {
-    title: string,
+    title: string
     action: Function
+    isActive: boolean
 }

@@ -18,11 +18,7 @@ const ResourceDemonstrationPage = observer(
     const theme = useTheme();
     const styles = useStyles(theme);
     const location = useLocation();
-
-    const [actions, setActions] = useState<ResourceAction[]>(
-      viewModel.getActions()
-    );
-
+  
     const clearPage = () => {
       viewModel.clearResource();
       window.removeEventListener("popstate", clearPage);
@@ -33,12 +29,6 @@ const ResourceDemonstrationPage = observer(
       viewModel.setResourceUuid(resourceUuid);
       window.addEventListener("popstate", clearPage);
     }, []);
-
-    useEffect(() => {
-      if (viewModel.resourceModel.resource!.status == FetchingStatus.Finished) {
-        setActions(viewModel.getActions());
-      }
-    }, [viewModel.resourceModel]);
 
     if (
       viewModel.resourceModel.isPrivate === undefined ||
@@ -61,7 +51,7 @@ const ResourceDemonstrationPage = observer(
         ) : (
           <ResourceDemonstrationPanel
             resource={viewModel.getResource()}
-            actions={actions}
+            actions={viewModel.getActions()}
           />
         )}
       </Box>

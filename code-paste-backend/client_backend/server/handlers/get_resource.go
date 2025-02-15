@@ -10,15 +10,23 @@ import (
 	"strings"
 )
 
-func GetResourceMetaData(resourceUuid, requestSenderName string, context *HandleContext) (response.ResourceMetaDataResponse, error) {
+func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context *HandleContext) (response.ResourceMetaDataResponse, error) {
 	resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
 	if err != nil {
 		return response.ResourceMetaDataResponse{}, err
 	}
 
+	isLiked := false
+	if len(userId) > 0 {
+		var likedResourceRow LikedResources
+		result := context.PostgresClient.Database.Where("user_id = ?", userId).Find(&likedResourceRow)
+		isLiked = result.RowsAffected > 0 && likedResourceRow.IsActive
+	}
+
 	return response.ResourceMetaDataResponse{
 		IsPrivate:               resourceMetaData.HasPassword(),
 		IsPrivateForCurrentUser: resourceMetaData.Owner != GetUserBucketName(requestSenderName),
+		IsLiked:                 isLiked,
 		Owner:                   resourceMetaData.Owner,
 		Name:                    resourceMetaData.Title,
 	}, nil

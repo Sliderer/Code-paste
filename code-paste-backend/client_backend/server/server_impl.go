@@ -47,11 +47,12 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 	w = SetDefaultHeaders(w)
 
 	if r.Method == "GET" {
+		userId := r.Header.Get("UserId")
 		resourceUuid := r.PathValue("resourceUuid")
 
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
 
-		resourceMetaData, err := GetResourceMetaData(resourceUuid, session.GetUserName(), serverImpl.Context)
+		resourceMetaData, err := GetResourceMetaData(userId, resourceUuid, session.GetUserName(), serverImpl.Context)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

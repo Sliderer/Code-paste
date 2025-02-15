@@ -1,4 +1,4 @@
-import { makeObservable, observable } from "mobx";
+import { action, isAction, makeObservable, observable } from "mobx";
 import ResourceModel, {
   getDefaultResourceModel,
 } from "../models/ResourceModel";
@@ -19,10 +19,11 @@ export class ResourceDemonstrationViewModel {
 
   setResourceUuid = async (resourceUuid: string) => {
     this.resourceModel.resourceUuid = resourceUuid;
+    let userId = customSesionStorage.getUserId().getValue();
     this.clientServerAPI
-      .getResourceMetaData(resourceUuid)
+      .getResourceMetaData(userId !== null ? userId : '', resourceUuid)
       .then(async (data) => {
-        console.log(data.data);
+        console.log(data.data)
         this.resourceModel = {
           isPrivate: !data.data.IsPrivateForCurrentUser
             ? false
@@ -31,6 +32,7 @@ export class ResourceDemonstrationViewModel {
           resource: this.resourceModel.resource,
           resourceUuid: this.resourceModel.resourceUuid,
           owner: this.resourceModel.owner,
+          isLiked: data.data.IsLiked,
         };
 
         if (this.resourceModel.isPrivate === false) {
@@ -61,6 +63,7 @@ export class ResourceDemonstrationViewModel {
         action: () => {
           this.downloadResource();
         },
+        isActive: false
       },
       {
         title: "Скопировать",
@@ -69,16 +72,19 @@ export class ResourceDemonstrationViewModel {
             this.resourceModel.resource!.text
           );
         },
+        isActive: false
       },
       {
         title: "Поделиться",
         action: () => {
           this.inSharingMode = true;
         },
+        isActive: false
       },
     ];
 
     if (customSesionStorage.getUserName().getValue() !== null) {
+      console.log('push', this.resourceModel.isLiked)
       actions.push({
         title: "В избранное",
         action: () => {
@@ -87,6 +93,7 @@ export class ResourceDemonstrationViewModel {
             this.resourceModel.resourceUuid!,
           );
         },
+        isActive: this.resourceModel.isLiked
       });
     }
 
@@ -94,6 +101,7 @@ export class ResourceDemonstrationViewModel {
       actions.push({
         title: "Автор",
         action: () => {},
+        isActive: false
       });
     }
 
@@ -145,6 +153,7 @@ export class ResourceDemonstrationViewModel {
       },
       resourceUuid: this.resourceModel.resourceUuid,
       owner: this.resourceModel.owner,
+      isLiked: this.resourceModel.isLiked,
     };
     this.clientServerAPI
       .getResourceData(this.resourceModel.resourceUuid!, password)
@@ -158,6 +167,7 @@ export class ResourceDemonstrationViewModel {
           },
           resourceUuid: this.resourceModel.resourceUuid,
           owner: this.resourceModel.owner,
+          isLiked: this.resourceModel.isLiked,
         };
       })
       .catch((reason) => console.log(reason));
