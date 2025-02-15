@@ -1,4 +1,4 @@
-package models
+package requests
 
 type LikeResourceRequest struct {
 	UserId       string `json:"UserId"`

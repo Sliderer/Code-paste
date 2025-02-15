@@ -120,14 +120,13 @@ class ClientServerAPI {
   async updateUserContacts(userId: string, value: string, field: string) {
     let promise = await axios.post(
       `/update_user_contacts`,
-      {},
+      {
+        UserId: userId,
+        Value: value,
+        Field: field,
+      },
       {
         withCredentials: true,
-        headers: {
-          UserId: userId,
-          Value: value,
-          Field: field,
-        },
       }
     );
 

@@ -1,24 +1,25 @@
 package lib
 
-type ConfigParser struct {
-	configPath string
-}
+import (
+	"os"
 
-func (parser *ConfigParser) ValidateJson(configText string) bool {
-	return true
-}
+	"gopkg.in/yaml.v2"
+)
 
-func (parser *ConfigParser) ParseConfig() (bool, string) {
-	configText := ""
-	return parser.ValidateJson(configText), configText
-}
+type ConfigParser struct{}
 
-func ParseConfig(configPath string) *ServerSettings {
-	configParser := ConfigParser{configPath: configPath}
-	isParsed, _ := configParser.ParseConfig()
+func (configParser *ConfigParser) ParseConfig(configPath string) ServerSettings {
+	yamlFile, err := os.ReadFile(configPath)
 
-	if isParsed {
-		panic("Can not parse config")
+	if err != nil {
+		panic(err)
 	}
-	return &ServerSettings{port: 1}
+
+	var serverSettings ServerSettings
+	err = yaml.Unmarshal(yamlFile, &serverSettings)
+	if err != nil {
+		panic(err)
+	}
+
+	return serverSettings
 }

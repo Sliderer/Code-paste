@@ -222,11 +222,14 @@ func (serverImpl *ServerImpl) UpdateUserContacts(w http.ResponseWriter, r *http.
 	w = SetDefaultHeaders(w)
 
 	if r.Method == "POST" {
-		log.Println(r.Header)
-		userId := r.Header.Get("UserId")
-		value := r.Header.Get("Value")
-		field := r.Header.Get("Field")
-		err := UpdateUserContacts(userId, value, field, serverImpl.Context)
+		len := r.ContentLength
+		body := make([]byte, len)
+		r.Body.Read(body)
+		log.Println(string(body))
+		var requestBody UpdateUserContactsRequest
+		json.Unmarshal(body, &requestBody)
+
+		err := UpdateUserContacts(requestBody, serverImpl.Context)
 
 		if err != nil {
 			log.Println("Error updating user contacts: ", err)

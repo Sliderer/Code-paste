@@ -21,8 +21,8 @@ func GetUserMetaData(userName string, context *HandleContext) (responses.UserMet
 	}, result.Error
 }
 
-func UpdateUserContacts(userId, newValue, field string, context *HandleContext) error {
-	result := context.PostgresClient.Database.Model(&User{}).Where("id = ?", userId).Update(field, newValue)
+func UpdateUserContacts(request UpdateUserContactsRequest, context *HandleContext) error {
+	result := context.PostgresClient.Database.Model(&User{}).Where("id = ?", request.UserId).Update(request.Field, request.Value)
 	return result.Error
 }
 

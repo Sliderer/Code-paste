@@ -6,6 +6,7 @@ import (
 	"client_backend/postgres"
 	"client_backend/redis"
 	. "client_backend/server/handlers"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -13,7 +14,7 @@ import (
 )
 
 type ClientServer struct {
-	serverSettings ServerSettings
+	ServerSettings ServerSettings
 	serverImpl     ServerImpl
 }
 
@@ -21,30 +22,20 @@ func (server *ClientServer) InitFields() {
 	server.serverImpl = ServerImpl{
 		Context: &HandleContext{
 			MinioClient: &minio.MinioClient{
-				Settings: MinioSettings{
-					Endpoint:        "84.252.133.175:9000",
-					AccessKeyID:     "minioadmin",
-					SecretAccessKey: "minioadmin",
-					UseSSL:          false,
-				},
+				Settings: server.ServerSettings.MinioSettings,
 			},
 			RedisClient: &redis.RedisClient{
 				Settings: redisOriginal.Options{
-					Addr:       "84.252.133.175:6379",
-					Password:   "redisadmin",
-					ClientName: "redisadmin",
+					Addr:       server.ServerSettings.RedisSettings.Address,
+					Password:   server.ServerSettings.RedisSettings.Password,
+					ClientName: server.ServerSettings.RedisSettings.ClientName,
 				},
 			},
 			PostgresClient: &postgres.PostgresClient{
-				Settings: PostgresSettings{
-					Host:         "84.252.133.175",
-					User:         "postgre",
-					Password:     "postgre",
-					DatabaseName: "CodePaste",
-				},
+				Settings: server.ServerSettings.PostgresSettings,
 			},
 			SessionStore: &SessionStore{
-				Key: []byte("some hash"),
+				Key: []byte(server.ServerSettings.SessionKey),
 			},
 		},
 	}
@@ -66,7 +57,8 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/update_user_contacts", server.serverImpl.UpdateUserContacts)
 	http.HandleFunc("/like_resource", server.serverImpl.LikeResource)
 
-	err := http.ListenAndServe(":90", nil)
+	log.Println(server.ServerSettings.Port)
+	err := http.ListenAndServe(fmt.Sprintf(":%v", server.ServerSettings.Port), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
