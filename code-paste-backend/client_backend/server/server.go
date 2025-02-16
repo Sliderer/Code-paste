@@ -57,7 +57,6 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/update_user_contacts", server.serverImpl.UpdateUserContacts)
 	http.HandleFunc("/like_resource", server.serverImpl.LikeResource)
 
-	log.Println(server.ServerSettings.Port)
 	err := http.ListenAndServe(fmt.Sprintf(":%v", server.ServerSettings.Port), nil)
 	if err != nil {
 		log.Fatal(err)
