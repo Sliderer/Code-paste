@@ -54,7 +54,6 @@ function cunstructStyles(theme: Theme) {
         alignContent: "top",
         borderRadius: 10,
         padding: 40,
-        marginLeft: 5
     };
 
     const settingBox = {

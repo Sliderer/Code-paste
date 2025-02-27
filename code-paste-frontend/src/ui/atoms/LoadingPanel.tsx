@@ -1,11 +1,8 @@
-import { Box, CircularProgress, Stack, Typography, useTheme } from "@mui/material";
-import { useStyles } from "../styling/styles/ElementStyles";
+import { Box, CircularProgress } from "@mui/material";
+import StylingProps from "../../helpers/StylingProps";
 
-const LoadingPanel = ({progress} : {progress?: number}) => {
-    const theme = useTheme();
-    const styles = useStyles(theme);
-
-    return <Box className={styles.centerPanel}>
+const LoadingPanel = ({stylingProps, progress} : {stylingProps: StylingProps, progress?: number}) => {
+    return <Box className={stylingProps.styles.centerPanel}>
         <CircularProgress value={10} size={150} thickness={1}/>
     </Box>
 }

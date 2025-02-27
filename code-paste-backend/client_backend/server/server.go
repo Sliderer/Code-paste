@@ -1,14 +1,15 @@
 package server
 
 import (
-	. "client_backend/lib"
 	"client_backend/minio"
+	. "client_backend/models"
+	. "client_backend/models_for_server"
 	"client_backend/postgres"
 	"client_backend/redis"
-	. "client_backend/server/handlers"
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 
 	redisOriginal "github.com/redis/go-redis/v9"
 )
@@ -16,9 +17,14 @@ import (
 type ClientServer struct {
 	ServerSettings ServerSettings
 	serverImpl     ServerImpl
+	HttpClient     *http.Client
+	IAM            string
+	IAMTokenMutex  sync.Mutex
 }
 
 func (server *ClientServer) InitFields() {
+	server.HttpClient = &http.Client{}
+
 	server.serverImpl = ServerImpl{
 		Context: &HandleContext{
 			MinioClient: &minio.MinioClient{
@@ -37,10 +43,22 @@ func (server *ClientServer) InitFields() {
 			SessionStore: &SessionStore{
 				Key: []byte(server.ServerSettings.SessionKey),
 			},
+			TranslationContext: TranslationContext{
+				IAMToken:          &server.IAM,
+				TranslateFolderId: server.ServerSettings.TranslateFolderId,
+				TranslateUrl:      server.ServerSettings.TranslateUrl,
+			},
+			HttpClient: server.HttpClient,
 		},
 	}
 
 	server.serverImpl.Context.Initialize()
+}
+
+func (server *ClientServer) SetIAMToken(value string) {
+	server.IAMTokenMutex.Lock()
+	server.IAM = value
+	server.IAMTokenMutex.Unlock()
 }
 
 func (server *ClientServer) StartServer() {

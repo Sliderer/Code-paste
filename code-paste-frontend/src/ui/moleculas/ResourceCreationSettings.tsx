@@ -1,40 +1,34 @@
-import React, { ChangeEvent, useState } from "react";
-import {
-  Box,
-  Button,
-  FormControlLabel,
-  Grid,
-  Grid2,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
-  Stack,
-  TextField,
-  useTheme,
-} from "@mui/material";
+import { useState } from "react";
+import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../styling/styles/ElementStyles";
 import SettingsTextInput from "../atoms/resource_creation_settings/SettingsTextInput";
 import SettingsSelectInput from "../atoms/resource_creation_settings/SettingsSelectInput";
 type ChangeHandler = (highlightSettings: any) => void;
 
 const ResourceCreationSettings = ({
+  translateLanguages,
   onTranslateLanguageChange,
   onProgrammingLanguageChange,
   onFileNameChange,
   onFolderNameChange,
   onPasswordChange,
   onPublish,
+  error
 }: {
+  translateLanguages: string[];
   onTranslateLanguageChange: ChangeHandler;
   onProgrammingLanguageChange: ChangeHandler;
   onFileNameChange: ChangeHandler;
   onFolderNameChange: ChangeHandler;
-  onPasswordChange: ChangeHandler
+  onPasswordChange: ChangeHandler;
   onPublish: Function;
+  error: string;
 }) => {
-  const theme = useTheme();
-  const styles = useStyles(theme);
+  const stylingProps = {
+    theme: useTheme(),
+    styles: useStyles(useTheme()),
+  };
+
   const lifePeriods = [
     "Никогда не удалять",
     "1 час",
@@ -50,19 +44,21 @@ const ResourceCreationSettings = ({
     "Json",
     "Protobuf",
   ];
-  const translateLanguages = ["Русский", "Английский", "Испанский", "Немецкий"];
+
   const [lifePeriod, setLifePeriod] = useState(lifePeriods[0]);
 
   return (
-    <Box className={styles.settingsPanel}>
-      <Stack display={"grid"} spacing={5}>
+    <Box className={stylingProps.styles.settingsPanel}>
+      <Stack display={"grid"} spacing={5} sx={{width: "15vw"}}>
         <SettingsTextInput
+          stylingProps={stylingProps}
           key={"fileName"}
           placeholder="Имя"
           onChange={onFileNameChange}
         />
 
         <SettingsTextInput
+          stylingProps={stylingProps}
           key={"password"}
           placeholder="Пароль"
           type="password"
@@ -70,34 +66,38 @@ const ResourceCreationSettings = ({
         />
 
         <SettingsTextInput
+          stylingProps={stylingProps}
           key={"folderName"}
           placeholder="Название папки"
           onChange={onFolderNameChange}
         />
 
         <SettingsSelectInput
+          stylingProps={stylingProps}
           key={"lifePeriod"}
           values={lifePeriods}
           onChange={setLifePeriod}
         />
 
         <SettingsSelectInput
+          stylingProps={stylingProps}
           key={"highlitingSyntax"}
           values={syntaxHighlightingLanguages}
           onChange={setLifePeriod}
         />
 
         <SettingsSelectInput
-          key={"translateSyntax"}
+          stylingProps={stylingProps}
+          key={"translateLanguage"}
           values={translateLanguages}
-          onChange={setLifePeriod}
+          onChange={onTranslateLanguageChange}
         />
-
-        <Button
-          className={styles.publishButton}
+        <Typography sx={{textAlign: "center"}}>{error}</Typography>
+        <Button 
+          className={stylingProps.styles.publishButton}
           sx={{
-            background: theme.palette.primary.main,
-            color: theme.palette.primary.dark,
+            background: stylingProps.theme.palette.primary.main,
+            color: stylingProps.theme.palette.primary.dark,
             borderRadius: 2,
           }}
           onClick={() => onPublish()}

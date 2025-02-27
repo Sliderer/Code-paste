@@ -1,6 +1,7 @@
 package lib
 
 import (
+	. "client_backend/models"
 	"os"
 
 	"gopkg.in/yaml.v2"

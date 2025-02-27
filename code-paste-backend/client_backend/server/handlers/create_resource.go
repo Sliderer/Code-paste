@@ -4,6 +4,7 @@ import (
 	"bytes"
 	. "client_backend/lib"
 	. "client_backend/models"
+	. "client_backend/models_for_server"
 	. "client_backend/postgres/models"
 	"compress/gzip"
 	"io"
@@ -12,7 +13,7 @@ import (
 	"unicode/utf8"
 )
 
-func CreateResource(body []byte, userId, userName, filePassword, fileName, folderName string, context *HandleContext) string {
+func CreateResource(body []byte, userId, userName, language, filePassword, fileName, folderName string, context *HandleContext) string {
 	decompressed, err := gzip.NewReader(bytes.NewReader(body))
 	if err != nil {
 		log.Fatalln("Encoding gzip error: ", err)
@@ -24,7 +25,8 @@ func CreateResource(body []byte, userId, userName, filePassword, fileName, folde
 		log.Fatalln("Reading decompressed data error: ", err)
 	}
 
-	document := string(decompressedData)
+	document := Translate(decompressedData, language, context)
+
 	resultChannel := make(chan error)
 
 	fileName += ".txt"

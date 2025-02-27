@@ -1,4 +1,4 @@
-import { Stack, useTheme } from "@mui/material";
+import { Container, Stack, useTheme } from "@mui/material";
 import ResourceInputField from "../../ui/atoms/ResourceInputField";
 import ResourceCreationSettings from "../../ui/moleculas/ResourceCreationSettings";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
@@ -11,6 +11,8 @@ import { Navigate, useNavigate } from "react-router-dom";
 
 const ResourceCreationPage = observer(
   ({ viewModel }: { viewModel: ResourceCreationViewModel }) => {
+    const navigate = useNavigate();
+    const [error, setError] = useState("");
     const [programmingLanguageHighlight, setProgrammingLanguageHighlight] =
       useState<HighlightingSyntax>({
         grammar: languages.java,
@@ -23,10 +25,10 @@ const ResourceCreationPage = observer(
         language: "",
       });
 
-    const navigate = useNavigate();
-
-    const theme = useTheme();
-    const styles = useStyles(theme);
+    const stylingProps = {
+      theme: useTheme(),
+      styles: useStyles(useTheme()),
+    };
 
     useEffect(() => {
       if (viewModel.createdResource !== undefined) {
@@ -43,10 +45,9 @@ const ResourceCreationPage = observer(
       []
     );
 
-    const onTranslateLanguageChange = useCallback(
-      (highlightSettings: string) => {},
-      []
-    );
+    const onTranslateLanguageChange = useCallback((language: string) => {
+      viewModel.setLanguage(language);
+    }, []);
 
     const onFileNameChange = useCallback((value: string) => {
       viewModel.setFileName(value);
@@ -60,24 +61,37 @@ const ResourceCreationPage = observer(
       viewModel.setPassword(value);
     }, []);
 
+    const uploadResource = () => {
+      const validationResult = viewModel.validateData();
+      if (validationResult.isValid) {
+        viewModel.uploadResource();
+      } else {
+        setError(validationResult.error);
+      }
+    };
+
     return (
       <Stack
         direction={"row"}
-        className={styles.basicPanel}
-        sx={{ justifyContent: "space-between" }}
+        className={stylingProps.styles.basicPanel}
+        spacing={5}
+        sx={{ justifyContent: "space-between"}}
       >
         <ResourceInputField
+          stylingProps={stylingProps}
           highlightSyntax={programmingLanguageHighlight}
           getTextDefaultValue={viewModel.getText}
           onTextUpdate={viewModel.setText}
         />
         <ResourceCreationSettings
+          translateLanguages={viewModel.getTranslateLanguages()}
           onFileNameChange={onFileNameChange}
           onFolderNameChange={onFolderNameChange}
           onProgrammingLanguageChange={onProgrammingLanguageChange}
           onTranslateLanguageChange={onTranslateLanguageChange}
           onPasswordChange={onPasswordChange}
-          onPublish={viewModel.uploadResource}
+          onPublish={uploadResource}
+          error={error}
         />
       </Stack>
     );

@@ -1,0 +1,17 @@
+port: 90
+session-key: "key"
+minio-settings:
+  endpoint: "addr"
+  access-key-id: "user"
+  secret-access-key: "password"
+  use-ssl: false
+redis-settings:
+  address: "addr"
+  password: "user"
+  client-name: "password"
+postgres-settings:
+  host: "addr"
+  user: "user"
+  password: "password"
+  database-name: "db"
+  

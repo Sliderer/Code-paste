@@ -1,4 +1,4 @@
-package lib
+package models
 
 type RedisSettings struct {
 	Address    string `yaml:"address"`

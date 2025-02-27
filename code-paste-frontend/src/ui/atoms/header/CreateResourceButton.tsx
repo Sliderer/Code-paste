@@ -1,17 +1,15 @@
-import { Box, Button, useTheme } from "@mui/material";
-import { useStyles } from "../../styling/styles/ElementStyles";
+import { Button} from "@mui/material";
+import StylingProps from "../../../helpers/StylingProps";
 
-const CreateResourceButton = ({onClick} : {onClick: () => void}) => {
-  const theme = useTheme();
-  const styles = useStyles(theme);
+const CreateResourceButton = ({stylingProps, onClick} : {stylingProps: StylingProps, onClick: () => void}) => {
 
   return (
     <Button
-      className={styles.lightShadow}
+      className={stylingProps.styles.lightShadow}
       onClick={onClick}
       sx={{
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.dark,
+        backgroundColor: stylingProps.theme.palette.primary.main,
+        color: stylingProps.theme.palette.primary.dark,
         borderRadius: 3,
         minWidth: "200px"
       }}

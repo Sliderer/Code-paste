@@ -1,9 +1,15 @@
 import { Button, Stack, Typography, useTheme } from "@mui/material";
-import { useStyles } from "../styling/styles/ElementStyles";
+import StylingProps from "../../helpers/StylingProps";
 
-const OtherUserAccount = ({nickname, subscribeOnPublications} : {nickname: string, subscribeOnPublications: (publisher: string) => void}) => {
-  const theme = useTheme();
-  const styles = useStyles(theme);
+const OtherUserAccount = ({
+  stylingProps,
+  nickname,
+  subscribeOnPublications,
+}: {
+  stylingProps: StylingProps;
+  nickname: string;
+  subscribeOnPublications: (publisher: string) => void;
+}) => {
   return (
     <>
       <Stack
@@ -14,16 +20,16 @@ const OtherUserAccount = ({nickname, subscribeOnPublications} : {nickname: strin
         sx={{ display: "flex" }}
       >
         <Typography
-          className={styles.headerStyle}
+          className={stylingProps.styles.headerStyle}
           sx={{ fontSize: 50, fontWeight: "bold" }}
         >
           {nickname}
         </Typography>
         <Button
-          className={styles.publishButton}
+          className={stylingProps.styles.publishButton}
           sx={{
-            background: theme.palette.primary.main,
-            color: theme.palette.primary.dark,
+            background: stylingProps.theme.palette.primary.main,
+            color: stylingProps.theme.palette.primary.dark,
             borderRadius: 2,
           }}
           onClick={() => subscribeOnPublications(nickname)}

@@ -1,4 +1,4 @@
-package lib
+package models
 
 type MinioSettings struct {
 	Endpoint        string `yaml:"endpoint"`

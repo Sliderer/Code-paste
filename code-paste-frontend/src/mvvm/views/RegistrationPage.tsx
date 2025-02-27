@@ -4,15 +4,19 @@ import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import SettingsTextInput from "../../ui/atoms/resource_creation_settings/SettingsTextInput";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const RegistrationPage = observer(
   ({ viewModel }: { viewModel: RegistrationViewModel }) => {
-    const theme = useTheme();
-    const styles = useStyles(theme);
+    const stylingProps = {
+      theme: useTheme(),
+      styles: useStyles(useTheme()),
+    };
+
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
     let navigation = useNavigate();
 
     useEffect(() => {
@@ -20,6 +24,19 @@ const RegistrationPage = observer(
         navigation(`/account/${viewModel.userName}`);
       }
     }, [viewModel.userName]);
+
+    const createUser = () => {
+      const validationResult = viewModel.validateData(
+        userName,
+        email,
+        password
+      );
+      if (validationResult.isValid) {
+        viewModel.createUser(userName, email, password);
+      } else {
+        setErrorMessage(validationResult.error);
+      }
+    };
 
     return (
       <div
@@ -33,39 +50,52 @@ const RegistrationPage = observer(
           minHeight: "100vh",
         }}
       >
-        <Box className={styles.centerPanel}>
+        <Box className={stylingProps.styles.centerPanel}>
           <Stack>
             <Typography
-              className={styles.headerStyle}
+              className={stylingProps.styles.headerStyle}
               sx={{ fontSize: 30, textAlign: "center" }}
             >
               Регистрация
             </Typography>
-            <Box className={styles.settingsPanel} sx={{ background: "white" }}>
-              <Stack spacing={4}>
-                <SettingsTextInput placeholder="Имя" onChange={setUserName} />
-                <SettingsTextInput placeholder="E-mail" onChange={setEmail} />
+            <Box
+              className={stylingProps.styles.settingsPanel}
+              sx={{ background: "white" }}
+            >
+              <Stack spacing={4} sx={{ width: "40vh" }}>
                 <SettingsTextInput
+                  stylingProps={stylingProps}
+                  placeholder="Имя"
+                  onChange={setUserName}
+                />
+                <SettingsTextInput
+                  stylingProps={stylingProps}
+                  placeholder="E-mail"
+                  onChange={setEmail}
+                />
+                <SettingsTextInput
+                  stylingProps={stylingProps}
                   placeholder="Пароль"
                   type="password"
                   onChange={setPassword}
                 />
+                <Typography sx={{ textAlign: "center" }}>
+                  {errorMessage}
+                </Typography>
                 <Button
-                  className={styles.publishButton}
+                  className={stylingProps.styles.publishButton}
                   sx={{
-                    background: theme.palette.primary.main,
-                    color: theme.palette.primary.dark,
+                    background: stylingProps.theme.palette.primary.main,
+                    color: stylingProps.theme.palette.primary.dark,
                     borderRadius: 2,
                   }}
-                  onClick={() =>
-                    viewModel.createUser(userName, email, password)
-                  }
+                  onClick={createUser}
                 >
                   Зарегистрироваться
                 </Button>
                 <Link
                   style={{
-                    color: theme.palette.primary.light,
+                    color: stylingProps.theme.palette.primary.light,
                     fontSize: "15px",
                     textDecoration: "none",
                     textAlign: "center",

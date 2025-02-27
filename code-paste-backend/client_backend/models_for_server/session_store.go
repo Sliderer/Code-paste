@@ -1,4 +1,4 @@
-package lib
+package models_for_server
 
 import (
 	"net/http"

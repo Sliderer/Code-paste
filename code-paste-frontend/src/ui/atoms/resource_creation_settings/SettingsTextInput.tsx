@@ -1,9 +1,7 @@
-import { TextField, useTheme } from "@mui/material"
-import { useStyles } from "../../styling/styles/ElementStyles";
+import { TextField } from "@mui/material"
+import StylingProps from "../../../helpers/StylingProps";
 
-const SettingsTextInput = ({ placeholder, type, onChange }: { placeholder: string, type?: string, onChange?: (value: string) => void}) => {
-    const theme = useTheme();
-    const styles = useStyles(theme);
+const SettingsTextInput = ({ stylingProps, placeholder, type, onChange }: { stylingProps: StylingProps, placeholder: string, type?: string, onChange?: (value: string) => void}) => {
     return <TextField variant="standard"
         slotProps={{
             input: {
@@ -17,7 +15,7 @@ const SettingsTextInput = ({ placeholder, type, onChange }: { placeholder: strin
         }}
         placeholder={placeholder}
         type={type}
-        className={styles.settingsTextInput} sx={{paddingLeft: 1, paddingRight: 1}}></TextField>
+        className={stylingProps.styles.settingsTextInput} sx={{paddingLeft: 1, paddingRight: 1}}></TextField>
 }
 
 export default SettingsTextInput;

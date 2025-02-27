@@ -1,4 +1,4 @@
-package lib
+package models
 
 type PostgresSettings struct {
 	Host         string `yaml:"host"`

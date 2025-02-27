@@ -1,35 +1,36 @@
-import { Box, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import ResourcePreviewModel from "../../mvvm/models/ResourcePreviewModel";
-import { useStyles } from "../styling/styles/ElementStyles";
 import { Link } from "react-router-dom";
+import StylingProps from "../../helpers/StylingProps";
 
 export type ResourcePreviewProps = {
   showAuthor: boolean;
 };
 
 const ResourcePreview = ({
+  stylingProps,
   resource,
   props,
 }: {
+  stylingProps: StylingProps,
   resource: ResourcePreviewModel;
   props: ResourcePreviewProps;
 }) => {
-  const theme = useTheme();
-  const styles = useStyles(theme);
   return (
     <Link
       style={{
-        color: theme.palette.primary.dark,
+        color: stylingProps.theme.palette.primary.dark,
         textDecoration: "none",
         fontFamily: "Montserrat Alternates",
       }}
       to={`/resource/${resource.resourceUuid}`}
     >
-      <Box className={styles.basicShadow} sx={{ borderRadius: 2, padding: 1 }}>
+      <Box className={stylingProps.styles.basicShadow} sx={{ borderRadius: 2, padding: 1 }}>
         <Stack
-          direction={"column"}
-          alignItems={"left"}
-          spacing={"0.1px"}
+          direction={"row"}
+          alignItems={"center"}
+          alignContent={"center"}
+          spacing={2}
         >
           <Typography
             style={{

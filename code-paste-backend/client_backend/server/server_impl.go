@@ -1,6 +1,7 @@
 package server
 
 import (
+	. "client_backend/models_for_server"
 	. "client_backend/requests"
 	. "client_backend/responses"
 	. "client_backend/server/handlers"
@@ -14,18 +15,18 @@ type ServerImpl struct {
 	Context *HandleContext
 }
 
-func SetDefaultHeaders(w http.ResponseWriter) http.ResponseWriter {
+func SetDefaultHeaders(w http.ResponseWriter, allowedHeaders string) http.ResponseWriter {
 	w.Header().Set("Content-Type", "*")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	w.Header().Set("Access-Control-Max-Age", "15")
-	w.Header().Set("Access-Control-Allow-Headers", "content-type, userId, value, field, offset, username, email, password, foldername, user, filename, cookie")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 	return w
 }
 
 func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w)
+	w = SetDefaultHeaders(w, "password")
 
 	if r.Method == "GET" {
 		resourceUuid := r.PathValue("resourceUuid")
@@ -44,7 +45,7 @@ func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *ht
 }
 
 func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w)
+	w = SetDefaultHeaders(w, "userid")
 
 	if r.Method == "GET" {
 		userId := r.Header.Get("UserId")
@@ -64,7 +65,7 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
+		log.Println("Liked", resourceMetaData.IsLiked)
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(response)
@@ -74,7 +75,7 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 }
 
 func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w)
+	w = SetDefaultHeaders(w, "password")
 
 	resourceUuid := r.PathValue("resourceUuid")
 	textData, err := GetResourceData(resourceUuid, serverImpl.Context)
@@ -90,7 +91,7 @@ func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Req
 }
 
 func (serverImpl *ServerImpl) UploadDocument(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w)
+	w = SetDefaultHeaders(w, "username, userid, password, filename, foldername, language")
 
 	if r.Method == "POST" {
 		len := r.ContentLength
@@ -102,8 +103,9 @@ func (serverImpl *ServerImpl) UploadDocument(w http.ResponseWriter, r *http.Requ
 		filePassword := r.Header.Get("Password")
 		fileName := r.Header.Get("FileName")
 		folderName := r.Header.Get("FolderName")
+		language := r.Header.Get("Language")
 
-		resourceUuid := CreateResource(body, userId, userName, filePassword, fileName, folderName, serverImpl.Context)
+		resourceUuid := CreateResource(body, userId, userName, language, filePassword, fileName, folderName, serverImpl.Context)
 		w.Write([]byte(resourceUuid))
 	} else {
 		w.WriteHeader(http.StatusOK)
@@ -111,7 +113,7 @@ func (serverImpl *ServerImpl) UploadDocument(w http.ResponseWriter, r *http.Requ
 }
 
 func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w)
+	w = SetDefaultHeaders(w, "username, email, password")
 
 	if r.Method == "POST" {
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
@@ -137,7 +139,7 @@ func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request)
 }
 
 func (serverImpl *ServerImpl) CheckAccountPassword(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w)
+	w = SetDefaultHeaders(w, "username, password")
 
 	if r.Method == "GET" {
 
@@ -165,13 +167,21 @@ func (serverImpl *ServerImpl) CheckAccountPassword(w http.ResponseWriter, r *htt
 }
 
 func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w)
+	w = SetDefaultHeaders(w, "userid, offset, needonlyliked")
 
 	if r.Method == "GET" {
 		userId := r.Header.Get("UserId")
+		var needOnlyLiked bool
+
+		log.Println("Liked", r.Header.Get("NeedOnlyLiked"))
+		if r.Header.Get("NeedOnlyLiked") == "true" {
+			needOnlyLiked = true
+		} else {
+			needOnlyLiked = false
+		}
 		offset, _ := strconv.Atoi(r.Header.Get("Offset"))
 
-		resourcesPreview, err := GetUserResources(userId, offset, serverImpl.Context)
+		resourcesPreview, err := GetUserResources(userId, offset, needOnlyLiked, serverImpl.Context)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -189,7 +199,7 @@ func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Re
 }
 
 func (serverImpl *ServerImpl) Logout(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w)
+	w = SetDefaultHeaders(w, "")
 
 	if r.Method == "GET" {
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
@@ -201,7 +211,7 @@ func (serverImpl *ServerImpl) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (serverImpl *ServerImpl) GetUserMetadata(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w)
+	w = SetDefaultHeaders(w, "username")
 
 	if r.Method == "GET" {
 		userName := r.Header.Get("UserName")
@@ -220,13 +230,13 @@ func (serverImpl *ServerImpl) GetUserMetadata(w http.ResponseWriter, r *http.Req
 }
 
 func (serverImpl *ServerImpl) UpdateUserContacts(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w)
+	w = SetDefaultHeaders(w, "content-type")
 
 	if r.Method == "POST" {
 		len := r.ContentLength
 		body := make([]byte, len)
 		r.Body.Read(body)
-		log.Println(string(body))
+
 		var requestBody UpdateUserContactsRequest
 		json.Unmarshal(body, &requestBody)
 
@@ -242,13 +252,13 @@ func (serverImpl *ServerImpl) UpdateUserContacts(w http.ResponseWriter, r *http.
 }
 
 func (serverImpl *ServerImpl) LikeResource(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w)
+	w = SetDefaultHeaders(w, "content-type")
 
 	if r.Method == "POST" {
 		len := r.ContentLength
 		body := make([]byte, len)
 		r.Body.Read(body)
-		log.Println(string(body))
+
 		var requestBody LikeResourceRequest
 		json.Unmarshal(body, &requestBody)
 

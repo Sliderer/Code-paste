@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Stack,
-  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -15,22 +14,24 @@ const ResourcePasswordPanel = ({
 }: {
   onCheckButtonClick: (value: string) => void;
 }) => {
-  const theme = useTheme();
-  const styles = useStyles(theme);
+  const stylingProps = {
+    theme: useTheme(),
+    styles: useStyles(useTheme())
+  }
 
   const [password, setPassword] = useState('');
 
   return (
-    <Box className={styles.centerPanel}>
-      <Box className={styles.settingsPanel}>
+    <Box className={stylingProps.styles.centerPanel}>
+      <Box className={stylingProps.styles.settingsPanel}>
         <Stack spacing={4}>
           <Typography>Этот файл защищен паролем</Typography>
-          <SettingsTextInput placeholder="Пароль" type="password" onChange={e => setPassword(e)}/>
+          <SettingsTextInput stylingProps={stylingProps} placeholder="Пароль" type="password" onChange={e => setPassword(e)}/>
           <Button
-            className={styles.publishButton}
+            className={stylingProps.styles.publishButton}
             sx={{
-              background: theme.palette.primary.main,
-              color: theme.palette.primary.dark,
+              background: stylingProps.theme.palette.primary.main,
+              color: stylingProps.theme.palette.primary.dark,
               borderRadius: 2,
             }}
             onClick={() => onCheckButtonClick(password)}

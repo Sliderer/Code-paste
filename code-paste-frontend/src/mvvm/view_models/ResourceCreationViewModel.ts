@@ -5,11 +5,22 @@ import ResourceCreationModel from "../models/ResourceCreationModel";
 import { makeObservable, observable } from "mobx";
 import { HighlightSharp } from "@mui/icons-material";
 import customSesionStorage from "../../helpers/SessionController";
+import ValidationResult from "../../helpers/ValidationResult";
 
 export class ResourceCreationViewModel {
   @observable createdResource: string | undefined = undefined;
   private model: ResourceCreationModel;
   private clientAPI: ClientServerAPI;
+
+  private language: string = "default";
+
+  private languageCodes: Map<string, string> = new Map<string, string>([
+    ["Обычный текст", "default"],
+    ["Английский", "en"],
+    ["Испанский", "es"],
+    ["Русский", "ru"],
+    ["Немецкий", "de"],
+  ]);
 
   constructor() {
     this.uploadResource = this.uploadResource.bind(this);
@@ -40,6 +51,39 @@ export class ResourceCreationViewModel {
     this.model.password = password;
   }
 
+  setLanguage(language: string) {
+    this.language = this.languageCodes.get(language)!;
+  }
+
+  getTranslateLanguages() : string[] {
+    let result: string[] = [];
+    this.languageCodes.forEach((_, key) => {
+      result.push(key);
+    })
+    return result;
+  }
+
+  validateData() : ValidationResult {
+    if (this.model.text.length === 0) {
+      return {
+        isValid: false,
+        error: 'Текст должен быть не пустым'
+      }
+    }
+
+    if (this.model.fileName.length === 0) {
+      return {
+        isValid: false,
+        error: 'Имя файла не должно быть пустым'
+      }
+    }
+
+    return {
+      isValid: true,
+      error: ''
+    }
+  }
+
   async uploadResource() {
     const compressedText = await ZlibEncode(this.model.text);
     let userId = customSesionStorage.getUserId().getValue();
@@ -58,6 +102,7 @@ export class ResourceCreationViewModel {
       .uploadDocument(
         userId!,
         userName!,
+        this.language,
         this.model.fileName,
         this.model.password,
         folderPath,

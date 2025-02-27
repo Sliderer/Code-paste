@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	. "client_backend/lib"
+	. "client_backend/models"
 	. "client_backend/postgres/models"
 	"fmt"
 	"log"

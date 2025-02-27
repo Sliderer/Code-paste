@@ -1,5 +1,5 @@
 type ValidationResult = {
-    result: boolean,
+    isValid: boolean,
     error: string
 }
 

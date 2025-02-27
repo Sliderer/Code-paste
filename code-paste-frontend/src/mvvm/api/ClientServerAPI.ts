@@ -8,6 +8,7 @@ class ClientServerAPI {
   async uploadDocument(
     userId: string,
     userName: string,
+    language: string,
     fileName: string,
     password: string,
     folderName: string,
@@ -19,6 +20,7 @@ class ClientServerAPI {
         UserId: userId,
         UserName: userName,
         Password: password,
+        Language: language,
         FileName: fileName,
         FolderName: folderName,
       },
@@ -89,12 +91,13 @@ class ClientServerAPI {
     return promise;
   }
 
-  async getUserResources(userId: string, offset: number) {
+  async getUserResources(userId: string, offset: number, needOnlyLiked: boolean) {
     let promise = await axios.get(`/get_resources`, {
       withCredentials: true,
       headers: {
         Offset: offset,
         UserId: userId,
+        NeedOnlyLiked: needOnlyLiked === true ? "true" : "false"
       },
     });
 

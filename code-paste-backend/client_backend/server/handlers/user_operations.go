@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	. "client_backend/models_for_server"
 	. "client_backend/postgres/models"
 	. "client_backend/requests"
 	responses "client_backend/responses"

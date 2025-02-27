@@ -3,11 +3,14 @@ package handlers
 import (
 	. "client_backend/lib"
 	. "client_backend/models"
+	. "client_backend/models_for_server"
 	. "client_backend/postgres/models"
 	response "client_backend/responses"
 	"io"
 	"log"
 	"strings"
+
+	"gorm.io/gorm"
 )
 
 func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context *HandleContext) (response.ResourceMetaDataResponse, error) {
@@ -19,7 +22,7 @@ func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context
 	isLiked := false
 	if len(userId) > 0 {
 		var likedResourceRow LikedResources
-		result := context.PostgresClient.Database.Where("user_id = ?", userId).Find(&likedResourceRow)
+		result := context.PostgresClient.Database.Where("user_id = ? AND resource_id = ?", userId, resourceUuid).Find(&likedResourceRow)
 		isLiked = result.RowsAffected > 0 && likedResourceRow.IsActive
 	}
 
@@ -64,20 +67,34 @@ func GetResourceData(resourceUuid string, context *HandleContext) ([]byte, error
 	return textData, nil
 }
 
-func GetUserResources(userId string, offset int, context *HandleContext) ([]ResourcePreview, error) {
-	var userResources []UserResources
+func GetUserResources(userId string, offset int, needOnlyLiked bool, context *HandleContext) ([]ResourcePreview, error) {
+	var userResourceUuids []string
+	const resourcesCountLimit = 30
+	var result *gorm.DB
 
-	result := context.PostgresClient.Database.Offset(offset).Limit(30).Select("resource_id").Where("user_id = ?", userId).Find(&userResources)
+	if needOnlyLiked {
+		var likedResources []LikedResources
+		result = context.PostgresClient.Database.Offset(offset).Limit(resourcesCountLimit).Select("resource_id").Where("user_id = ? AND is_active", userId).Find(&likedResources)
+		for _, value := range likedResources {
+			userResourceUuids = append(userResourceUuids, value.ResourceId)
+		}
+	} else {
+		var userResources []UserResources
+		result = context.PostgresClient.Database.Offset(offset).Limit(resourcesCountLimit).Select("resource_id").Where("user_id = ?", userId).Find(&userResources)
+		for _, value := range userResources {
+			userResourceUuids = append(userResourceUuids, value.ResourceId)
+		}
+	}
 
 	if result.Error != nil {
 		log.Println("Error in db: ", result.Error)
 		return nil, result.Error
 	}
 
-	resourcePreviews := make([]ResourcePreview, len(userResources))
-	for index, resource := range userResources {
+	resourcePreviews := make([]ResourcePreview, len(userResourceUuids))
+	for index, resourceUuid := range userResourceUuids {
 
-		resourceMetaData, err := context.RedisClient.GetResourceMetaData(resource.ResourceId)
+		resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
 		if err != nil {
 			log.Println("Error in redis: ", err)
 			return nil, err
@@ -86,7 +103,7 @@ func GetUserResources(userId string, offset int, context *HandleContext) ([]Reso
 		resourcePreviews[index] = ResourcePreview{
 			Title:        resourceMetaData.Title[:strings.LastIndex(resourceMetaData.Title, ".")],
 			Preview:      resourceMetaData.Preview,
-			ResourceUuid: resource.ResourceId,
+			ResourceUuid: resourceUuid,
 			Author:       resourceMetaData.Owner,
 		}
 	}

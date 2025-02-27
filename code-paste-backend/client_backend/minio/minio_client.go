@@ -2,7 +2,7 @@ package minio
 
 import (
 	"bytes"
-	. "client_backend/lib"
+	. "client_backend/models"
 	"context"
 	"io"
 	"log"

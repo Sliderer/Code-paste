@@ -1,26 +1,34 @@
 import { observer } from "mobx-react";
 import { AccountViewModel } from "../view_models/AccountViewModel";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Box, Button, Stack, useTheme } from "@mui/material";
+import { Box, Stack, useTheme } from "@mui/material";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
-import ResourcePreviewPanel from "../../ui/moleculas/ResourcePreviewPanel";
 import { ResourcePreviewProps } from "../../ui/atoms/ResourcePreview";
 import CurrentUserAccount from "../../ui/organisms/CurrentUserAccount";
 import OtherUserAccount from "../../ui/organisms/OtherUserAccount";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import customSesionStorage from "../../helpers/SessionController";
+import ResourcesList from "../../ui/organisms/ResourcesList";
+import AllUserResourcesPanel from "../../ui/organisms/AllUserResourcesPanel";
 
 const AccountPage = observer(
   ({ viewModel }: { viewModel: AccountViewModel }) => {
-    const theme = useTheme();
-    const styles = useStyles(theme);
+    const stylingProps = {
+      theme: useTheme(),
+      styles: useStyles(useTheme()),
+    };
+
     const currentNickname = customSesionStorage.getUserName().getValue();
     const location = useLocation();
     const nickname = location.pathname.split("/").reverse()[0];
-    let navigation = useNavigate()
+    let navigation = useNavigate();
 
     const resourcePreviewProps: ResourcePreviewProps = {
       showAuthor: false,
+    };
+
+    const likedResourcePreviewProps: ResourcePreviewProps = {
+      showAuthor: true,
     };
 
     useEffect(() => {
@@ -32,40 +40,58 @@ const AccountPage = observer(
     const logout = () => {
       viewModel.logOut();
       window.location.reload();
-    }
+    };
 
     useEffect(() => {
       if (viewModel.redirectToEnder) {
         viewModel.redirectToEnder = false;
-        navigation(`/enter`)
+        navigation(`/enter`);
       }
-    }, [viewModel.redirectToEnder])
+    }, [viewModel.redirectToEnder]);
 
     if (viewModel.account === undefined) {
-      return <></>
+      return <></>;
     }
 
     return (
-      <Box className={styles.basicPanel} sx={{}}>
+      <Box className={stylingProps.styles.basicPanel} sx={{}}>
         <Stack spacing={10} sx={{ justifyContent: "center", width: "100%" }}>
           {currentNickname !== nickname ? (
-            <OtherUserAccount nickname={nickname} subscribeOnPublications={viewModel.subscribeOnPublications}/>
+            <Stack>
+              <OtherUserAccount
+                stylingProps={stylingProps}
+                nickname={nickname}
+                subscribeOnPublications={viewModel.subscribeOnPublications}
+              />
+              <ResourcesList
+                stylingProps={stylingProps}
+                resourcesList={viewModel.resourcesList}
+                resourcePreviewProps={resourcePreviewProps}
+                onLoad={viewModel.getUsersResources}
+              />
+            </Stack>
           ) : (
-            <CurrentUserAccount
-              nickname={nickname}
-              email={viewModel.account!.email}
-              telegram={viewModel.account!.telegram}
-              logOut={logout}
-              validateContact={viewModel.validateContact}
-              updateContact={viewModel.updateContact}
-            />
+            <Stack>
+              <CurrentUserAccount
+                stylingProps={stylingProps}
+                nickname={nickname}
+                email={viewModel.account!.email}
+                telegram={viewModel.account!.telegram}
+                logOut={logout}
+                validateContact={viewModel.validateContact}
+                updateContact={viewModel.updateContact}
+              />
+              <AllUserResourcesPanel
+                stylingProps={stylingProps}
+                allResourcesList={viewModel.resourcesList}
+                allResourcesPreviewProps={resourcePreviewProps}
+                allResourcesOnLoad={viewModel.getUsersResources}
+                likedResourcesList={viewModel.likedResourcesList}
+                likedResourcesPreviewProps={likedResourcePreviewProps}
+                likedResourcesOnLoad={viewModel.getLikedUsersResources}
+              />
+            </Stack>
           )}
-
-          <ResourcePreviewPanel
-            resources={viewModel.resourcesList}
-            resourcePreviewProps={resourcePreviewProps}
-          />
-          <Button onClick={viewModel.getUsersResources}>Еще</Button>
         </Stack>
       </Box>
     );
