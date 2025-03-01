@@ -26,7 +26,7 @@ func SetDefaultHeaders(w http.ResponseWriter, allowedHeaders string) http.Respon
 }
 
 func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "password")
+	w = SetDefaultHeaders(w, "content-type, password")
 
 	if r.Method == "GET" {
 		resourceUuid := r.PathValue("resourceUuid")
@@ -45,7 +45,7 @@ func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *ht
 }
 
 func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "userid")
+	w = SetDefaultHeaders(w, "content-type, userid")
 
 	if r.Method == "GET" {
 		userId := r.Header.Get("UserId")
@@ -75,23 +75,28 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 }
 
 func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "password")
+	w = SetDefaultHeaders(w, "content-type, password")
 
-	resourceUuid := r.PathValue("resourceUuid")
-	textData, err := GetResourceData(resourceUuid, serverImpl.Context)
+	if r.Method == "GET" {
+		resourceUuid := r.PathValue("resourceUuid")
+		textData, err := GetResourceData(resourceUuid, serverImpl.Context)
 
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/text")
+		w.Write(textData)
+	} else {
+		w.WriteHeader(http.StatusOK)
 	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/text")
-	w.Write(textData)
 }
 
 func (serverImpl *ServerImpl) UploadDocument(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "username, userid, password, filename, foldername, language")
+	w = SetDefaultHeaders(w, "content-type, username, userid, password, filename, foldername, language")
 
 	if r.Method == "POST" {
 		len := r.ContentLength
@@ -113,7 +118,7 @@ func (serverImpl *ServerImpl) UploadDocument(w http.ResponseWriter, r *http.Requ
 }
 
 func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "username, email, password")
+	w = SetDefaultHeaders(w, "content-type, username, email, password")
 
 	if r.Method == "POST" {
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
@@ -124,7 +129,7 @@ func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request)
 		userId, err := CreateUser(userName, email, password, serverImpl.Context)
 
 		if err != nil {
-
+			log.Println(err)
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -139,7 +144,7 @@ func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request)
 }
 
 func (serverImpl *ServerImpl) CheckAccountPassword(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "username, password")
+	w = SetDefaultHeaders(w, "content-type, username, password")
 
 	if r.Method == "GET" {
 
@@ -167,7 +172,7 @@ func (serverImpl *ServerImpl) CheckAccountPassword(w http.ResponseWriter, r *htt
 }
 
 func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "userid, offset, needonlyliked")
+	w = SetDefaultHeaders(w, "content-type, userid, offset, needonlyliked")
 
 	if r.Method == "GET" {
 		userId := r.Header.Get("UserId")
@@ -199,7 +204,7 @@ func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Re
 }
 
 func (serverImpl *ServerImpl) Logout(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "")
+	w = SetDefaultHeaders(w, "content-type")
 
 	if r.Method == "GET" {
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
@@ -211,7 +216,7 @@ func (serverImpl *ServerImpl) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (serverImpl *ServerImpl) GetUserMetadata(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "username")
+	w = SetDefaultHeaders(w, "content-type, username")
 
 	if r.Method == "GET" {
 		userName := r.Header.Get("UserName")

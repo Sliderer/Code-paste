@@ -1,29 +1,17 @@
-import { Container, Stack, useTheme } from "@mui/material";
+import { Stack, useTheme } from "@mui/material";
 import ResourceInputField from "../../ui/atoms/ResourceInputField";
 import ResourceCreationSettings from "../../ui/moleculas/ResourceCreationSettings";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import { useCallback, useEffect, useState } from "react";
-import { languages } from "prismjs";
-import { HighlightingSyntax } from "../../helpers/HighlightingSyntax";
 import { ResourceCreationViewModel } from "../view_models/ResourceCreationViewModel";
 import { observer } from "mobx-react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const ResourceCreationPage = observer(
   ({ viewModel }: { viewModel: ResourceCreationViewModel }) => {
     const navigate = useNavigate();
     const [error, setError] = useState("");
-    const [programmingLanguageHighlight, setProgrammingLanguageHighlight] =
-      useState<HighlightingSyntax>({
-        grammar: languages.java,
-        language: "jss",
-      });
-
-    const [translateLanguageHighlight, setTranslateLanguageHightlight] =
-      useState<HighlightingSyntax>({
-        grammar: languages.text,
-        language: "",
-      });
+    const [programmingLanguageHighlight, setProgrammingLanguageHighlight] = useState("text");
 
     const stylingProps = {
       theme: useTheme(),
@@ -38,8 +26,8 @@ const ResourceCreationPage = observer(
       }
     }, [viewModel.createdResource]);
 
-    const onProgrammingLanguageChange = useCallback(
-      (highlightSettings: HighlightingSyntax) => {
+    const onHighlightLanguageChange = useCallback(
+      (highlightSettings: string) => {
         setProgrammingLanguageHighlight(highlightSettings);
       },
       []
@@ -75,19 +63,18 @@ const ResourceCreationPage = observer(
         direction={"row"}
         className={stylingProps.styles.basicPanel}
         spacing={5}
-        sx={{ justifyContent: "space-between"}}
+        sx={{ justifyContent: "space-between" }}
       >
         <ResourceInputField
           stylingProps={stylingProps}
           highlightSyntax={programmingLanguageHighlight}
-          getTextDefaultValue={viewModel.getText}
           onTextUpdate={viewModel.setText}
         />
         <ResourceCreationSettings
           translateLanguages={viewModel.getTranslateLanguages()}
           onFileNameChange={onFileNameChange}
           onFolderNameChange={onFolderNameChange}
-          onProgrammingLanguageChange={onProgrammingLanguageChange}
+          onHighlightLanguageChange={onHighlightLanguageChange}
           onTranslateLanguageChange={onTranslateLanguageChange}
           onPasswordChange={onPasswordChange}
           onPublish={uploadResource}

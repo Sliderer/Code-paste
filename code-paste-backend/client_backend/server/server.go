@@ -66,14 +66,16 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/upload_resource", server.serverImpl.UploadDocument)
 	http.HandleFunc("/get_resource/{resourceUuid}", server.serverImpl.GetResourceData)
 	http.HandleFunc("/get_resource_meta/{resourceUuid}", server.serverImpl.GetResourceMetaData)
-	http.HandleFunc("/check_password/{resourceUuid}", server.serverImpl.CheckResourcePassword)
+	http.HandleFunc("/get_resources", server.serverImpl.GetUserResources)
+	http.HandleFunc("/like_resource", server.serverImpl.LikeResource)
+
 	http.HandleFunc("/create_user", server.serverImpl.CreateUser)
 	http.HandleFunc("/check_account_password", server.serverImpl.CheckAccountPassword)
-	http.HandleFunc("/get_resources", server.serverImpl.GetUserResources)
-	http.HandleFunc("/logout", server.serverImpl.Logout)
+
+	http.HandleFunc("/check_password/{resourceUuid}", server.serverImpl.CheckResourcePassword)
 	http.HandleFunc("/get_user_metadata", server.serverImpl.GetUserMetadata)
 	http.HandleFunc("/update_user_contacts", server.serverImpl.UpdateUserContacts)
-	http.HandleFunc("/like_resource", server.serverImpl.LikeResource)
+	http.HandleFunc("/logout", server.serverImpl.Logout)
 
 	err := http.ListenAndServe(fmt.Sprintf(":%v", server.ServerSettings.Port), nil)
 	if err != nil {

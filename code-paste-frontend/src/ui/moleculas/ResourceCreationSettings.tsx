@@ -8,7 +8,7 @@ type ChangeHandler = (highlightSettings: any) => void;
 const ResourceCreationSettings = ({
   translateLanguages,
   onTranslateLanguageChange,
-  onProgrammingLanguageChange,
+  onHighlightLanguageChange,
   onFileNameChange,
   onFolderNameChange,
   onPasswordChange,
@@ -17,7 +17,7 @@ const ResourceCreationSettings = ({
 }: {
   translateLanguages: string[];
   onTranslateLanguageChange: ChangeHandler;
-  onProgrammingLanguageChange: ChangeHandler;
+  onHighlightLanguageChange: ChangeHandler;
   onFileNameChange: ChangeHandler;
   onFolderNameChange: ChangeHandler;
   onPasswordChange: ChangeHandler;
@@ -42,7 +42,7 @@ const ResourceCreationSettings = ({
     "Python",
     "Java",
     "Json",
-    "Protobuf",
+    "HTML",
   ];
 
   const [lifePeriod, setLifePeriod] = useState(lifePeriods[0]);
@@ -83,7 +83,7 @@ const ResourceCreationSettings = ({
           stylingProps={stylingProps}
           key={"highlitingSyntax"}
           values={syntaxHighlightingLanguages}
-          onChange={setLifePeriod}
+          onChange={onHighlightLanguageChange}
         />
 
         <SettingsSelectInput

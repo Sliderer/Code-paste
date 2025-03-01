@@ -56,6 +56,15 @@ func CreateResource(body []byte, userId, userName, language, filePassword, fileN
 		Preview:  document[:min(len(document), 100)],
 	})
 
+	if userId == "temp" {
+		result := context.PostgresClient.Database.Find(&User{
+			Name: "temp",
+		})
+		if result.RowsAffected == 0 {
+			context.PostgresClient.Database.Create(&User{Id: "temp", Name: "temp", Email: "temp", Password: "temp"})
+		}
+	}
+
 	context.PostgresClient.Database.Create(&UserResources{
 		UserId:     userId,
 		ResourceId: resourceUuid,

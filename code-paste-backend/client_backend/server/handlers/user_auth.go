@@ -5,6 +5,7 @@ import (
 	. "client_backend/models_for_server"
 	. "client_backend/postgres/models"
 	response "client_backend/responses"
+	"log"
 )
 
 func CreateUser(userName, email, password string, context *HandleContext) (string, error) {
@@ -16,7 +17,7 @@ func CreateUser(userName, email, password string, context *HandleContext) (strin
 		Email:    email,
 		Password: hashedPassword,
 	})
-
+	log.Println("User created")
 	return userId, result.Error
 }
 
