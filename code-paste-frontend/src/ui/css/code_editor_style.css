@@ -1,0 +1,7 @@
+.cm-editor {
+    max-height: 550px;
+}
+
+.cm-editor.cm-focused {
+    outline: none;
+}

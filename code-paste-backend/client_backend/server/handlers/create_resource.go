@@ -13,7 +13,7 @@ import (
 	"unicode/utf8"
 )
 
-func CreateResource(body []byte, userId, userName, language, filePassword, fileName, folderName string, context *HandleContext) string {
+func CreateResource(body []byte, userId, userName, language, filePassword, fileName, folderName string, ttl int, context *HandleContext) string {
 	decompressed, err := gzip.NewReader(bytes.NewReader(body))
 	if err != nil {
 		log.Fatalln("Encoding gzip error: ", err)
@@ -26,6 +26,8 @@ func CreateResource(body []byte, userId, userName, language, filePassword, fileN
 	}
 
 	document := Translate(decompressedData, language, context)
+
+	log.Println("File", document, int64(utf8.RuneCountInString(document)))
 
 	resultChannel := make(chan error)
 
@@ -48,13 +50,19 @@ func CreateResource(body []byte, userId, userName, language, filePassword, fileN
 		passwordHash = GetHash(filePassword)
 	}
 
-	context.RedisClient.UploadResourceMetaData(resourceUuid, &ResourceMetaData{
-		Title:    fileName,
-		Path:     folderName,
-		Owner:    userName,
-		Password: passwordHash,
-		Preview:  document[:min(len(document), 100)],
+	err = context.RedisClient.UploadResourceMetaData(resourceUuid, ttl, &ResourceMetaData{
+		Title:        fileName,
+		Path:         folderName,
+		Owner:        userName,
+		Password:     passwordHash,
+		Preview:      document[:min(len(document), 100)],
+		Type:         "text",
+		CreationTime: uint64(time.Now().Unix()),
 	})
+
+	if err != nil {
+		log.Println(err)
+	}
 
 	if userId == "temp" {
 		result := context.PostgresClient.Database.Find(&User{

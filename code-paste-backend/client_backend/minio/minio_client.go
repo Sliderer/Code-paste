@@ -43,7 +43,8 @@ func (minioClient *MinioClient) CreateBucketIfNotExists(bucketName string) error
 
 func (minioClient *MinioClient) UploadFile(userName, fileName, data string, dataSize int64, result chan error) {
 	go minioClient.CreateBucketIfNotExists(userName)
-	_, err := minioClient.client.PutObject(context.Background(), userName, fileName, bytes.NewReader([]byte(data)), dataSize, minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	textBytes := []byte(data)
+	_, err := minioClient.client.PutObject(context.Background(), userName, fileName, bytes.NewReader(textBytes), int64(len(textBytes)), minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	result <- err
 }
 

@@ -6,4 +6,5 @@ type ResourceMetaDataResponse struct {
 	IsLiked                 bool
 	Owner                   string
 	Name                    string
+	Type                    string
 }

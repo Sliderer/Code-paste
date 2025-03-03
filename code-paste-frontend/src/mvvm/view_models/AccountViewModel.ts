@@ -7,8 +7,8 @@ import ValidationResult from "../../helpers/ValidationResult";
 
 export class AccountViewModel {
   @observable account: AccountModel | undefined = undefined;
-  @observable.shallow resourcesList: ResourcePreviewModel[] = [];
-  @observable.shallow likedResourcesList: ResourcePreviewModel[] = [];
+  @observable resourcesList: ResourcePreviewModel[] = [];
+  @observable likedResourcesList: ResourcePreviewModel[] = [];
   @observable redirectToEnder: boolean = false;
   private clientServerAPI: ClientServerAPI;
   private loadedResourcesCount = 0;
@@ -39,9 +39,14 @@ export class AccountViewModel {
         email: data.data.Email,
         telegram: data.data.Telegram,
       };
-      this.getUsersResources();
-      this.getLikedUsersResources();
+      this.updateResourcesLists();
     });
+  };
+
+  updateResourcesLists = () => {
+    this.loadedResourcesCount = 0;
+    this.getUsersResources();
+    this.getLikedUsersResources();
   };
 
   updateContact = (value: string, field: string) => {
@@ -50,8 +55,8 @@ export class AccountViewModel {
       .then((_) => {
         console.log("contacts updated");
       })
-      .catch(e => {
-        console.log(e)
+      .catch((e) => {
+        console.log(e);
       });
   };
 
@@ -64,18 +69,14 @@ export class AccountViewModel {
   };
 
   getUsersResources = () => {
-    console.log('get all res')
     this.getUsersResourcesWithFilter(false);
   };
 
   getLikedUsersResources = () => {
-    console.log('get liked res')
     this.getUsersResourcesWithFilter(true);
   };
 
-  private getUsersResourcesWithFilter = (
-    needOnlyLiked: boolean
-  ) => {
+  private getUsersResourcesWithFilter = (needOnlyLiked: boolean) => {
     this.clientServerAPI
       .getUserResources(
         this.account!.id,
@@ -115,7 +116,7 @@ export class AccountViewModel {
           resourceUuid: resource.ResourceUuid,
           author: resource.Author,
         },
-      ]
+      ];
     } else {
       this.resourcesList = [
         ...this.resourcesList,
@@ -125,7 +126,7 @@ export class AccountViewModel {
           resourceUuid: resource.ResourceUuid,
           author: resource.Author,
         },
-      ]
+      ];
     }
   }
 

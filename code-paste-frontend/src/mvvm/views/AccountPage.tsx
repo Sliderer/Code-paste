@@ -43,6 +43,13 @@ const AccountPage = observer(
     };
 
     useEffect(() => {
+      console.log('refrsh', viewModel.account !== undefined)
+      if (viewModel.account !== undefined) {
+        viewModel.updateResourcesLists();
+      }
+    }, []);
+
+    useEffect(() => {
       if (viewModel.redirectToEnder) {
         viewModel.redirectToEnder = false;
         navigation(`/enter`);

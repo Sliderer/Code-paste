@@ -32,7 +32,13 @@ const RegistrationPage = observer(
         password
       );
       if (validationResult.isValid) {
-        viewModel.createUser(userName, email, password);
+        viewModel.createUser(userName, email, password).then(
+          isSuccessed => {
+            if (!isSuccessed) {
+              setErrorMessage('Пользователь с таким уменем уже существует');
+            }
+          }
+        )
       } else {
         setErrorMessage(validationResult.error);
       }

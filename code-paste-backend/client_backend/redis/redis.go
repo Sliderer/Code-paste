@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"time"
 
 	redis "github.com/redis/go-redis/v9"
 )
@@ -19,8 +20,19 @@ func (redisClient *RedisClient) CreateClient() error {
 	return nil
 }
 
-func (redisClient *RedisClient) UploadResourceMetaData(uuid string, metaData *ResourceMetaData) {
-	redisClient.Client.Set(context.Background(), uuid, metaData, 0)
+func (redisClient *RedisClient) UploadResourceMetaData(uuid string, ttl int, metaData *ResourceMetaData) error {
+	err := redisClient.Client.Set(context.Background(), uuid, metaData, 0)
+	if err.Err() != nil {
+		return err.Err()
+	}
+
+	if ttl != 0 {
+		err := redisClient.Client.Expire(context.Background(), uuid, time.Duration(ttl)*time.Hour)
+		if err.Err() != nil {
+			return err.Err()
+		}
+	}
+	return err.Err()
 }
 
 func (redisClient *RedisClient) GetResourceMetaData(uuid string) (ResourceMetaData, error) {

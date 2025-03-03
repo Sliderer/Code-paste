@@ -8,6 +8,7 @@ import (
 	response "client_backend/responses"
 	"io"
 	"log"
+	"sort"
 	"strings"
 
 	"gorm.io/gorm"
@@ -32,6 +33,7 @@ func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context
 		IsLiked:                 isLiked,
 		Owner:                   resourceMetaData.Owner,
 		Name:                    resourceMetaData.Title,
+		Type:                    resourceMetaData.Type,
 	}, nil
 }
 
@@ -91,22 +93,25 @@ func GetUserResources(userId string, offset int, needOnlyLiked bool, context *Ha
 		return nil, result.Error
 	}
 
-	resourcePreviews := make([]ResourcePreview, len(userResourceUuids))
-	for index, resourceUuid := range userResourceUuids {
-
+	resourcePreviews := make([]ResourcePreview, 0)
+	for _, resourceUuid := range userResourceUuids {
 		resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
 		if err != nil {
 			log.Println("Error in redis: ", err)
-			return nil, err
+			continue
 		}
 
-		resourcePreviews[index] = ResourcePreview{
+		resourcePreviews = append(resourcePreviews, ResourcePreview{
 			Title:        resourceMetaData.Title[:strings.LastIndex(resourceMetaData.Title, ".")],
 			Preview:      resourceMetaData.Preview,
 			ResourceUuid: resourceUuid,
 			Author:       resourceMetaData.Owner,
-		}
+			CreationTime: resourceMetaData.CreationTime,
+		})
 	}
 
+	sort.Slice(resourcePreviews, func(i, j int) bool {
+		return resourcePreviews[i].CreationTime > resourcePreviews[j].CreationTime
+	})
 	return resourcePreviews, nil
 }

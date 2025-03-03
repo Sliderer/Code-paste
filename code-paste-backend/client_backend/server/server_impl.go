@@ -45,7 +45,7 @@ func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *ht
 }
 
 func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, userid")
+	w = SetDefaultHeaders(w, "content-type, user-id")
 
 	if r.Method == "GET" {
 		userId := r.Header.Get("UserId")
@@ -65,7 +65,7 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		log.Println("Liked", resourceMetaData.IsLiked)
+
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(response)
@@ -95,22 +95,23 @@ func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Req
 	}
 }
 
-func (serverImpl *ServerImpl) UploadDocument(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, username, userid, password, filename, foldername, language")
+func (serverImpl *ServerImpl) UploadResource(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w, "content-type, user-name, user-id, password, file-name, folder-name, language, ttl")
 
 	if r.Method == "POST" {
 		len := r.ContentLength
 		body := make([]byte, len)
 		r.Body.Read(body)
 
-		userName := r.Header.Get("UserName")
-		userId := r.Header.Get("UserId")
+		userName := r.Header.Get("User-Name")
+		userId := r.Header.Get("User-Id")
 		filePassword := r.Header.Get("Password")
-		fileName := r.Header.Get("FileName")
-		folderName := r.Header.Get("FolderName")
+		fileName := r.Header.Get("File-Name")
+		folderName := r.Header.Get("Folder-Name")
 		language := r.Header.Get("Language")
+		ttl, _ := strconv.Atoi(r.Header.Get("ttl"))
 
-		resourceUuid := CreateResource(body, userId, userName, language, filePassword, fileName, folderName, serverImpl.Context)
+		resourceUuid := CreateResource(body, userId, userName, language, filePassword, fileName, folderName, ttl, serverImpl.Context)
 		w.Write([]byte(resourceUuid))
 	} else {
 		w.WriteHeader(http.StatusOK)
@@ -118,11 +119,11 @@ func (serverImpl *ServerImpl) UploadDocument(w http.ResponseWriter, r *http.Requ
 }
 
 func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, username, email, password")
+	w = SetDefaultHeaders(w, "content-type, user-name, email, password")
 
 	if r.Method == "POST" {
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
-		userName := r.Header.Get("UserName")
+		userName := r.Header.Get("User-Name")
 		email := r.Header.Get("Email")
 		password := r.Header.Get("Password")
 
@@ -144,13 +145,13 @@ func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request)
 }
 
 func (serverImpl *ServerImpl) CheckAccountPassword(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, username, password")
+	w = SetDefaultHeaders(w, "content-type, user-name, password")
 
 	if r.Method == "GET" {
 
 		session, err := serverImpl.Context.SessionStore.GetSession(r)
 
-		userName := r.Header.Get("UserName")
+		userName := r.Header.Get("User-Name")
 		password := r.Header.Get("Password")
 
 		result, err := CheckAccountPassword(userName, password, serverImpl.Context)
@@ -172,14 +173,14 @@ func (serverImpl *ServerImpl) CheckAccountPassword(w http.ResponseWriter, r *htt
 }
 
 func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, userid, offset, needonlyliked")
+	w = SetDefaultHeaders(w, "content-type, user-id, offset, need-only-liked")
 
 	if r.Method == "GET" {
-		userId := r.Header.Get("UserId")
+		userId := r.Header.Get("User-Id")
 		var needOnlyLiked bool
 
-		log.Println("Liked", r.Header.Get("NeedOnlyLiked"))
-		if r.Header.Get("NeedOnlyLiked") == "true" {
+		log.Println("Liked", r.Header.Get("Need-Only-Liked"))
+		if r.Header.Get("Need-Only-Liked") == "true" {
 			needOnlyLiked = true
 		} else {
 			needOnlyLiked = false
@@ -216,10 +217,10 @@ func (serverImpl *ServerImpl) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (serverImpl *ServerImpl) GetUserMetadata(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, username")
+	w = SetDefaultHeaders(w, "content-type, user-name")
 
 	if r.Method == "GET" {
-		userName := r.Header.Get("UserName")
+		userName := r.Header.Get("User-Name")
 		userMetaData, err := GetUserMetaData(userName, serverImpl.Context)
 		if err != nil {
 			log.Println("Can not get user metadata: ", err)

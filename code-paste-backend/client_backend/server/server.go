@@ -63,7 +63,7 @@ func (server *ClientServer) SetIAMToken(value string) {
 
 func (server *ClientServer) StartServer() {
 
-	http.HandleFunc("/upload_resource", server.serverImpl.UploadDocument)
+	http.HandleFunc("/upload_resource", server.serverImpl.UploadResource)
 	http.HandleFunc("/get_resource/{resourceUuid}", server.serverImpl.GetResourceData)
 	http.HandleFunc("/get_resource_meta/{resourceUuid}", server.serverImpl.GetResourceMetaData)
 	http.HandleFunc("/get_resources", server.serverImpl.GetUserResources)

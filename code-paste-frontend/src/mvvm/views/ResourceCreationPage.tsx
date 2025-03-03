@@ -11,7 +11,8 @@ const ResourceCreationPage = observer(
   ({ viewModel }: { viewModel: ResourceCreationViewModel }) => {
     const navigate = useNavigate();
     const [error, setError] = useState("");
-    const [programmingLanguageHighlight, setProgrammingLanguageHighlight] = useState("text");
+    const [programmingLanguageHighlight, setProgrammingLanguageHighlight] =
+      useState("text");
 
     const stylingProps = {
       theme: useTheme(),
@@ -35,6 +36,10 @@ const ResourceCreationPage = observer(
 
     const onTranslateLanguageChange = useCallback((language: string) => {
       viewModel.setLanguage(language);
+    }, []);
+
+    const onTTLChange = useCallback((ttl: string) => {
+      viewModel.setTTL(ttl);
     }, []);
 
     const onFileNameChange = useCallback((value: string) => {
@@ -72,12 +77,14 @@ const ResourceCreationPage = observer(
         />
         <ResourceCreationSettings
           translateLanguages={viewModel.getTranslateLanguages()}
+          ttlOptions={viewModel.getTTLOptions()}
           onFileNameChange={onFileNameChange}
           onFolderNameChange={onFolderNameChange}
           onHighlightLanguageChange={onHighlightLanguageChange}
           onTranslateLanguageChange={onTranslateLanguageChange}
           onPasswordChange={onPasswordChange}
           onPublish={uploadResource}
+          onTTLChange={onTTLChange}
           error={error}
         />
       </Stack>

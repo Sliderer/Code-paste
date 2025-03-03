@@ -13,6 +13,7 @@ export class ResourceCreationViewModel {
   private clientAPI: ClientServerAPI;
 
   private language: string = "default";
+  private ttl: number = 0;
 
   private languageCodes: Map<string, string> = new Map<string, string>([
     ["Обычный текст", "default"],
@@ -20,6 +21,14 @@ export class ResourceCreationViewModel {
     ["Испанский", "es"],
     ["Русский", "ru"],
     ["Немецкий", "de"],
+  ]);
+
+  private TTLOptions: Map<string, number> = new Map<string, number>([
+    ["Никогда не удалять", -1],
+    ["1 час", 1],
+    ["1 день", 24],
+    ["1 неделя", 7 * 24],
+    ["1 месяц", 30 * 24],
   ]);
 
   constructor() {
@@ -55,33 +64,45 @@ export class ResourceCreationViewModel {
     this.language = this.languageCodes.get(language)!;
   }
 
-  getTranslateLanguages() : string[] {
+  setTTL(ttl: string): void {
+    this.ttl = this.TTLOptions.get(ttl)!;
+  }
+
+  getTranslateLanguages(): string[] {
     let result: string[] = [];
     this.languageCodes.forEach((_, key) => {
       result.push(key);
-    })
+    });
     return result;
   }
 
-  validateData() : ValidationResult {
+  getTTLOptions(): string[] {
+    let result: string[] = [];
+    this.TTLOptions.forEach((_, key) => {
+      result.push(key);
+    });
+    return result;
+  }
+
+  validateData(): ValidationResult {
     if (this.model.text.length === 0) {
       return {
         isValid: false,
-        error: 'Текст должен быть не пустым'
-      }
+        error: "Текст должен быть не пустым",
+      };
     }
 
     if (this.model.fileName.length === 0) {
       return {
         isValid: false,
-        error: 'Имя файла не должно быть пустым'
-      }
+        error: "Имя файла не должно быть пустым",
+      };
     }
 
     return {
       isValid: true,
-      error: ''
-    }
+      error: "",
+    };
   }
 
   async uploadResource() {
@@ -106,6 +127,7 @@ export class ResourceCreationViewModel {
         this.model.fileName,
         this.model.password,
         folderPath,
+        this.ttl,
         compressedText
       )
       .then((data) => {

@@ -7,20 +7,24 @@ type ChangeHandler = (highlightSettings: any) => void;
 
 const ResourceCreationSettings = ({
   translateLanguages,
+  ttlOptions,
   onTranslateLanguageChange,
   onHighlightLanguageChange,
   onFileNameChange,
   onFolderNameChange,
   onPasswordChange,
+  onTTLChange,
   onPublish,
   error
 }: {
   translateLanguages: string[];
+  ttlOptions: string[];
   onTranslateLanguageChange: ChangeHandler;
   onHighlightLanguageChange: ChangeHandler;
   onFileNameChange: ChangeHandler;
   onFolderNameChange: ChangeHandler;
   onPasswordChange: ChangeHandler;
+  onTTLChange: ChangeHandler;
   onPublish: Function;
   error: string;
 }) => {
@@ -29,13 +33,6 @@ const ResourceCreationSettings = ({
     styles: useStyles(useTheme()),
   };
 
-  const lifePeriods = [
-    "Никогда не удалять",
-    "1 час",
-    "1 день",
-    "1 неделя",
-    "1 месяц",
-  ];
   const syntaxHighlightingLanguages = [
     "Текст",
     "C++",
@@ -44,8 +41,6 @@ const ResourceCreationSettings = ({
     "Json",
     "HTML",
   ];
-
-  const [lifePeriod, setLifePeriod] = useState(lifePeriods[0]);
 
   return (
     <Box className={stylingProps.styles.settingsPanel}>
@@ -75,8 +70,8 @@ const ResourceCreationSettings = ({
         <SettingsSelectInput
           stylingProps={stylingProps}
           key={"lifePeriod"}
-          values={lifePeriods}
-          onChange={setLifePeriod}
+          values={ttlOptions}
+          onChange={onTTLChange}
         />
 
         <SettingsSelectInput

@@ -59,12 +59,19 @@ export class RegistrationViewModel {
     };
   }
 
-  createUser(userName: string, email: string, password: string) {
-    this.clientServerAPI.createUser(userName, email, password).then((data) => {
-      this.userName = userName;
-      customSesionStorage.getUserName().setValue(userName);
-      customSesionStorage.getUserId().setValue(data.data);
-    });
+  async createUser(userName: string, email: string, password: string): Promise<boolean> {
+    let result = true;
+    await this.clientServerAPI
+      .createUser(userName, email, password)
+      .then((data) => {
+        this.userName = userName;
+        customSesionStorage.getUserName().setValue(userName);
+        customSesionStorage.getUserId().setValue(data.data);
+      })
+      .catch((_) => {
+        result = false;
+      });
+    return result;
   }
 }
 

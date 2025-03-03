@@ -12,17 +12,19 @@ class ClientServerAPI {
     fileName: string,
     password: string,
     folderName: string,
+    ttl: number,
     data: Uint8Array
   ) {
     let promise = await axios.post(`/upload_resource`, data, {
       withCredentials: true,
       headers: {
-        UserId: userId,
-        UserName: userName,
-        Password: password,
-        Language: language,
-        FileName: fileName,
-        FolderName: folderName,
+        "User-id": userId,
+        "User-Name": userName,
+        "Password": password,
+        "Language": language,
+        "File-Name": fileName,
+        "Folder-Name": folderName,
+        "TTL": ttl
       },
     });
 
@@ -33,7 +35,7 @@ class ClientServerAPI {
     let promise = await axios.get(`/get_resource_meta/${resourceUuid}`, {
       withCredentials: true,
       headers: {
-        UserId: userId,
+        "User-Id": userId,
       },
     });
 
@@ -44,7 +46,7 @@ class ClientServerAPI {
     let promise = await axios.get(`/check_password/${resourceUuid}`, {
       withCredentials: true,
       headers: {
-        Password: password,
+        "Password": password,
       },
     });
 
@@ -55,7 +57,7 @@ class ClientServerAPI {
     let promise = await axios.get(`/get_resource/${resourceUuid}`, {
       withCredentials: true,
       headers: {
-        Password: password,
+        "Password": password,
       },
     });
 
@@ -69,9 +71,9 @@ class ClientServerAPI {
       {
         withCredentials: true,
         headers: {
-          UserName: userName,
-          Password: password,
-          Email: email,
+          "User-Name": userName,
+          "Password": password,
+          "Email": email,
         },
       }
     );
@@ -83,8 +85,8 @@ class ClientServerAPI {
     let promise = await axios.get(`/check_account_password`, {
       withCredentials: true,
       headers: {
-        UserName: userName,
-        Password: password,
+        "User-Name": userName,
+        "Password": password,
       },
     });
 
@@ -95,9 +97,9 @@ class ClientServerAPI {
     let promise = await axios.get(`/get_resources`, {
       withCredentials: true,
       headers: {
-        Offset: offset,
-        UserId: userId,
-        NeedOnlyLiked: needOnlyLiked === true ? "true" : "false"
+        "Offset": offset,
+        "User-Id": userId,
+        "Need-Only-Liked": needOnlyLiked === true ? "true" : "false"
       },
     });
 
@@ -116,7 +118,7 @@ class ClientServerAPI {
     let promise = await axios.get(`/get_user_metadata`, {
       withCredentials: true,
       headers: {
-        UserName: userName,
+        "User-Name": userName,
       },
     });
 
@@ -144,7 +146,7 @@ class ClientServerAPI {
       `/like_resource`,
       {
         UserId: userId,
-        ResourceUuid: resourceUuid,
+        Resourceuuid: resourceUuid,
       },
       {
         withCredentials: true,
