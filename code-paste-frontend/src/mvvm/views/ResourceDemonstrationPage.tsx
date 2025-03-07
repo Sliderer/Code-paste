@@ -1,6 +1,6 @@
 import { Box, useTheme } from "@mui/material";
 import { observer } from "mobx-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ResourceDemonstrationViewModel } from "../view_models/ResourceDemonstrationViewModel";
 import ResourcePasswordPanel from "../../ui/moleculas/ResourcePasswordPanel";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
@@ -9,6 +9,7 @@ import LoadingPanel from "../../ui/atoms/LoadingPanel";
 import { useEffect, useState } from "react";
 import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 import SharePopup from "../../ui/moleculas/SharePopup";
+import customSesionStorage from "../../helpers/SessionController";
 
 const ResourceDemonstrationPage = observer(
   ({ viewModel }: { viewModel: ResourceDemonstrationViewModel }) => {
@@ -17,6 +18,7 @@ const ResourceDemonstrationPage = observer(
       styles: useStyles(useTheme()),
     };
 
+    const navigate = useNavigate();
     const location = useLocation();
 
     const clearPage = () => {
@@ -30,11 +32,17 @@ const ResourceDemonstrationPage = observer(
       window.addEventListener("popstate", clearPage);
     }, []);
 
+    useEffect(() => {
+      if (viewModel.isDeleted) {
+        navigate(`/account/${customSesionStorage.getUserName().getValue()}`);
+      }
+    }, [viewModel.isDeleted]);
+
     if (
       viewModel.resourceModel.isPrivate === undefined ||
-      (viewModel.getResource().status === FetchingStatus.NotStarted &&
+      (viewModel.getResource().resource.status === FetchingStatus.NotStarted &&
         viewModel.isPasswordEntered) ||
-      viewModel.getResource().status === FetchingStatus.InProgress
+      viewModel.getResource().resource.status === FetchingStatus.InProgress
     ) {
       return <LoadingPanel stylingProps={stylingProps} />;
     }

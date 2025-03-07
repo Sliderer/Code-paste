@@ -5,7 +5,7 @@ class ClientServerAPI {
     axios.defaults.baseURL = "http://127.0.0.1:90";
   }
 
-  async uploadDocument(
+  async uploadTextResource(
     userId: string,
     userName: string,
     language: string,
@@ -13,6 +13,7 @@ class ClientServerAPI {
     password: string,
     folderName: string,
     ttl: number,
+    highlightSetting: string,
     data: Uint8Array
   ) {
     let promise = await axios.post(`/upload_resource`, data, {
@@ -24,7 +25,8 @@ class ClientServerAPI {
         "Language": language,
         "File-Name": fileName,
         "Folder-Name": folderName,
-        "TTL": ttl
+        "TTL": ttl,
+        "Highlight-Setting": highlightSetting
       },
     });
 
@@ -152,6 +154,20 @@ class ClientServerAPI {
         withCredentials: true,
       }
     );
+
+    return promise;
+  }
+
+  async deleteResource(userId: string, userName: string, resourceUuid: string) {
+    let promise = await axios.delete(
+      `/delete_resource/${resourceUuid}`,
+      {
+        headers: {
+          "User-Id": userId,
+          "User-Name": userName
+        }
+      }
+    )
 
     return promise;
   }

@@ -4,6 +4,7 @@ import (
 	. "client_backend/lib"
 	. "client_backend/models"
 	. "client_backend/models_for_server"
+	. "client_backend/postgres"
 	. "client_backend/postgres/models"
 	response "client_backend/responses"
 	"io"
@@ -23,7 +24,10 @@ func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context
 	isLiked := false
 	if len(userId) > 0 {
 		var likedResourceRow LikedResources
-		result := context.PostgresClient.Database.Where("user_id = ? AND resource_id = ?", userId, resourceUuid).Find(&likedResourceRow)
+		result := Find(
+			context.PostgresClient.Database.Where("user_id = ? AND resource_id = ?", userId, resourceUuid),
+			&likedResourceRow,
+		)
 		isLiked = result.RowsAffected > 0 && likedResourceRow.IsActive
 	}
 
@@ -34,6 +38,7 @@ func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context
 		Owner:                   resourceMetaData.Owner,
 		Name:                    resourceMetaData.Title,
 		Type:                    resourceMetaData.Type,
+		HighlightSetting:        resourceMetaData.HighlightSetting,
 	}, nil
 }
 
@@ -76,13 +81,19 @@ func GetUserResources(userId string, offset int, needOnlyLiked bool, context *Ha
 
 	if needOnlyLiked {
 		var likedResources []LikedResources
-		result = context.PostgresClient.Database.Offset(offset).Limit(resourcesCountLimit).Select("resource_id").Where("user_id = ? AND is_active", userId).Find(&likedResources)
+		result = Find(
+			context.PostgresClient.Database.Offset(offset).Limit(resourcesCountLimit).Select("resource_id").Where("user_id = ? AND is_active", userId),
+			&likedResources,
+		)
 		for _, value := range likedResources {
 			userResourceUuids = append(userResourceUuids, value.ResourceId)
 		}
 	} else {
 		var userResources []UserResources
-		result = context.PostgresClient.Database.Offset(offset).Limit(resourcesCountLimit).Select("resource_id").Where("user_id = ?", userId).Find(&userResources)
+		result = Find(
+			context.PostgresClient.Database.Offset(offset).Limit(resourcesCountLimit).Select("resource_id").Where("user_id = ?", userId),
+			&userResources,
+		)
 		for _, value := range userResources {
 			userResourceUuids = append(userResourceUuids, value.ResourceId)
 		}

@@ -7,4 +7,5 @@ type ResourceMetaDataResponse struct {
 	Owner                   string
 	Name                    string
 	Type                    string
+	HighlightSetting        string
 }

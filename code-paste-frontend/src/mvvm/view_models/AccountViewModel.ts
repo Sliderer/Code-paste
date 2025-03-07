@@ -45,6 +45,8 @@ export class AccountViewModel {
 
   updateResourcesLists = () => {
     this.loadedResourcesCount = 0;
+    this.resourcesList = [];
+    this.likedResourcesList = [];
     this.getUsersResources();
     this.getLikedUsersResources();
   };

@@ -1,9 +1,11 @@
 import { Box, Stack, Typography, useTheme } from "@mui/material";
-import { ResourceFetchingStatus } from "../../helpers/ResourceFetchingStatus";
-import { useStyles } from "../styling/styles/ElementStyles";
 import { ResourceAction } from "../../helpers/ResourceAction";
 import ResourceActionButton from "../atoms/ResourceActionButton";
 import StylingProps from "../../helpers/StylingProps";
+import ResourceModel from "../../mvvm/models/ResourceModel";
+import { getCodeEditorTheme, getLanguageSyntax } from "../../helpers/CodeEditorHelpers";
+import CodeMirror from "@uiw/react-codemirror";
+import "../css/code_editor_style.css";
 
 const ResourceDemonstrationPanel = ({
   stylingProps,
@@ -11,11 +13,11 @@ const ResourceDemonstrationPanel = ({
   actions,
 }: {
   stylingProps: StylingProps;
-  resource: ResourceFetchingStatus;
+  resource: ResourceModel;
   actions: ResourceAction[];
 }) => {
-  const theme = useTheme();
-  const styles = useStyles(theme);
+  const highlightSyntaxLanguage = getLanguageSyntax(resource.highlightSetting);
+
   return (
     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
       <Stack spacing={5}>
@@ -29,7 +31,7 @@ const ResourceDemonstrationPanel = ({
           ))}
         </Stack>
         <Box
-          className={styles.basicShadow}
+          className={stylingProps.styles.basicShadow}
           sx={{
             padding: 1,
             borderRadius: 1,
@@ -37,7 +39,15 @@ const ResourceDemonstrationPanel = ({
             width: "90vw",
           }}
         >
-          <Typography sx={{ color: "black" }}>{resource.text}</Typography>
+          <CodeMirror
+            theme={getCodeEditorTheme(stylingProps)}
+            className="cm-editor"
+            value={resource.resource.text}
+            editable={false}
+            extensions={
+              highlightSyntaxLanguage ? [highlightSyntaxLanguage] : []
+            }
+          ></CodeMirror>
         </Box>
       </Stack>
     </Box>

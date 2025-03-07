@@ -14,6 +14,7 @@ export class ResourceCreationViewModel {
 
   private language: string = "default";
   private ttl: number = 0;
+  private highlightSetting: string = 'text';
 
   private languageCodes: Map<string, string> = new Map<string, string>([
     ["Обычный текст", "default"],
@@ -54,6 +55,10 @@ export class ResourceCreationViewModel {
 
   setFolder(folderPath: string) {
     this.model.folderPath = folderPath;
+  }
+
+  setHightlightSetting(value: string) {
+    this.highlightSetting = value;
   }
 
   setPassword(password: string) {
@@ -120,7 +125,7 @@ export class ResourceCreationViewModel {
     }
 
     this.clientAPI
-      .uploadDocument(
+      .uploadTextResource(
         userId!,
         userName!,
         this.language,
@@ -128,6 +133,7 @@ export class ResourceCreationViewModel {
         this.model.password,
         folderPath,
         this.ttl,
+        this.highlightSetting,
         compressedText
       )
       .then((data) => {

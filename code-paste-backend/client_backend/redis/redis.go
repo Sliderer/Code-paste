@@ -4,7 +4,6 @@ import (
 	. "client_backend/models"
 	"context"
 	"encoding/json"
-	"log"
 	"time"
 
 	redis "github.com/redis/go-redis/v9"
@@ -21,13 +20,23 @@ func (redisClient *RedisClient) CreateClient() error {
 }
 
 func (redisClient *RedisClient) UploadResourceMetaData(uuid string, ttl int, metaData *ResourceMetaData) error {
-	err := redisClient.Client.Set(context.Background(), uuid, metaData, 0)
+	errorChan := make(chan *redis.StatusCmd)
+	go func() {
+		errorChan <- redisClient.Client.Set(context.Background(), uuid, metaData, 0)
+	}()
+
+	err := <-errorChan
 	if err.Err() != nil {
 		return err.Err()
 	}
 
 	if ttl != 0 {
-		err := redisClient.Client.Expire(context.Background(), uuid, time.Duration(ttl)*time.Hour)
+		errorChan := make(chan *redis.BoolCmd)
+		go func() {
+			errorChan <- redisClient.Client.Expire(context.Background(), uuid, time.Duration(ttl)*time.Hour)
+		}()
+
+		err := <-errorChan
 		if err.Err() != nil {
 			return err.Err()
 		}
@@ -37,9 +46,13 @@ func (redisClient *RedisClient) UploadResourceMetaData(uuid string, ttl int, met
 
 func (redisClient *RedisClient) GetResourceMetaData(uuid string) (ResourceMetaData, error) {
 	var data ResourceMetaData
-	log.Println(uuid)
-	resultString := redisClient.Client.Get(context.Background(), uuid).Val()
-	log.Println(resultString)
+
+	resultChan := make(chan string)
+	go func() {
+		resultChan <- redisClient.Client.Get(context.Background(), uuid).Val()
+	}()
+
+	resultString := <-resultChan
 	err := json.Unmarshal([]byte(resultString), &data)
 
 	return data, err

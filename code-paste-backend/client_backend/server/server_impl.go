@@ -21,6 +21,7 @@ func SetDefaultHeaders(w http.ResponseWriter, allowedHeaders string) http.Respon
 	w.Header().Set("Access-Control-Max-Age", "15")
 	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 
 	return w
 }
@@ -48,7 +49,7 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 	w = SetDefaultHeaders(w, "content-type, user-id")
 
 	if r.Method == "GET" {
-		userId := r.Header.Get("UserId")
+		userId := r.Header.Get("User-Id")
 		resourceUuid := r.PathValue("resourceUuid")
 
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
@@ -96,7 +97,7 @@ func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Req
 }
 
 func (serverImpl *ServerImpl) UploadResource(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, user-name, user-id, password, file-name, folder-name, language, ttl")
+	w = SetDefaultHeaders(w, "content-type, user-name, user-id, password, file-name, folder-name, language, ttl, highlight-setting")
 
 	if r.Method == "POST" {
 		len := r.ContentLength
@@ -109,9 +110,10 @@ func (serverImpl *ServerImpl) UploadResource(w http.ResponseWriter, r *http.Requ
 		fileName := r.Header.Get("File-Name")
 		folderName := r.Header.Get("Folder-Name")
 		language := r.Header.Get("Language")
+		highlightSetting := r.Header.Get("Highlight-Setting")
 		ttl, _ := strconv.Atoi(r.Header.Get("ttl"))
 
-		resourceUuid := CreateResource(body, userId, userName, language, filePassword, fileName, folderName, ttl, serverImpl.Context)
+		resourceUuid := CreateResource(body, userId, userName, language, highlightSetting, filePassword, fileName, folderName, ttl, serverImpl.Context)
 		w.Write([]byte(resourceUuid))
 	} else {
 		w.WriteHeader(http.StatusOK)
@@ -276,5 +278,25 @@ func (serverImpl *ServerImpl) LikeResource(w http.ResponseWriter, r *http.Reques
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
+	}
+}
+
+func (serverImpl *ServerImpl) DeleteResource(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w, "content-type, user-name, user-id")
+
+	if r.Method == "DELETE" {
+		userName := r.Header.Get("User-Name")
+		userId := r.Header.Get("User-Id")
+		resourceUuid := r.PathValue("resourceUuid")
+		err := DeleteResource(userId, userName, resourceUuid, serverImpl.Context)
+
+		if err != nil {
+			log.Println("Error deleting resource: ", err)
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusOK)
+		}
+	} else {
+		w.WriteHeader(http.StatusOK)
 	}
 }

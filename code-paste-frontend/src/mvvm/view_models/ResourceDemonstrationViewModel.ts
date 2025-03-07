@@ -8,8 +8,10 @@ import customSesionStorage from "../../helpers/SessionController";
 export class ResourceDemonstrationViewModel {
   @observable isPasswordEntered = false;
   @observable inSharingMode = false;
+  @observable isDeleted = false;
   @observable resourceModel: ResourceModel;
   private clientServerAPI: ClientServerAPI;
+  private isCurrentUserAuthor = false;
 
   constructor() {
     this.resourceModel = getDefaultResourceModel();
@@ -33,7 +35,11 @@ export class ResourceDemonstrationViewModel {
           resourceUuid: this.resourceModel.resourceUuid,
           owner: this.resourceModel.owner,
           isLiked: data.data.IsLiked,
+          highlightSetting: data.data.HighlightSetting,
         };
+
+        this.isCurrentUserAuthor = !data.data.IsPrivateForCurrentUser;
+        console.log("Is author", data.data.IsLiked)
 
         if (this.resourceModel.isPrivate === false) {
           this.getResourceData("");
@@ -48,8 +54,8 @@ export class ResourceDemonstrationViewModel {
     this.resourceModel = getDefaultResourceModel();
   };
 
-  getResource = () => {
-    return this.resourceModel.resource!;
+  getResource = () : ResourceModel => {
+    return this.resourceModel!;
   };
 
   disableShareMode = () => {
@@ -84,7 +90,6 @@ export class ResourceDemonstrationViewModel {
     ];
 
     if (customSesionStorage.getUserName().getValue() !== null) {
-      console.log('push', this.resourceModel.isLiked)
       actions.push({
         title: "В избранное",
         action: () => {
@@ -94,6 +99,21 @@ export class ResourceDemonstrationViewModel {
           );
         },
         isActive: this.resourceModel.isLiked
+      });
+    }
+
+    if (this.isCurrentUserAuthor) {
+      actions.push({
+        title: "Удалить",
+        action: () => {
+          this.clientServerAPI.deleteResource(
+            customSesionStorage.getUserId().getValue()!,
+            customSesionStorage.getUserName().getValue()!,
+            this.resourceModel.resourceUuid!
+          );
+          this.isDeleted = true;
+        },
+        isActive: false
       });
     }
 
@@ -154,6 +174,7 @@ export class ResourceDemonstrationViewModel {
       resourceUuid: this.resourceModel.resourceUuid,
       owner: this.resourceModel.owner,
       isLiked: this.resourceModel.isLiked,
+      highlightSetting: this.resourceModel.highlightSetting
     };
     this.clientServerAPI
       .getResourceData(this.resourceModel.resourceUuid!, password)
@@ -168,6 +189,7 @@ export class ResourceDemonstrationViewModel {
           resourceUuid: this.resourceModel.resourceUuid,
           owner: this.resourceModel.owner,
           isLiked: this.resourceModel.isLiked,
+          highlightSetting: this.resourceModel.highlightSetting
         };
       })
       .catch((reason) => console.log(reason));

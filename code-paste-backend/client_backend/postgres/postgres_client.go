@@ -25,3 +25,43 @@ func (postgresClient *PostgresClient) OpenConnection() {
 	database.AutoMigrate(&User{}, &Subscribtions{}, &UserResources{}, &LikedResources{})
 	postgresClient.Database = database
 }
+
+func Find[T any](tx *gorm.DB, object *T) *gorm.DB {
+	resultChan := make(chan *gorm.DB)
+
+	go func() {
+		resultChan <- tx.Find(&object)
+	}()
+
+	return <-resultChan
+}
+
+func Create[T any](tx *gorm.DB, object *T) *gorm.DB {
+	resultChan := make(chan *gorm.DB)
+
+	go func() {
+		resultChan <- tx.Create(&object)
+	}()
+
+	return <-resultChan
+}
+
+func Update[T any](tx *gorm.DB, key string, value T) *gorm.DB {
+	resultChan := make(chan *gorm.DB)
+
+	go func() {
+		resultChan <- tx.Update(key, value)
+	}()
+
+	return <-resultChan
+}
+
+func Delete[T any](tx *gorm.DB, object *T) *gorm.DB {
+	resultChan := make(chan *gorm.DB)
+
+	go func() {
+		resultChan <- tx.Delete(object)
+	}()
+
+	return <-resultChan
+}

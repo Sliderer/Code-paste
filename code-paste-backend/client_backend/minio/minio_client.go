@@ -31,30 +31,73 @@ func (minioClient *MinioClient) CreateClient() error {
 }
 
 func (minioClient *MinioClient) CreateBucketIfNotExists(bucketName string) error {
-	result, err := minioClient.client.BucketExists(context.Background(), bucketName)
-	if err != nil || result {
-		return err
+
+	bucketExistsChan := make(chan struct {
+		bool
+		error
+	})
+	go func() {
+		result, err := minioClient.client.BucketExists(context.Background(), bucketName)
+		bucketExistsChan <- struct {
+			bool
+			error
+		}{result, err}
+	}()
+
+	bucketExistsResult := <-bucketExistsChan
+	if bucketExistsResult.error != nil || bucketExistsResult.bool {
+		return bucketExistsResult.error
 	}
 
-	err = minioClient.client.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
+	makeBuckerChan := make(chan error)
+	go func() {
+		makeBuckerChan <- minioClient.client.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{})
+	}()
 
-	return err
+	return <-makeBuckerChan
 }
 
-func (minioClient *MinioClient) UploadFile(userName, fileName, data string, dataSize int64, result chan error) {
-	go minioClient.CreateBucketIfNotExists(userName)
+func (minioClient *MinioClient) UploadFile(userName, fileName, data string, dataSize int64) error {
+	minioClient.CreateBucketIfNotExists(userName)
 	textBytes := []byte(data)
-	_, err := minioClient.client.PutObject(context.Background(), userName, fileName, bytes.NewReader(textBytes), int64(len(textBytes)), minio.PutObjectOptions{ContentType: "application/octet-stream"})
-	result <- err
+
+	uploadingChan := make(chan error)
+
+	go func() {
+		_, err := minioClient.client.PutObject(context.Background(), userName, fileName, bytes.NewReader(textBytes), int64(len(textBytes)), minio.PutObjectOptions{ContentType: "application/octet-stream"})
+		uploadingChan <- err
+	}()
+
+	return <-uploadingChan
 }
 
 func (minioClient *MinioClient) DownloadFile(bucketName, filePath string) (io.Reader, error) {
 	options := minio.GetObjectOptions{}
 	options.Header().Add("Content-Type", "plain/text")
-	result, err := minioClient.client.GetObject(context.Background(), bucketName, filePath, options)
-	if err != nil {
 
-	}
+	getObjectChan := make(chan struct {
+		*minio.Object
+		error
+	})
 
-	return result, nil
+	go func() {
+		result, err := minioClient.client.GetObject(context.Background(), bucketName, filePath, options)
+		getObjectChan <- struct {
+			*minio.Object
+			error
+		}{result, err}
+	}()
+
+	getObjectResult := <-getObjectChan
+	return getObjectResult.Object, getObjectResult.error
+}
+
+func (minioClient *MinioClient) DeleteFile(bucketName, filePath string) error {
+	options := minio.RemoveObjectOptions{}
+	removeObjectChan := make(chan error)
+	go func() {
+		removeObjectChan <- minioClient.client.RemoveObject(context.Background(), bucketName, filePath, options)
+	}()
+
+	return <-removeObjectChan
 }

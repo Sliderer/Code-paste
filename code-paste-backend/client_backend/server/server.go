@@ -68,6 +68,7 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/get_resource_meta/{resourceUuid}", server.serverImpl.GetResourceMetaData)
 	http.HandleFunc("/get_resources", server.serverImpl.GetUserResources)
 	http.HandleFunc("/like_resource", server.serverImpl.LikeResource)
+	http.HandleFunc("/delete_resource/{resourceUuid}", server.serverImpl.DeleteResource)
 
 	http.HandleFunc("/create_user", server.serverImpl.CreateUser)
 	http.HandleFunc("/check_account_password", server.serverImpl.CheckAccountPassword)

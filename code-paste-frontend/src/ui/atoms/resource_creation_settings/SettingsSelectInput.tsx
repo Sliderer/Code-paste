@@ -28,8 +28,8 @@ const SettingsSelectInput = ({
       disableUnderline={true}
       className={stylingProps.styles.selectPanel}
     >
-      {values.map((value) => (
-        <MenuItem value={value} className={stylingProps.styles.selectMenuItem}>
+      {values.map((value, index) => (
+        <MenuItem key={index} value={value} className={stylingProps.styles.selectMenuItem}>
           {value}
         </MenuItem>
       ))}

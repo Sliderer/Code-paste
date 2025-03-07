@@ -10,6 +10,7 @@ type ResourceModel = {
   resource: ResourceFetchingStatus;
   resourceUuid: string | undefined;
   isLiked: boolean;
+  highlightSetting: string;
 };
 
 export const getDefaultResourceModel = (): ResourceModel => {
@@ -22,7 +23,8 @@ export const getDefaultResourceModel = (): ResourceModel => {
       status: FetchingStatus.NotStarted,
     },
     resourceUuid: undefined,
-    isLiked: false
+    isLiked: false,
+    highlightSetting: ''
   };
 };
 

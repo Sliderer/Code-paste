@@ -5,6 +5,7 @@ import (
 	. "client_backend/lib"
 	. "client_backend/models"
 	. "client_backend/models_for_server"
+	. "client_backend/postgres"
 	. "client_backend/postgres/models"
 	"compress/gzip"
 	"io"
@@ -13,7 +14,7 @@ import (
 	"unicode/utf8"
 )
 
-func CreateResource(body []byte, userId, userName, language, filePassword, fileName, folderName string, ttl int, context *HandleContext) string {
+func CreateResource(body []byte, userId, userName, language, highlightSetting, filePassword, fileName, folderName string, ttl int, context *HandleContext) string {
 	decompressed, err := gzip.NewReader(bytes.NewReader(body))
 	if err != nil {
 		log.Fatalln("Encoding gzip error: ", err)
@@ -29,19 +30,11 @@ func CreateResource(body []byte, userId, userName, language, filePassword, fileN
 
 	log.Println("File", document, int64(utf8.RuneCountInString(document)))
 
-	resultChannel := make(chan error)
-
 	fileName += ".txt"
 	filePath := folderName + "/" + fileName
 	userName = GetUserBucketName(userName)
 
-	go context.MinioClient.UploadFile(userName, filePath, document, int64(utf8.RuneCountInString(document)), resultChannel)
-	select {
-	case err := <-resultChannel:
-		if err != nil {
-
-		}
-	}
+	err = context.MinioClient.UploadFile(userName, filePath, document, int64(utf8.RuneCountInString(document)))
 
 	hashString := userId + fileName + time.Now().String()
 	resourceUuid := GetHash(hashString)
@@ -51,13 +44,14 @@ func CreateResource(body []byte, userId, userName, language, filePassword, fileN
 	}
 
 	err = context.RedisClient.UploadResourceMetaData(resourceUuid, ttl, &ResourceMetaData{
-		Title:        fileName,
-		Path:         folderName,
-		Owner:        userName,
-		Password:     passwordHash,
-		Preview:      document[:min(len(document), 100)],
-		Type:         "text",
-		CreationTime: uint64(time.Now().Unix()),
+		Title:            fileName,
+		Path:             folderName,
+		Owner:            userName,
+		Password:         passwordHash,
+		Preview:          document[:min(len(document), 100)],
+		Type:             "text",
+		HighlightSetting: highlightSetting,
+		CreationTime:     uint64(time.Now().Unix()),
 	})
 
 	if err != nil {
@@ -65,18 +59,21 @@ func CreateResource(body []byte, userId, userName, language, filePassword, fileN
 	}
 
 	if userId == "temp" {
-		result := context.PostgresClient.Database.Find(&User{
+		result := Find(context.PostgresClient.Database, &User{
 			Name: "temp",
 		})
 		if result.RowsAffected == 0 {
-			context.PostgresClient.Database.Create(&User{Id: "temp", Name: "temp", Email: "temp", Password: "temp"})
+			Create(context.PostgresClient.Database, &User{Id: "temp", Name: "temp", Email: "temp", Password: "temp"})
 		}
 	}
 
-	context.PostgresClient.Database.Create(&UserResources{
-		UserId:     userId,
-		ResourceId: resourceUuid,
-	})
+	Create(
+		context.PostgresClient.Database,
+		&UserResources{
+			UserId:     userId,
+			ResourceId: resourceUuid,
+		},
+	)
 
 	return resourceUuid
 }

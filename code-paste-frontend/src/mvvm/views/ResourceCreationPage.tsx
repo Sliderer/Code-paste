@@ -30,6 +30,7 @@ const ResourceCreationPage = observer(
     const onHighlightLanguageChange = useCallback(
       (highlightSettings: string) => {
         setProgrammingLanguageHighlight(highlightSettings);
+        viewModel.setHightlightSetting(highlightSettings);
       },
       []
     );

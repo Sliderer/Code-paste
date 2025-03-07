@@ -5,13 +5,14 @@ import (
 )
 
 type ResourceMetaData struct {
-	Title        string `json:"Title"`
-	Path         string `json:"Path"`
-	Owner        string `json:"Owner"`
-	Password     string `json:"Password"`
-	Preview      string `json:"Preview"`
-	Type         string `json:"Type"`
-	CreationTime uint64 `json:"CreationTime"`
+	Title             string `json:"Title"`
+	Path              string `json:"Path"`
+	Owner             string `json:"Owner"`
+	Password          string `json:"Password"`
+	Preview           string `json:"Preview"`
+	Type              string `json:"Type"`
+	CreationTime      uint64 `json:"CreationTime"`
+	HighlightSetting string `json:"HighlightSetting"`
 }
 
 func (i ResourceMetaData) MarshalBinary() ([]byte, error) {
