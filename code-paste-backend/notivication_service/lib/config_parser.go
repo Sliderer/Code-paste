@@ -14,8 +14,20 @@ type EmailNotificatorConfig struct {
 	UserId        string `yaml:"user_id"`
 }
 
+type TelegramNotificatorConfig struct {
+	BotToken string `yaml:"bot_token"`
+}
+
+type RedisConfig struct {
+	Address    string `yaml:"address"`
+	Password   string `yaml:"string"`
+	ClientName string `yaml:"client-name"`
+}
+
 type ServiceConfig struct {
-	EmailNotificatorConfig EmailNotificatorConfig `yaml:"email_notificator"`
+	EmailNotificatorConfig    EmailNotificatorConfig    `yaml:"email_notificator"`
+	TelegramNotificatorConfig TelegramNotificatorConfig `yaml:"telegram_notificator"`
+	RedisConfig               RedisConfig               `yaml:"redis-settings"`
 }
 
 type ConfigParser struct {
