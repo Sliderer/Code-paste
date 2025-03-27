@@ -5,6 +5,7 @@ import ResourcePreviewModel from "../../mvvm/models/ResourcePreviewModel";
 import { ResourcePreviewProps } from "../atoms/ResourcePreview";
 import StylingProps from "../../helpers/StylingProps";
 import SelectResourcesTypeButton from "../atoms/account_page/SelectResourcesTypeButton";
+import CreateFolderButton from "../atoms/CreateFolderButton";
 
 const AllUserResourcesPanel = ({
   stylingProps,
@@ -14,6 +15,7 @@ const AllUserResourcesPanel = ({
   likedResourcesList,
   likedResourcesPreviewProps,
   likedResourcesOnLoad,
+  onCreateFolder,
 }: {
   stylingProps: StylingProps;
   allResourcesList: ResourcePreviewModel[];
@@ -22,6 +24,7 @@ const AllUserResourcesPanel = ({
   likedResourcesList: ResourcePreviewModel[];
   likedResourcesPreviewProps: ResourcePreviewProps;
   likedResourcesOnLoad: () => void;
+  onCreateFolder: () => void;
 }) => {
   const [showAllResources, setShowAllResources] = useState(true);
 
@@ -55,6 +58,8 @@ const AllUserResourcesPanel = ({
           }}
           stylingProps={stylingProps}
         />
+
+      <CreateFolderButton onClick={onCreateFolder} stylingProps={stylingProps}/>
       </Stack>
       <ResourcesList
         stylingProps={stylingProps}

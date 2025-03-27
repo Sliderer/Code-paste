@@ -6,4 +6,5 @@ type ResourcePreview struct {
 	ResourceUuid string
 	Author       string
 	CreationTime uint64
+	Type         string
 }

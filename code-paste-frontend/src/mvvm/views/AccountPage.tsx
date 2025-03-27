@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import customSesionStorage from "../../helpers/SessionController";
 import ResourcesList from "../../ui/organisms/ResourcesList";
 import AllUserResourcesPanel from "../../ui/organisms/AllUserResourcesPanel";
+import CreateFolderPanel from "../../ui/moleculas/CreateFolderPanel";
 
 const AccountPage = observer(
   ({ viewModel }: { viewModel: AccountViewModel }) => {
@@ -43,7 +44,7 @@ const AccountPage = observer(
     };
 
     useEffect(() => {
-      console.log('refrsh', viewModel.account !== undefined)
+      console.log("refrsh", viewModel.account !== undefined);
       if (viewModel.account !== undefined) {
         viewModel.updateResourcesLists();
       }
@@ -58,6 +59,21 @@ const AccountPage = observer(
 
     if (viewModel.account === undefined) {
       return <></>;
+    }
+
+    if (viewModel.createFolder) {
+      return (
+        <CreateFolderPanel
+          onClose={() => {
+            viewModel.setOnCreateFolder(false);
+          }}
+          onCreate={(folderName: string) => {
+            viewModel.onCreateFolder(folderName);
+            viewModel.setOnCreateFolder(false);
+          }}
+          stylingProps={stylingProps}
+        />
+      );
     }
 
     return (
@@ -96,6 +112,9 @@ const AccountPage = observer(
                 likedResourcesList={viewModel.likedResourcesList}
                 likedResourcesPreviewProps={likedResourcePreviewProps}
                 likedResourcesOnLoad={viewModel.getLikedUsersResources}
+                onCreateFolder={() => {
+                  viewModel.setOnCreateFolder(true);
+                }}
               />
             </Stack>
           )}

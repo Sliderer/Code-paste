@@ -10,6 +10,9 @@ import { useEffect, useState } from "react";
 import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 import SharePopup from "../../ui/moleculas/SharePopup";
 import customSesionStorage from "../../helpers/SessionController";
+import ResourcesList from "../../ui/organisms/ResourcesList";
+import { ResourcePreviewProps } from "../../ui/atoms/ResourcePreview";
+import FolderDemonstration from "../../ui/moleculas/FolderDemonstration";
 
 const ResourceDemonstrationPage = observer(
   ({ viewModel }: { viewModel: ResourceDemonstrationViewModel }) => {
@@ -26,6 +29,10 @@ const ResourceDemonstrationPage = observer(
       window.removeEventListener("popstate", clearPage);
     };
 
+    const resourcePreviewProps: ResourcePreviewProps = {
+      showAuthor: false,
+    };
+
     useEffect(() => {
       const resourceUuid = location.pathname.split("/").reverse()[0];
       viewModel.setResourceUuid(resourceUuid);
@@ -38,11 +45,18 @@ const ResourceDemonstrationPage = observer(
       }
     }, [viewModel.isDeleted]);
 
+    useEffect(() => {
+      if (viewModel.backRedirectOnDelete) {
+        navigate(`/resource/${viewModel.backRedirectOnDelete}`);
+      }
+    }, [viewModel.backRedirectOnDelete]);
+
     if (
       viewModel.resourceModel.isPrivate === undefined ||
       (viewModel.getResource().resource.status === FetchingStatus.NotStarted &&
         viewModel.isPasswordEntered) ||
-      viewModel.getResource().resource.status === FetchingStatus.InProgress
+      (viewModel.getResource().resource.status === FetchingStatus.InProgress &&
+        viewModel.folderResourcesList === undefined)
     ) {
       return <LoadingPanel stylingProps={stylingProps} />;
     }
@@ -57,11 +71,21 @@ const ResourceDemonstrationPage = observer(
           />
         ) : viewModel.needToAskPassword() ? (
           <ResourcePasswordPanel onCheckButtonClick={viewModel.checkPassword} />
-        ) : (
+        ) : viewModel.resourceModel.type == "text" ? (
           <ResourceDemonstrationPanel
             stylingProps={stylingProps}
             resource={viewModel.getResource()}
             actions={viewModel.getActions()}
+          />
+        ) : (
+          <FolderDemonstration
+            onDeleteFolder={viewModel.onDeleteFolder}
+            stylingProps={stylingProps}
+            onFolderChipsClick={viewModel.onFolderChipsClick}
+            resource={viewModel.resourceModel}
+            onCreateFolder={viewModel.onCreateFolder}
+            resourcesList={viewModel.folderResourcesList ?? []}
+            resourcePreviewProps={resourcePreviewProps}
           />
         )}
       </Box>

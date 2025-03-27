@@ -21,12 +21,12 @@ class ClientServerAPI {
       headers: {
         "User-id": userId,
         "User-Name": userName,
-        "Password": password,
-        "Language": language,
+        Password: password,
+        Language: language,
         "File-Name": fileName,
         "Folder-Name": folderName,
-        "TTL": ttl,
-        "Highlight-Setting": highlightSetting
+        TTL: ttl,
+        "Highlight-Setting": highlightSetting,
       },
     });
 
@@ -48,7 +48,7 @@ class ClientServerAPI {
     let promise = await axios.get(`/check_password/${resourceUuid}`, {
       withCredentials: true,
       headers: {
-        "Password": password,
+        Password: password,
       },
     });
 
@@ -59,7 +59,7 @@ class ClientServerAPI {
     let promise = await axios.get(`/get_resource/${resourceUuid}`, {
       withCredentials: true,
       headers: {
-        "Password": password,
+        Password: password,
       },
     });
 
@@ -74,8 +74,8 @@ class ClientServerAPI {
         withCredentials: true,
         headers: {
           "User-Name": userName,
-          "Password": password,
-          "Email": email,
+          Password: password,
+          Email: email,
         },
       }
     );
@@ -88,20 +88,26 @@ class ClientServerAPI {
       withCredentials: true,
       headers: {
         "User-Name": userName,
-        "Password": password,
+        Password: password,
       },
     });
 
     return promise;
   }
 
-  async getUserResources(userId: string, offset: number, needOnlyLiked: boolean) {
+  async getUserResources(
+    userId: string,
+    path: string,
+    offset: number,
+    needOnlyLiked: boolean
+  ) {
     let promise = await axios.get(`/get_resources`, {
       withCredentials: true,
       headers: {
-        "Offset": offset,
+        Path: path,
+        Offset: offset,
         "User-Id": userId,
-        "Need-Only-Liked": needOnlyLiked === true ? "true" : "false"
+        "Need-Only-Liked": needOnlyLiked === true ? "true" : "false",
       },
     });
 
@@ -159,15 +165,54 @@ class ClientServerAPI {
   }
 
   async deleteResource(userId: string, userName: string, resourceUuid: string) {
-    let promise = await axios.delete(
-      `/delete_resource/${resourceUuid}`,
+    let promise = await axios.delete(`/delete_resource/${resourceUuid}`, {
+      headers: {
+        "User-Id": userId,
+        "User-Name": userName,
+      },
+    });
+
+    return promise;
+  }
+
+  async createFolder(
+    userName: string,
+    userId: string,
+    folderName: string,
+    folderPath: string
+  ) {
+    let promise = await axios.post(
+      `/create_folder`,
+      {},
       {
         headers: {
+          "User-Name": userName,
           "User-Id": userId,
-          "User-Name": userName
-        }
+          "Folder-Name": folderName,
+          "Folder-Path": folderPath,
+        },
       }
-    )
+    );
+
+    return promise;
+  }
+
+  async deleteFolder(userId: string, resourceUuid: string) {
+    let promise = await axios.delete(`/delete_folder/${resourceUuid}`, {
+      headers: {
+        "User-Id": userId,
+      },
+    });
+
+    return promise;
+  }
+
+  async getFolderUuid(path: string) {
+    let promise = await axios.get(`/get_folderUuid`, {
+      headers: {
+        Path: path,
+      },
+    });
 
     return promise;
   }

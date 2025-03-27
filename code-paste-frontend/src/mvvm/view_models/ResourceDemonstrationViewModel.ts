@@ -5,11 +5,16 @@ import ResourceModel, {
 import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 import ClientServerAPI from "../api/ClientServerAPI";
 import customSesionStorage from "../../helpers/SessionController";
+import ResourcePreviewModel from "../models/ResourcePreviewModel";
+import { Axios, AxiosResponse } from "axios";
 export class ResourceDemonstrationViewModel {
   @observable isPasswordEntered = false;
   @observable inSharingMode = false;
   @observable isDeleted = false;
   @observable resourceModel: ResourceModel;
+  @observable folderResourcesList: ResourcePreviewModel[] | undefined =
+    undefined;
+  @observable backRedirectOnDelete: string | undefined = undefined;
   private clientServerAPI: ClientServerAPI;
   private isCurrentUserAuthor = false;
 
@@ -23,9 +28,9 @@ export class ResourceDemonstrationViewModel {
     this.resourceModel.resourceUuid = resourceUuid;
     let userId = customSesionStorage.getUserId().getValue();
     this.clientServerAPI
-      .getResourceMetaData(userId !== null ? userId : '', resourceUuid)
+      .getResourceMetaData(userId !== null ? userId : "", resourceUuid)
       .then(async (data) => {
-        console.log(data.data)
+        console.log(data.data);
         this.resourceModel = {
           isPrivate: !data.data.IsPrivateForCurrentUser
             ? false
@@ -33,13 +38,16 @@ export class ResourceDemonstrationViewModel {
           name: data.data.Name,
           resource: this.resourceModel.resource,
           resourceUuid: this.resourceModel.resourceUuid,
-          owner: this.resourceModel.owner,
+          owner: data.data.Owner,
           isLiked: data.data.IsLiked,
           highlightSetting: data.data.HighlightSetting,
+          type: data.data.Type,
+          ownerId: data.data.OwnerId,
+          path: data.data.Path,
         };
 
         this.isCurrentUserAuthor = !data.data.IsPrivateForCurrentUser;
-        console.log("Is author", data.data.IsLiked)
+        console.log("Is author", data.data.IsLiked);
 
         if (this.resourceModel.isPrivate === false) {
           this.getResourceData("");
@@ -54,12 +62,52 @@ export class ResourceDemonstrationViewModel {
     this.resourceModel = getDefaultResourceModel();
   };
 
-  getResource = () : ResourceModel => {
+  getResource = (): ResourceModel => {
     return this.resourceModel!;
   };
 
   disableShareMode = () => {
     this.inSharingMode = false;
+  };
+
+  onCreateFolder = (folderName: string) => {
+    this.clientServerAPI
+      .createFolder(
+        customSesionStorage.getUserName().getValue()!,
+        customSesionStorage.getUserId().getValue()!,
+        folderName,
+        this.resourceModel.path
+      )
+      .then((_) => {
+        this.getResourceData("");
+      });
+  };
+
+  onDeleteFolder = () => {
+    this.clientServerAPI
+      .deleteFolder(
+        customSesionStorage.getUserId().getValue()!,
+        this.resourceModel.resourceUuid!
+      )
+      .then((_) => {
+        let splittedPath = this.resourceModel.path.split("/");
+        const newFolderPath =
+          customSesionStorage.getUserName().getValue()! +
+          "/" +
+          splittedPath.slice(1, splittedPath.length - 2).join("/");
+        this.onFolderChipsClick(newFolderPath).then((data) => {
+          console.log("new path", data.data);
+          this.backRedirectOnDelete = data.data;
+        });
+      });
+  };
+
+  onFolderChipsClick = async (
+    folderPath: string
+  ): Promise<AxiosResponse<string>> => {
+    let result = this.clientServerAPI.getFolderUuid(folderPath);
+
+    return result;
   };
 
   getActions = () => {
@@ -69,7 +117,7 @@ export class ResourceDemonstrationViewModel {
         action: () => {
           this.downloadResource();
         },
-        isActive: false
+        isActive: false,
       },
       {
         title: "Скопировать",
@@ -78,14 +126,14 @@ export class ResourceDemonstrationViewModel {
             this.resourceModel.resource!.text
           );
         },
-        isActive: false
+        isActive: false,
       },
       {
         title: "Поделиться",
         action: () => {
           this.inSharingMode = true;
         },
-        isActive: false
+        isActive: false,
       },
     ];
 
@@ -95,10 +143,10 @@ export class ResourceDemonstrationViewModel {
         action: () => {
           this.clientServerAPI.likeResource(
             customSesionStorage.getUserId().getValue()!,
-            this.resourceModel.resourceUuid!,
+            this.resourceModel.resourceUuid!
           );
         },
-        isActive: this.resourceModel.isLiked
+        isActive: this.resourceModel.isLiked,
       });
     }
 
@@ -113,7 +161,7 @@ export class ResourceDemonstrationViewModel {
           );
           this.isDeleted = true;
         },
-        isActive: false
+        isActive: false,
       });
     }
 
@@ -121,7 +169,7 @@ export class ResourceDemonstrationViewModel {
       actions.push({
         title: "Автор",
         action: () => {},
-        isActive: false
+        isActive: false,
       });
     }
 
@@ -174,26 +222,76 @@ export class ResourceDemonstrationViewModel {
       resourceUuid: this.resourceModel.resourceUuid,
       owner: this.resourceModel.owner,
       isLiked: this.resourceModel.isLiked,
-      highlightSetting: this.resourceModel.highlightSetting
+      highlightSetting: this.resourceModel.highlightSetting,
+      type: this.resourceModel.type,
+      ownerId: this.resourceModel.ownerId,
+      path: this.resourceModel.path,
     };
-    this.clientServerAPI
-      .getResourceData(this.resourceModel.resourceUuid!, password)
-      .then((data) => {
-        this.resourceModel = {
-          isPrivate: this.resourceModel.isPrivate,
-          name: this.resourceModel.name,
-          resource: {
-            text: data.data,
-            status: FetchingStatus.Finished,
-          },
-          resourceUuid: this.resourceModel.resourceUuid,
-          owner: this.resourceModel.owner,
-          isLiked: this.resourceModel.isLiked,
-          highlightSetting: this.resourceModel.highlightSetting
-        };
-      })
-      .catch((reason) => console.log(reason));
+
+    if (this.resourceModel.type == "text") {
+      this.clientServerAPI
+        .getResourceData(this.resourceModel.resourceUuid!, password)
+        .then((data) => {
+          this.resourceModel = {
+            isPrivate: this.resourceModel.isPrivate,
+            name: this.resourceModel.name,
+            resource: {
+              text: data.data,
+              status: FetchingStatus.Finished,
+            },
+            resourceUuid: this.resourceModel.resourceUuid,
+            owner: this.resourceModel.owner,
+            isLiked: this.resourceModel.isLiked,
+            highlightSetting: this.resourceModel.highlightSetting,
+            type: this.resourceModel.type,
+            ownerId: this.resourceModel.ownerId,
+            path: this.resourceModel.path,
+          };
+        })
+        .catch((reason) => console.log(reason));
+    } else {
+      this.clientServerAPI
+        .getUserResources(
+          this.resourceModel.ownerId,
+          this.resourceModel.path,
+          0,
+          false
+        )
+        .then((data) => {
+          this.folderResourcesList = [];
+          data.data.Resources.map(
+            (resource: {
+              Title: string;
+              Preview: string;
+              ResourceUuid: string;
+              Author: string;
+              Type: string;
+            }) => {
+              this.refresh(resource);
+            }
+          );
+        });
+    }
   };
+
+  @action private refresh(resource: {
+    Title: string;
+    Preview: string;
+    ResourceUuid: string;
+    Author: string;
+    Type: string;
+  }) {
+    this.folderResourcesList = [
+      ...this.folderResourcesList!,
+      {
+        name: resource.Title,
+        previewText: resource.Preview,
+        resourceUuid: resource.ResourceUuid,
+        author: resource.Author,
+        type: resource.Type,
+      },
+    ];
+  }
 }
 
 export let resourceDemonstrationViewModel =

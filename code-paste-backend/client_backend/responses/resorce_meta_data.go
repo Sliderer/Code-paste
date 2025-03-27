@@ -5,7 +5,9 @@ type ResourceMetaDataResponse struct {
 	IsPrivateForCurrentUser bool
 	IsLiked                 bool
 	Owner                   string
+	OwnerId                 string
 	Name                    string
 	Type                    string
 	HighlightSetting        string
+	Path                    string
 }

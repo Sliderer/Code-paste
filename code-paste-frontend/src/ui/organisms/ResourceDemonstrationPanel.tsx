@@ -6,6 +6,7 @@ import ResourceModel from "../../mvvm/models/ResourceModel";
 import { getCodeEditorTheme, getLanguageSyntax } from "../../helpers/CodeEditorHelpers";
 import CodeMirror from "@uiw/react-codemirror";
 import "../css/code_editor_style.css";
+import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 
 const ResourceDemonstrationPanel = ({
   stylingProps,

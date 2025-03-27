@@ -10,8 +10,10 @@ export class AccountViewModel {
   @observable resourcesList: ResourcePreviewModel[] = [];
   @observable likedResourcesList: ResourcePreviewModel[] = [];
   @observable redirectToEnder: boolean = false;
+  @observable createFolder: boolean = false;
   private clientServerAPI: ClientServerAPI;
-  private loadedResourcesCount = 0;
+  private loadedResourcesCount: number = 0;
+  private defaultPath: string = "default";
 
   constructor() {
     this.clientServerAPI = new ClientServerAPI();
@@ -78,10 +80,24 @@ export class AccountViewModel {
     this.getUsersResourcesWithFilter(true);
   };
 
+  setOnCreateFolder = (value: boolean) => {
+    this.createFolder = value;
+  }
+
+  onCreateFolder = (folderName: string) => {
+    this.clientServerAPI.createFolder(
+      customSessionStorage.getUserName().getValue()!,
+      customSessionStorage.getUserId().getValue()!,
+      folderName,
+      this.defaultPath
+    )
+  }
+
   private getUsersResourcesWithFilter = (needOnlyLiked: boolean) => {
     this.clientServerAPI
       .getUserResources(
         this.account!.id,
+        this.defaultPath,
         this.loadedResourcesCount,
         needOnlyLiked
       )
@@ -92,6 +108,7 @@ export class AccountViewModel {
             Preview: string;
             ResourceUuid: string;
             Author: string;
+            Type: string;
           }) => {
             this.refresh(needOnlyLiked, resource);
           }
@@ -107,6 +124,7 @@ export class AccountViewModel {
       Preview: string;
       ResourceUuid: string;
       Author: string;
+      Type: string;
     }
   ) {
     if (needOnlyLiked) {
@@ -117,6 +135,7 @@ export class AccountViewModel {
           previewText: resource.Preview,
           resourceUuid: resource.ResourceUuid,
           author: resource.Author,
+          type: resource.Type,
         },
       ];
     } else {
@@ -127,6 +146,7 @@ export class AccountViewModel {
           previewText: resource.Preview,
           resourceUuid: resource.ResourceUuid,
           author: resource.Author,
+          type: resource.Type,
         },
       ];
     }

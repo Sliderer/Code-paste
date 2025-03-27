@@ -2,6 +2,7 @@ import { Box, Stack, Typography } from "@mui/material";
 import ResourcePreviewModel from "../../mvvm/models/ResourcePreviewModel";
 import { Link } from "react-router-dom";
 import StylingProps from "../../helpers/StylingProps";
+import { Folder } from "@mui/icons-material";
 
 export type ResourcePreviewProps = {
   showAuthor: boolean;
@@ -18,6 +19,7 @@ const ResourcePreview = ({
 }) => {
   return (
     <Link
+      reloadDocument
       style={{
         color: stylingProps.theme.palette.primary.dark,
         textDecoration: "none",
@@ -32,6 +34,9 @@ const ResourcePreview = ({
           alignContent={"center"}
           spacing={2}
         >
+          {
+            resource.type === "folder" && <Folder/>
+          }
           <Typography
             style={{
               fontSize: "30px",

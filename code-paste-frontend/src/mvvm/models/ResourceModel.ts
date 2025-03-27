@@ -11,6 +11,9 @@ type ResourceModel = {
   resourceUuid: string | undefined;
   isLiked: boolean;
   highlightSetting: string;
+  type: string;
+  ownerId: string;
+  path: string;
 };
 
 export const getDefaultResourceModel = (): ResourceModel => {
@@ -24,7 +27,10 @@ export const getDefaultResourceModel = (): ResourceModel => {
     },
     resourceUuid: undefined,
     isLiked: false,
-    highlightSetting: ''
+    highlightSetting: '',
+    type: '',
+    ownerId: '',
+    path: '',
   };
 };
 

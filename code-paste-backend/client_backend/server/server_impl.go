@@ -175,13 +175,13 @@ func (serverImpl *ServerImpl) CheckAccountPassword(w http.ResponseWriter, r *htt
 }
 
 func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, user-id, offset, need-only-liked")
+	w = SetDefaultHeaders(w, "content-type, user-id, offset, need-only-liked, path")
 
 	if r.Method == "GET" {
 		userId := r.Header.Get("User-Id")
+		path := r.Header.Get("Path")
 		var needOnlyLiked bool
 
-		log.Println("Liked", r.Header.Get("Need-Only-Liked"))
 		if r.Header.Get("Need-Only-Liked") == "true" {
 			needOnlyLiked = true
 		} else {
@@ -189,7 +189,7 @@ func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Re
 		}
 		offset, _ := strconv.Atoi(r.Header.Get("Offset"))
 
-		resourcesPreview, err := GetUserResources(userId, offset, needOnlyLiked, serverImpl.Context)
+		resourcesPreview, err := GetUserResources(userId, path, offset, needOnlyLiked, serverImpl.Context)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -278,6 +278,69 @@ func (serverImpl *ServerImpl) LikeResource(w http.ResponseWriter, r *http.Reques
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
+	}
+}
+
+func (serverImpl *ServerImpl) CreateFolder(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w, "content-type, user-name, user-id, folder-name, folder-path")
+
+	if r.Method == "POST" {
+		userName := r.Header.Get("User-Name")
+		userId := r.Header.Get("User-Id")
+		folderName := r.Header.Get("Folder-Name")
+		folderPath := r.Header.Get("Folder-Path")
+
+		err := CreateFolder(userName, userId, folderName, folderPath, serverImpl.Context)
+
+		if err != nil {
+			log.Println("Error deleting resource: ", err)
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusOK)
+		}
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func (serverImpl *ServerImpl) DeleteFolder(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w, "content-type, user-id")
+
+	if r.Method == "DELETE" {
+		userId := r.Header.Get("User-Id")
+		resourceUuid := r.PathValue("resourceUuid")
+
+		err := DeleteFolder(userId, resourceUuid, serverImpl.Context)
+
+		if err != nil {
+			log.Println("Error deleting resource: ", err)
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusOK)
+		}
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func (serverImpl *ServerImpl) GetFolderUuid(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w, "content-type, path")
+
+	if r.Method == "GET" {
+		path := r.Header.Get("Path")
+
+		resourceUuid, err := GetFolderUuid(path, serverImpl.Context)
+
+		if err != nil {
+			log.Println("Error getting folder uuid: ", err)
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusOK)
+			log.Println("Folder Uuid", resourceUuid)
+			w.Write([]byte(resourceUuid))
+		}
+	} else {
+		w.WriteHeader(http.StatusOK)
 	}
 }
 

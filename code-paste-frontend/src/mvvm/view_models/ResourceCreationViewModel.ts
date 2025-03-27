@@ -122,6 +122,8 @@ export class ResourceCreationViewModel {
     let folderPath = this.model.folderPath;
     if (folderPath.length === 0) {
       folderPath = "default";
+    } else {
+      folderPath = "default/" + folderPath;
     }
 
     this.clientAPI

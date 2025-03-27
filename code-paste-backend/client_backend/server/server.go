@@ -73,6 +73,10 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/create_user", server.serverImpl.CreateUser)
 	http.HandleFunc("/check_account_password", server.serverImpl.CheckAccountPassword)
 
+	http.HandleFunc("/create_folder", server.serverImpl.CreateFolder)
+	http.HandleFunc("/delete_folder/{resourceUuid}", server.serverImpl.DeleteFolder)
+	http.HandleFunc("/get_folderUuid", server.serverImpl.GetFolderUuid)
+
 	http.HandleFunc("/check_password/{resourceUuid}", server.serverImpl.CheckResourcePassword)
 	http.HandleFunc("/get_user_metadata", server.serverImpl.GetUserMetadata)
 	http.HandleFunc("/update_user_contacts", server.serverImpl.UpdateUserContacts)

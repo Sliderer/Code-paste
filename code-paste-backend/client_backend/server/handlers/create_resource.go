@@ -47,6 +47,7 @@ func CreateResource(body []byte, userId, userName, language, highlightSetting, f
 		Title:            fileName,
 		Path:             folderName,
 		Owner:            userName,
+		OwnerId:          userId,
 		Password:         passwordHash,
 		Preview:          document[:min(len(document), 100)],
 		Type:             "text",
@@ -67,13 +68,17 @@ func CreateResource(body []byte, userId, userName, language, highlightSetting, f
 		}
 	}
 
-	Create(
+	result := Create(
 		context.PostgresClient.Database,
 		&UserResources{
 			UserId:     userId,
 			ResourceId: resourceUuid,
 		},
 	)
+
+	if result.Error != nil {
+		log.Println(result.Error)
+	}
 
 	return resourceUuid
 }

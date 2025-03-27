@@ -31,14 +31,21 @@ func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context
 		isLiked = result.RowsAffected > 0 && likedResourceRow.IsActive
 	}
 
+	resourcePath := resourceMetaData.Path
+	if resourceMetaData.Type == "folder" {
+		resourcePath += "/" + resourceMetaData.Title
+	}
+
 	return response.ResourceMetaDataResponse{
 		IsPrivate:               resourceMetaData.HasPassword(),
 		IsPrivateForCurrentUser: resourceMetaData.Owner != GetUserBucketName(requestSenderName),
 		IsLiked:                 isLiked,
 		Owner:                   resourceMetaData.Owner,
+		OwnerId:                 resourceMetaData.OwnerId,
 		Name:                    resourceMetaData.Title,
 		Type:                    resourceMetaData.Type,
 		HighlightSetting:        resourceMetaData.HighlightSetting,
+		Path:                    resourcePath,
 	}, nil
 }
 
@@ -74,7 +81,7 @@ func GetResourceData(resourceUuid string, context *HandleContext) ([]byte, error
 	return textData, nil
 }
 
-func GetUserResources(userId string, offset int, needOnlyLiked bool, context *HandleContext) ([]ResourcePreview, error) {
+func GetUserResources(userId string, lookUpPath string, offset int, needOnlyLiked bool, context *HandleContext) ([]ResourcePreview, error) {
 	var userResourceUuids []string
 	const resourcesCountLimit = 30
 	var result *gorm.DB
@@ -97,6 +104,15 @@ func GetUserResources(userId string, offset int, needOnlyLiked bool, context *Ha
 		for _, value := range userResources {
 			userResourceUuids = append(userResourceUuids, value.ResourceId)
 		}
+
+		var userFolders []UserFolders
+		result = Find(
+			context.PostgresClient.Database.Offset(offset).Limit(resourcesCountLimit).Select("resource_id").Where("user_id = ?", userId),
+			&userFolders,
+		)
+		for _, value := range userFolders {
+			userResourceUuids = append(userResourceUuids, value.ResourceId)
+		}
 	}
 
 	if result.Error != nil {
@@ -108,16 +124,27 @@ func GetUserResources(userId string, offset int, needOnlyLiked bool, context *Ha
 	for _, resourceUuid := range userResourceUuids {
 		resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
 		if err != nil {
-			log.Println("Error in redis: ", err)
+			log.Println("Error in redis getting user resources: ", err)
 			continue
 		}
 
+		log.Println("File path matching", lookUpPath, resourceMetaData.Path)
+		if resourceMetaData.Path != lookUpPath {
+			continue
+		}
+
+		resourceTitle := resourceMetaData.Title
+		if resourceMetaData.Type == "text" {
+			resourceTitle = resourceMetaData.Title[:strings.LastIndex(resourceMetaData.Title, ".")]
+		}
+
 		resourcePreviews = append(resourcePreviews, ResourcePreview{
-			Title:        resourceMetaData.Title[:strings.LastIndex(resourceMetaData.Title, ".")],
+			Title:        resourceTitle,
 			Preview:      resourceMetaData.Preview,
 			ResourceUuid: resourceUuid,
 			Author:       resourceMetaData.Owner,
 			CreationTime: resourceMetaData.CreationTime,
+			Type:         resourceMetaData.Type,
 		})
 	}
 

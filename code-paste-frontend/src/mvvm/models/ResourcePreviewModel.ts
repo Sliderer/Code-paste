@@ -3,6 +3,7 @@ class ResourcePreviewModel {
     previewText: string = ''
     resourceUuid: string = ''
     author: string = ''
+    type: string = ''
 }
 
 export default ResourcePreviewModel;
