@@ -28,9 +28,12 @@ export class AccountViewModel {
   };
 
   subscribeOnPublications = (publisher: string) => {
-    if (customSessionStorage.getUserId().getValue() == null) {
+    let userId = customSessionStorage.getUserId().getValue();
+    if (userId == null) {
       this.redirectToEnder = true;
     }
+    
+    this.clientServerAPI.subscribeOnPublications(userId!, this.account!.id)
   };
 
   getUserMetaData = (userName: string) => {

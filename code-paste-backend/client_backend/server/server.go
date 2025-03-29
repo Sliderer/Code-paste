@@ -4,7 +4,9 @@ import (
 	"client_backend/minio"
 	. "client_backend/models"
 	. "client_backend/models_for_server"
+	. "client_backend/notifications_client"
 	"client_backend/postgres"
+	. "client_backend/proto/notifications"
 	"client_backend/redis"
 	"fmt"
 	"log"
@@ -15,15 +17,17 @@ import (
 )
 
 type ClientServer struct {
-	ServerSettings ServerSettings
-	serverImpl     ServerImpl
-	HttpClient     *http.Client
-	IAM            string
-	IAMTokenMutex  sync.Mutex
+	ServerSettings      ServerSettings
+	serverImpl          ServerImpl
+	HttpClient          *http.Client
+	NotificationsClient NotificationsClient
+	IAM                 string
+	IAMTokenMutex       sync.Mutex
 }
 
 func (server *ClientServer) InitFields() {
 	server.HttpClient = &http.Client{}
+	server.NotificationsClient = GetNotificationsClient(server.ServerSettings.NotificationServiceAddress)
 
 	server.serverImpl = ServerImpl{
 		Context: &HandleContext{
@@ -48,10 +52,10 @@ func (server *ClientServer) InitFields() {
 				TranslateFolderId: server.ServerSettings.TranslateFolderId,
 				TranslateUrl:      server.ServerSettings.TranslateUrl,
 			},
-			HttpClient: server.HttpClient,
+			HttpClient:          server.HttpClient,
+			NotificationsClient: &server.NotificationsClient,
 		},
 	}
-
 	server.serverImpl.Context.Initialize()
 }
 
@@ -72,6 +76,7 @@ func (server *ClientServer) StartServer() {
 
 	http.HandleFunc("/create_user", server.serverImpl.CreateUser)
 	http.HandleFunc("/check_account_password", server.serverImpl.CheckAccountPassword)
+	http.HandleFunc("/subscribe", server.serverImpl.Subscribe)
 
 	http.HandleFunc("/create_folder", server.serverImpl.CreateFolder)
 	http.HandleFunc("/delete_folder/{resourceUuid}", server.serverImpl.DeleteFolder)

@@ -1,27 +1,35 @@
-package telegram_bot
+package notificators
 
 import (
 	"log"
 
+	. "notification_service/lib"
 	. "notification_service/redis"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type BotFather struct {
-	Bot *tgbotapi.BotAPI
+type TelegramNotificator struct {
+	Bot         *tgbotapi.BotAPI
+	RedisClient *RedisClient
 }
 
-func (botFather *BotFather) SendMessage(chatId int64, message string) {
-	_, err := botFather.Bot.Send(tgbotapi.NewMessage(chatId, message))
+func (notificator *TelegramNotificator) Notificate(sender, reciever string) error {
+	chatId, _ := notificator.RedisClient.GetUserInfo(reciever)
+	message := CreateNotificationText(sender)
+	return notificator.SendMessage(chatId, message)
+}
+
+func (notificator *TelegramNotificator) SendMessage(chatId int64, message string) error {
+	_, err := notificator.Bot.Send(tgbotapi.NewMessage(chatId, message))
 	if err != nil {
 		log.Println(err)
-	} else {
-		log.Println("sender")
 	}
+
+	return err
 }
 
-func (botFather *BotFather) StartBot(botToken string, redisClient *RedisClient, startedChan chan bool) {
+func (notificator *TelegramNotificator) StartBot(botToken string, redisClient *RedisClient, startedChan chan bool) {
 	bot, err := tgbotapi.NewBotAPI(botToken)
 	if err != nil {
 		log.Panic(err)
@@ -36,7 +44,8 @@ func (botFather *BotFather) StartBot(botToken string, redisClient *RedisClient, 
 
 	updates := bot.GetUpdatesChan(u)
 
-	botFather.Bot = bot
+	notificator.Bot = bot
+	notificator.RedisClient = redisClient
 	startedChan <- true
 
 	for update := range updates {

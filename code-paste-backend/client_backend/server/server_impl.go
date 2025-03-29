@@ -363,3 +363,19 @@ func (serverImpl *ServerImpl) DeleteResource(w http.ResponseWriter, r *http.Requ
 		w.WriteHeader(http.StatusOK)
 	}
 }
+
+func (serverImpl *ServerImpl) Subscribe(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w, "content-type, subscriber-id, publisher-id")
+
+	if r.Method == "POST" {
+		subsriberId := r.Header.Get("Subscriber-Id")
+		publisherId := r.Header.Get("Publisher-Id")
+		err := Subscribe(subsriberId, publisherId, serverImpl.Context)
+
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusOK)
+		}
+	}
+}

@@ -7,7 +7,9 @@ import (
 	. "client_backend/models_for_server"
 	. "client_backend/postgres"
 	. "client_backend/postgres/models"
+	. "client_backend/proto/notifications"
 	"compress/gzip"
+	ctx "context"
 	"io"
 	"log"
 	"time"
@@ -80,5 +82,45 @@ func CreateResource(body []byte, userId, userName, language, highlightSetting, f
 		log.Println(result.Error)
 	}
 
+	if userId != "temp" {
+		SendNotifications(context, userId, userName)
+	}
+
 	return resourceUuid
+}
+
+func SendNotifications(context *HandleContext, userId, userName string) {
+	var subscribtions []Subscribtions
+	Find(
+		context.PostgresClient.Database.Where("publisher_id = ?", userId),
+		&subscribtions,
+	)
+
+	for _, subscribtion := range subscribtions {
+		var subscriber User
+		Find(
+			context.PostgresClient.Database.Where("id = ?", subscribtion.SubscriberId),
+			&subscriber,
+		)
+		log.Println("Subscriber: ", subscriber.Telegram)
+		(*context.NotificationsClient).SendNotification(
+			ctx.Background(),
+			&SendNotificationRequest{
+				Sender:   userName,
+				Reciever: subscriber.Email,
+				Type:     NotificationType_Email,
+			},
+		)
+
+		if len(subscriber.Telegram) > 0 {
+			(*context.NotificationsClient).SendNotification(
+				ctx.Background(),
+				&SendNotificationRequest{
+					Sender:   userName,
+					Reciever: subscriber.Telegram,
+					Type:     NotificationType_Telegram,
+				},
+			)
+		}
+	}
 }

@@ -216,6 +216,17 @@ class ClientServerAPI {
 
     return promise;
   }
+
+  async subscribeOnPublications(subsriber_id: string, publisher_id: string) {
+    let promise = await axios.post(`/subscribe`, {}, {
+      headers: {
+        'Subscriber-Id': subsriber_id,
+        'Publisher-Id': publisher_id
+      }
+    });
+
+    return promise;
+  }
 }
 
 export default ClientServerAPI;

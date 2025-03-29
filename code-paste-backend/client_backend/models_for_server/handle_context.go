@@ -4,6 +4,7 @@ import (
 	. "client_backend/kafka"
 	. "client_backend/minio"
 	. "client_backend/postgres"
+	. "client_backend/proto/notifications"
 	. "client_backend/redis"
 	"net/http"
 )
@@ -15,13 +16,14 @@ type TranslationContext struct {
 }
 
 type HandleContext struct {
-	MinioClient        *MinioClient
-	RedisClient        *RedisClient
-	KafkaClient        *KafkaClient
-	PostgresClient     *PostgresClient
-	SessionStore       *SessionStore
-	HttpClient         *http.Client
-	TranslationContext TranslationContext
+	MinioClient         *MinioClient
+	RedisClient         *RedisClient
+	KafkaClient         *KafkaClient
+	PostgresClient      *PostgresClient
+	SessionStore        *SessionStore
+	HttpClient          *http.Client
+	NotificationsClient *NotificationsClient
+	TranslationContext  TranslationContext
 }
 
 func (context *HandleContext) Initialize() {

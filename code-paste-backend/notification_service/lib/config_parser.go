@@ -25,6 +25,7 @@ type RedisConfig struct {
 }
 
 type ServiceConfig struct {
+	SeverPort                 uint64                    `yaml:"server_port"`
 	EmailNotificatorConfig    EmailNotificatorConfig    `yaml:"email_notificator"`
 	TelegramNotificatorConfig TelegramNotificatorConfig `yaml:"telegram_notificator"`
 	RedisConfig               RedisConfig               `yaml:"redis-settings"`

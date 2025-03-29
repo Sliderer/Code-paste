@@ -6,6 +6,7 @@ import (
 	. "client_backend/postgres/models"
 	. "client_backend/requests"
 	responses "client_backend/responses"
+	"log"
 )
 
 const (
@@ -61,4 +62,20 @@ func LikeResource(request LikeResourceRequest, context *HandleContext) error {
 		)
 		return result.Error
 	}
+}
+
+func Subscribe(subscriberId, publisherId string, context *HandleContext) error {
+	result := Create(
+		context.PostgresClient.Database,
+		&Subscribtions{
+			SubscriberId: subscriberId,
+			PublisherId:  publisherId,
+		},
+	)
+
+	if result.Error != nil {
+		log.Println("Error creating a subscribtion: ", result.Error)
+	}
+
+	return result.Error
 }
