@@ -27,6 +27,12 @@ const ResourceCreationPage = observer(
       }
     }, [viewModel.createdResource]);
 
+    useEffect(() => {
+      if (viewModel.uploadingError !== undefined) {
+        setError(viewModel.uploadingError);
+      }
+    }, [viewModel.uploadingError]);
+
     const onHighlightLanguageChange = useCallback(
       (highlightSettings: string) => {
         setProgrammingLanguageHighlight(highlightSettings);

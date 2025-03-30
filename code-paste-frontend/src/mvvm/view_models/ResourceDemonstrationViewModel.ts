@@ -15,6 +15,7 @@ export class ResourceDemonstrationViewModel {
   @observable folderResourcesList: ResourcePreviewModel[] | undefined =
     undefined;
   @observable backRedirectOnDelete: string | undefined = undefined;
+  @observable resourceAuthorRedirect: string | undefined = undefined;
   private clientServerAPI: ClientServerAPI;
   private isCurrentUserAuthor = false;
 
@@ -32,7 +33,7 @@ export class ResourceDemonstrationViewModel {
       .then(async (data) => {
         console.log(data.data);
         this.resourceModel = {
-          isPrivate: !data.data.IsPrivateForCurrentUser
+          isPrivate: data.data.OwnerId == customSesionStorage.getUserId().getValue()
             ? false
             : data.data.IsPrivate,
           name: data.data.Name,
@@ -46,8 +47,7 @@ export class ResourceDemonstrationViewModel {
           path: data.data.Path,
         };
 
-        this.isCurrentUserAuthor = !data.data.IsPrivateForCurrentUser;
-        console.log("Is author", data.data.IsLiked);
+        this.isCurrentUserAuthor = data.data.OwnerId == customSesionStorage.getUserId().getValue();
 
         if (this.resourceModel.isPrivate === false) {
           this.getResourceData("");
@@ -168,7 +168,10 @@ export class ResourceDemonstrationViewModel {
     if (this.resourceModel.owner && this.resourceModel.owner !== "temp") {
       actions.push({
         title: "Автор",
-        action: () => {},
+        action: () => {
+          console.log(this.resourceModel.owner)
+          this.resourceAuthorRedirect = this.resourceModel.owner;
+        },
         isActive: false,
       });
     }

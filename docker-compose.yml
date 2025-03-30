@@ -36,6 +36,8 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     command: server --console-address ":9001" /data
+    ports:
+      - 9001:9001
     networks:
       default:
         ipv4_address: 10.5.0.5

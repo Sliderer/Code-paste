@@ -10,13 +10,14 @@ import (
 	. "client_backend/proto/notifications"
 	"compress/gzip"
 	ctx "context"
+	"errors"
 	"io"
 	"log"
 	"time"
 	"unicode/utf8"
 )
 
-func CreateResource(body []byte, userId, userName, language, highlightSetting, filePassword, fileName, folderName string, ttl int, context *HandleContext) string {
+func CreateResource(body []byte, userId, userName, language, highlightSetting, filePassword, fileName, folderName string, ttl int, context *HandleContext) (string, error) {
 	decompressed, err := gzip.NewReader(bytes.NewReader(body))
 	if err != nil {
 		log.Fatalln("Encoding gzip error: ", err)
@@ -35,6 +36,18 @@ func CreateResource(body []byte, userId, userName, language, highlightSetting, f
 	fileName += ".txt"
 	filePath := folderName + "/" + fileName
 	userName = GetUserBucketName(userName)
+
+	if folderName != "default" {
+		var folder UserFolders
+		folderLookup := Find(
+			context.PostgresClient.Database.Where("user_id = ? AND folder_path = ?", userId, folderName),
+			&folder,
+		)
+
+		if folderLookup.Error != nil || folder.FolderPath != folderName {
+			return "", errors.New("такой папки не существует")
+		}
+	}
 
 	err = context.MinioClient.UploadFile(userName, filePath, document, int64(utf8.RuneCountInString(document)))
 
@@ -59,6 +72,7 @@ func CreateResource(body []byte, userId, userName, language, highlightSetting, f
 
 	if err != nil {
 		log.Println(err)
+		return "", errors.New("не удалось загрузить файл, попробуйте снова")
 	}
 
 	if userId == "temp" {
@@ -80,13 +94,14 @@ func CreateResource(body []byte, userId, userName, language, highlightSetting, f
 
 	if result.Error != nil {
 		log.Println(result.Error)
+		return "", errors.New("не удалось загрузить файл, попробуйте снова")
 	}
 
 	if userId != "temp" {
 		SendNotifications(context, userId, userName)
 	}
 
-	return resourceUuid
+	return resourceUuid, nil
 }
 
 func SendNotifications(context *HandleContext, userId, userName string) {

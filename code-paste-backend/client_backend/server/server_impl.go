@@ -62,7 +62,6 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 		response, err := json.Marshal(resourceMetaData)
 
 		if err != nil {
-
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -83,7 +82,6 @@ func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Req
 		textData, err := GetResourceData(resourceUuid, serverImpl.Context)
 
 		if err != nil {
-			log.Println(err)
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -113,7 +111,13 @@ func (serverImpl *ServerImpl) UploadResource(w http.ResponseWriter, r *http.Requ
 		highlightSetting := r.Header.Get("Highlight-Setting")
 		ttl, _ := strconv.Atoi(r.Header.Get("ttl"))
 
-		resourceUuid := CreateResource(body, userId, userName, language, highlightSetting, filePassword, fileName, folderName, ttl, serverImpl.Context)
+		resourceUuid, err := CreateResource(body, userId, userName, language, highlightSetting, filePassword, fileName, folderName, ttl, serverImpl.Context)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte(err.Error()))
+			log.Println(err.Error())
+			return
+		}
 		w.Write([]byte(resourceUuid))
 	} else {
 		w.WriteHeader(http.StatusOK)

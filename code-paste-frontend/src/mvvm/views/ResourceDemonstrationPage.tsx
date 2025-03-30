@@ -51,6 +51,12 @@ const ResourceDemonstrationPage = observer(
       }
     }, [viewModel.backRedirectOnDelete]);
 
+    useEffect(() => {
+      if (viewModel.resourceAuthorRedirect) {
+        navigate(`/account/${viewModel.resourceAuthorRedirect}`);
+      }
+    }, [viewModel.resourceAuthorRedirect]);
+
     if (
       viewModel.resourceModel.isPrivate === undefined ||
       (viewModel.getResource().resource.status === FetchingStatus.NotStarted &&

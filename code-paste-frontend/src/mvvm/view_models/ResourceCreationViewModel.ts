@@ -9,6 +9,7 @@ import ValidationResult from "../../helpers/ValidationResult";
 
 export class ResourceCreationViewModel {
   @observable createdResource: string | undefined = undefined;
+  @observable uploadingError: string | undefined = undefined;
   private model: ResourceCreationModel;
   private clientAPI: ClientServerAPI;
 
@@ -141,6 +142,9 @@ export class ResourceCreationViewModel {
       .then((data) => {
         this.createdResource = data.data;
         this.model = new ResourceCreationModel();
+      })
+      .catch(data => {
+        this.uploadingError = 'Не удалось загрузить файл: проверьте правильность пути до папки';
       });
   }
 }

@@ -93,7 +93,11 @@ export class AccountViewModel {
       customSessionStorage.getUserId().getValue()!,
       folderName,
       this.defaultPath
-    )
+    ).then(_ => {
+      if (this.account !== undefined) {
+        this.updateResourcesLists();
+      }
+    })
   }
 
   private getUsersResourcesWithFilter = (needOnlyLiked: boolean) => {
