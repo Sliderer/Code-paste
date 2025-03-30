@@ -17,7 +17,7 @@ type ServerImpl struct {
 
 func SetDefaultHeaders(w http.ResponseWriter, allowedHeaders string) http.ResponseWriter {
 	w.Header().Set("Content-Type", "*")
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost")
 	w.Header().Set("Access-Control-Max-Age", "15")
 	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
 	w.Header().Set("Access-Control-Allow-Credentials", "true")

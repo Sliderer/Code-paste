@@ -8,6 +8,6 @@ email_notificator:
 telegram_notificator:
   bot_token: 7314772909:AAGSeLJcid1DLSA94VjEHEBKYzaaEE7SfW4
 redis-settings:
-  address: "51.250.40.56:6379"
+  address: "10.5.0.6:6379"
   password: "redisadmin"
   client-name: "redisadmin"

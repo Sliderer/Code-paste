@@ -2,7 +2,6 @@ package redis
 
 import (
 	"context"
-	"log"
 	"strconv"
 
 	redis "github.com/redis/go-redis/v9"
@@ -24,7 +23,7 @@ func (redisClient *RedisClient) SaveUserInfo(userName string, chatId int64) erro
 }
 
 func (redisClient *RedisClient) GetUserInfo(userName string) (int64, error) {
-	
+
 	result := redisClient.Client.Get(context.Background(), "user_info:"+userName)
 	chatId, _ := strconv.ParseInt(result.Val(), 10, 64)
 	return chatId, result.Err()
