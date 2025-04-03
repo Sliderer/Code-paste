@@ -1,0 +1,8 @@
+email_notificator:
+  our_address: "addr"
+  server_address: "smtp.mail.ru:587"
+  server_host: "smtp.mail.ru"
+  password: "password"
+  user_id: "id"
+telegram_notificator:
+  bot_token: token

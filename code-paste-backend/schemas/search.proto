@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package notifications;
+option go_package = "./search";
+
+enum NotificationType {
+    Email = 0;
+    Telegram = 1;
+}
+
+message UploadInIndexRequest {
+    NotificationType type = 1;
+    string sender = 2;
+    string reciever = 3;
+}
+
+message UploadInIndexResponse {}
+
+message SearchResourcesRequest {
+    string search_text = 1;
+}
+
+message SearchResourcesResponse {
+    repeated string resource_ids = 1;
+}
+
+service Search {
+    rpc UploadInIndex (UploadInIndexRequest) returns(UploadInIndexResponse) {}
+    rpc SearchResources (SearchResourcesRequest) returns(SearchResourcesResponse) {}
+}
+

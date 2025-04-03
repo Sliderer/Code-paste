@@ -76,6 +76,12 @@ services:
       default:
         ipv4_address: 10.5.0.7
 
+  search_backend:
+    build: ./code-paste-backend/search_backend
+    networks:
+      default:
+        ipv4_address: 10.5.0.8
+
 volumes:
   minio_storage: {}
 
