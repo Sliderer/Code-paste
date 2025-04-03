@@ -1,3 +1,4 @@
 code-paste-backend/notivication_service/config/config.yml
 code-paste-backend/client_backend/config/config.yml
+code-paste-backend/search_backend/config/config.yml
 postgres-data
