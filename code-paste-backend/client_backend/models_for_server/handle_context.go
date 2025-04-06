@@ -5,6 +5,7 @@ import (
 	. "client_backend/minio"
 	. "client_backend/postgres"
 	. "client_backend/proto/notifications"
+	. "client_backend/proto/search"
 	. "client_backend/redis"
 	"net/http"
 )
@@ -23,6 +24,7 @@ type HandleContext struct {
 	SessionStore        *SessionStore
 	HttpClient          *http.Client
 	NotificationsClient *NotificationsClient
+	SearchClient        *SearchClient
 	TranslationContext  TranslationContext
 }
 

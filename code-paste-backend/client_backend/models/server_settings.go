@@ -11,4 +11,5 @@ type ServerSettings struct {
 	PostgresSettings           PostgresSettings `yaml:"postgres-settings"`
 	RedisSettings              RedisSettings    `yaml:"redis-settings"`
 	NotificationServiceAddress string           `yaml:"notifications_service_address"`
+	SearchServiceAddress       string           `yaml:"search_service_address"`
 }

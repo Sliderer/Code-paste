@@ -1,1 +1,3 @@
 server_port: 8080
+elastic_search:
+    address: 51.250.41.128:9200

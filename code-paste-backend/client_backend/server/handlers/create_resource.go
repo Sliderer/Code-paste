@@ -8,6 +8,7 @@ import (
 	. "client_backend/postgres"
 	. "client_backend/postgres/models"
 	. "client_backend/proto/notifications"
+	. "client_backend/proto/search"
 	"compress/gzip"
 	ctx "context"
 	"errors"
@@ -18,7 +19,8 @@ import (
 )
 
 func CreateResource(body []byte, userId, userName, language, highlightSetting, filePassword, fileName, folderName string, ttl int, context *HandleContext) (string, error) {
-	decompressed, err := gzip.NewReader(bytes.NewReader(body))
+	compressedData := bytes.NewReader(body)
+	decompressed, err := gzip.NewReader(compressedData)
 	if err != nil {
 		log.Fatalln("Encoding gzip error: ", err)
 	}
@@ -101,6 +103,12 @@ func CreateResource(body []byte, userId, userName, language, highlightSetting, f
 		SendNotifications(context, userId, userName)
 	}
 
+	go (*context.SearchClient).UploadInIndex(ctx.Background(), &UploadInIndexRequest{
+		Language:     language,
+		ResourceUuid: resourceUuid,
+		Data:         body,
+	})
+
 	return resourceUuid, nil
 }
 
@@ -117,7 +125,7 @@ func SendNotifications(context *HandleContext, userId, userName string) {
 			context.PostgresClient.Database.Where("id = ?", subscribtion.SubscriberId),
 			&subscriber,
 		)
-		log.Println("Subscriber: ", subscriber.Telegram)
+
 		(*context.NotificationsClient).SendNotification(
 			ctx.Background(),
 			&SendNotificationRequest{

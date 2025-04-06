@@ -7,7 +7,9 @@ import (
 	. "client_backend/notifications_client"
 	"client_backend/postgres"
 	. "client_backend/proto/notifications"
+	. "client_backend/proto/search"
 	"client_backend/redis"
+	. "client_backend/search_client"
 	"fmt"
 	"log"
 	"net/http"
@@ -21,6 +23,7 @@ type ClientServer struct {
 	serverImpl          ServerImpl
 	HttpClient          *http.Client
 	NotificationsClient NotificationsClient
+	SearchClient        SearchClient
 	IAM                 string
 	IAMTokenMutex       sync.Mutex
 }
@@ -28,6 +31,7 @@ type ClientServer struct {
 func (server *ClientServer) InitFields() {
 	server.HttpClient = &http.Client{}
 	server.NotificationsClient = GetNotificationsClient(server.ServerSettings.NotificationServiceAddress)
+	server.SearchClient = GetSearchClient(server.ServerSettings.SearchServiceAddress)
 
 	server.serverImpl = ServerImpl{
 		Context: &HandleContext{
@@ -54,6 +58,7 @@ func (server *ClientServer) InitFields() {
 			},
 			HttpClient:          server.HttpClient,
 			NotificationsClient: &server.NotificationsClient,
+			SearchClient:        &server.SearchClient,
 		},
 	}
 	server.serverImpl.Context.Initialize()

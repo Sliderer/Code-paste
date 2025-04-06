@@ -6,8 +6,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type ElasticSearchConfig struct {
+	Address string `yaml:"address"`
+}
+
 type ServiceConfig struct {
-	SeverPort uint64 `yaml:"server_port"`
+	SeverPort           uint64              `yaml:"server_port"`
+	ElasticSearchConfig ElasticSearchConfig `yaml:"elastic_search"`
 }
 
 type ConfigParser struct {
