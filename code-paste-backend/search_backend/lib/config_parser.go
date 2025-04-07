@@ -11,7 +11,8 @@ type ElasticSearchConfig struct {
 }
 
 type ServiceConfig struct {
-	SeverPort           uint64              `yaml:"server_port"`
+	GrpcSeverPort       uint64              `yaml:"grpc_server_port"`
+	HttpSeverPort       uint64              `yaml:"http_server_port"`
 	ElasticSearchConfig ElasticSearchConfig `yaml:"elastic_search"`
 }
 

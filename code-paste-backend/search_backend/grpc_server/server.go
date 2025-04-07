@@ -40,11 +40,17 @@ func StartServer(port uint64, esClient *ElasticSearchClient) {
 func (server GrpcServer) UploadInIndex(ctx context.Context, request *pb.UploadInIndexRequest) (*pb.UploadInIndexResponse, error) {
 	decodedText, _ := DecompressText(request.Data)
 	document := TextResource{
-		Id:   request.ResourceUuid,
 		Text: string(decodedText),
 	}
 	data, _ := json.Marshal(document)
-	server.EsClient.Client.Index("text_resources", bytes.NewReader(data))
+
+	result, err := server.EsClient.Client.Index("text_resources", bytes.NewReader(data), server.EsClient.Client.Index.WithDocumentID(request.ResourceUuid))
+
+	if err != nil {
+		log.Println(err)
+	} else {
+		log.Println(result)
+	}
 
 	return &pb.UploadInIndexResponse{}, nil
 }

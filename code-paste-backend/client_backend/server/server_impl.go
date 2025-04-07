@@ -17,7 +17,7 @@ type ServerImpl struct {
 
 func SetDefaultHeaders(w http.ResponseWriter, allowedHeaders string) http.ResponseWriter {
 	w.Header().Set("Content-Type", "*")
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	w.Header().Set("Access-Control-Max-Age", "15")
 	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
@@ -60,6 +60,32 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 			return
 		}
 		response, err := json.Marshal(resourceMetaData)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(response)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func (serverImpl *ServerImpl) GetResourcePreview(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w, "content-type, user-id")
+
+	if r.Method == "GET" {
+		resourceUuid := r.PathValue("resourceUuid")
+
+		resourcePreview, err := GetResourcePreview(resourceUuid, serverImpl.Context)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		response, err := json.Marshal(resourcePreview)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

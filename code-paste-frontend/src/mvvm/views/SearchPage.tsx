@@ -1,21 +1,24 @@
 import { observer } from "mobx-react";
 import { useLocation } from "react-router-dom";
-import { Box, Stack, useTheme } from "@mui/material";
+import { Box, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import ResourcePreviewPanel from "../../ui/moleculas/ResourcePreviewPanel";
 import { SearchViewModel } from "../view_models/SearchViewModel";
 import { ResourcePreviewProps } from "../../ui/atoms/ResourcePreview";
 import customSesionStorage from "../../helpers/SessionController";
+import { useEffect } from "react";
 
 const SearchPage = observer(({ viewModel }: { viewModel: SearchViewModel }) => {
   const stylingProps = {
     theme: useTheme(),
     styles: useStyles(useTheme()),
   };
-
-  const currentNickname = customSesionStorage.getUserName().getValue();
   const location = useLocation();
-  const nickname = location.pathname.split("/").reverse()[0];
+  const searchText = location.pathname.split("/").reverse()[0];
+
+  useEffect(() => {
+    viewModel.search(searchText);
+  }, [searchText]);
 
   const resourcePreviewProps: ResourcePreviewProps = {
     showAuthor: true,
@@ -24,11 +27,15 @@ const SearchPage = observer(({ viewModel }: { viewModel: SearchViewModel }) => {
   return (
     <Box className={stylingProps.styles.basicPanel} sx={{}}>
       <Stack spacing={10} sx={{ justifyContent: "center", width: "100%" }}>
-        <ResourcePreviewPanel
-          stylingProps={stylingProps}
-          resources={viewModel.getUsersResources()}
-          resourcePreviewProps={resourcePreviewProps}
-        />
+        {viewModel.resources.length === 0 ? (
+          <Typography sx={{fontSize: 40, textAlign: "center"}}>Ничего не нашлось</Typography>
+        ) : (
+          <ResourcePreviewPanel
+            stylingProps={stylingProps}
+            resources={viewModel.resources}
+            resourcePreviewProps={resourcePreviewProps}
+          />
+        )}
       </Stack>
     </Box>
   );

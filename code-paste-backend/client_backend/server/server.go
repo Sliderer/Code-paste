@@ -75,6 +75,7 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/upload_resource", server.serverImpl.UploadResource)
 	http.HandleFunc("/get_resource/{resourceUuid}", server.serverImpl.GetResourceData)
 	http.HandleFunc("/get_resource_meta/{resourceUuid}", server.serverImpl.GetResourceMetaData)
+	http.HandleFunc("/get_resource_preview/{resourceUuid}", server.serverImpl.GetResourcePreview)
 	http.HandleFunc("/get_resources", server.serverImpl.GetUserResources)
 	http.HandleFunc("/like_resource", server.serverImpl.LikeResource)
 	http.HandleFunc("/delete_resource/{resourceUuid}", server.serverImpl.DeleteResource)

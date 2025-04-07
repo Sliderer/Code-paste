@@ -49,6 +49,19 @@ func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context
 	}, nil
 }
 
+func GetResourcePreview(resourceUuid string, context *HandleContext) (ResourcePreview, error) {
+	resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
+	if err != nil {
+		return ResourcePreview{}, err
+	}
+
+	return ResourcePreview{
+		Title:   resourceMetaData.Title,
+		Preview: resourceMetaData.Preview,
+		Author:  resourceMetaData.Owner,
+	}, nil
+}
+
 func ResourcePasswordCheck(resourceUuid string, passwordToCheck string, context *HandleContext) (response.PredicateResponse, error) {
 	hashedPassword := GetHash(passwordToCheck)
 	resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)

@@ -2,7 +2,7 @@ import axios, { HeadersDefaults } from "axios";
 
 class ClientServerAPI {
   constructor() {
-    axios.defaults.baseURL = "http://10.5.0.3:90";
+    axios.defaults.baseURL = "http://127.0.0.1:90";
   }
 
   async uploadTextResource(
@@ -39,6 +39,14 @@ class ClientServerAPI {
       headers: {
         "User-Id": userId,
       },
+    });
+
+    return promise;
+  }
+
+  async getResourcePreview(resourceUuid: string) {
+    let promise = await axios.get(`/get_resource_preview/${resourceUuid}`, {
+      withCredentials: true,
     });
 
     return promise;

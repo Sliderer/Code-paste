@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
 	. "search_backend/elastic_search_client"
 	"search_backend/grpc_server"
+	httpserver "search_backend/http_server"
 	"search_backend/lib"
 )
 
@@ -14,11 +14,11 @@ func main() {
 
 	esClient := ElasticSearchClient{}
 	esClient.Connect()
-	r, err := esClient.Client.Indices.Create("text_resources")
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Println(r)
-	}
-	grpc_server.StartServer(config.SeverPort, &esClient)
+
+	http_server := httpserver.SearchServer{}
+
+	go grpc_server.StartServer(config.GrpcSeverPort, &esClient)
+	go http_server.StartServer(config.HttpSeverPort, &esClient)
+	inifineChan := make(chan bool)
+	<-inifineChan
 }
