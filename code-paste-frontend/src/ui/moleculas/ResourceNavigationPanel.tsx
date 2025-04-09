@@ -13,7 +13,12 @@ const ResourceNavigationPanel = ({
   onFolderChipsClick: (value: string) => Promise<AxiosResponse<string>>;
 }) => {
   return (
-    <Stack direction={"row"} spacing={2} alignContent={"center"} alignItems={"center"}>
+    <Stack
+      direction={"row"}
+      spacing={2}
+      alignContent={"center"}
+      alignItems={"center"}
+    >
       {resourcePath.split("/").map((folderName, index) => {
         const fullPath = resourcePath
           .split("/")

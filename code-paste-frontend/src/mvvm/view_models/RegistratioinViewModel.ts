@@ -59,7 +59,11 @@ export class RegistrationViewModel {
     };
   }
 
-  async createUser(userName: string, email: string, password: string): Promise<boolean> {
+  async createUser(
+    userName: string,
+    email: string,
+    password: string
+  ): Promise<boolean> {
     let result = true;
     await this.clientServerAPI
       .createUser(userName, email, password)

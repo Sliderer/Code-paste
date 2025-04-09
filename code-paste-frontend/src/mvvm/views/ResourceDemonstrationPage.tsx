@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 import SharePopup from "../../ui/moleculas/SharePopup";
 import customSesionStorage from "../../helpers/SessionController";
-import ResourcesList from "../../ui/organisms/ResourcesList";
 import { ResourcePreviewProps } from "../../ui/atoms/ResourcePreview";
 import FolderDemonstration from "../../ui/moleculas/FolderDemonstration";
 

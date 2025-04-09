@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../styling/styles/ElementStyles";
 import SettingsTextInput from "../atoms/resource_creation_settings/SettingsTextInput";
@@ -15,7 +14,7 @@ const ResourceCreationSettings = ({
   onPasswordChange,
   onTTLChange,
   onPublish,
-  error
+  error,
 }: {
   translateLanguages: string[];
   ttlOptions: string[];
@@ -44,7 +43,7 @@ const ResourceCreationSettings = ({
 
   return (
     <Box className={stylingProps.styles.settingsPanel}>
-      <Stack display={"grid"} spacing={5} sx={{width: "15vw"}}>
+      <Stack display={"grid"} spacing={5} sx={{ width: "15vw" }}>
         <SettingsTextInput
           stylingProps={stylingProps}
           key={"fileName"}
@@ -87,8 +86,8 @@ const ResourceCreationSettings = ({
           values={translateLanguages}
           onChange={onTranslateLanguageChange}
         />
-        <Typography sx={{textAlign: "center"}}>{error}</Typography>
-        <Button 
+        <Typography sx={{ textAlign: "center" }}>{error}</Typography>
+        <Button
           className={stylingProps.styles.publishButton}
           sx={{
             background: stylingProps.theme.palette.primary.main,

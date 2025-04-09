@@ -27,10 +27,10 @@ export const getDefaultResourceModel = (): ResourceModel => {
     },
     resourceUuid: undefined,
     isLiked: false,
-    highlightSetting: '',
-    type: '',
-    ownerId: '',
-    path: '',
+    highlightSetting: "",
+    type: "",
+    ownerId: "",
+    path: "",
   };
 };
 

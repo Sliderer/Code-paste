@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import StylingProps from "../../helpers/StylingProps";
 import ResourcesList from "../organisms/ResourcesList";
 import ResourcePreviewModel from "../../mvvm/models/ResourcePreviewModel";
@@ -7,7 +7,6 @@ import CreateFolderButton from "../atoms/CreateFolderButton";
 import { useState } from "react";
 import CreateFolderPanel from "./CreateFolderPanel";
 import ResourceModel from "../../mvvm/models/ResourceModel";
-import FolderChips from "../atoms/FolderChips";
 import { AxiosResponse } from "axios";
 import ResourceNavigationPanel from "./ResourceNavigationPanel";
 

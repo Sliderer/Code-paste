@@ -9,6 +9,7 @@ import (
 	. "client_backend/postgres/models"
 	. "client_backend/proto/notifications"
 	. "client_backend/proto/search"
+	"client_backend/requests"
 	"compress/gzip"
 	ctx "context"
 	"errors"
@@ -18,9 +19,10 @@ import (
 	"unicode/utf8"
 )
 
-func CreateResource(body []byte, userId, userName, language, highlightSetting, filePassword, fileName, folderName string, ttl int, context *HandleContext) (string, error) {
-	compressedData := bytes.NewReader(body)
+func CreateResourceHandler(request requests.CreateResource, context *HandleContext) (string, error) {
+	compressedData := bytes.NewReader(request.Data)
 	decompressed, err := gzip.NewReader(compressedData)
+
 	if err != nil {
 		log.Fatalln("Encoding gzip error: ", err)
 	}
@@ -28,56 +30,54 @@ func CreateResource(body []byte, userId, userName, language, highlightSetting, f
 
 	decompressedData, err := io.ReadAll(decompressed)
 	if err != nil {
-		log.Fatalln("Reading decompressed data error: ", err)
+		log.Println("Reading decompressed data error: ", err)
 	}
 
-	document := Translate(decompressedData, language, context)
+	document := Translate(decompressedData, request.Language, context)
 
-	log.Println("File", document, int64(utf8.RuneCountInString(document)))
+	fileName := request.FileName + ".txt"
+	filePath := request.FolderName + "/" + fileName
+	userName := GetUserBucketName(request.UserName)
 
-	fileName += ".txt"
-	filePath := folderName + "/" + fileName
-	userName = GetUserBucketName(userName)
-
-	if folderName != "default" {
+	if request.FolderName != "default" {
 		var folder UserFolders
 		folderLookup := Find(
-			context.PostgresClient.Database.Where("user_id = ? AND folder_path = ?", userId, folderName),
+			context.PostgresClient.Database.Where("user_id = ? AND folder_path = ?", request.UserId, request.FolderName),
 			&folder,
 		)
 
-		if folderLookup.Error != nil || folder.FolderPath != folderName {
+		if folderLookup.Error != nil || folder.FolderPath != request.FolderName {
 			return "", errors.New("такой папки не существует")
 		}
 	}
 
 	err = context.MinioClient.UploadFile(userName, filePath, document, int64(utf8.RuneCountInString(document)))
 
-	hashString := userId + fileName + time.Now().String()
+	hashString := request.UserId + fileName + time.Now().String()
 	resourceUuid := GetHash(hashString)
 	passwordHash := ""
-	if len(filePassword) > 0 {
-		passwordHash = GetHash(filePassword)
+	if len(request.Password) > 0 {
+		passwordHash = GetHash(request.Password)
 	}
 
-	err = context.RedisClient.UploadResourceMetaData(resourceUuid, ttl, &ResourceMetaData{
+	err = context.RedisClient.UploadResourceMetaData(resourceUuid, request.TTL, &ResourceMetaData{
 		Title:            fileName,
-		Path:             folderName,
+		Path:             request.FolderName,
 		Owner:            userName,
-		OwnerId:          userId,
+		OwnerId:          request.UserId,
 		Password:         passwordHash,
 		Preview:          document[:min(len(document), 100)],
 		Type:             "text",
-		HighlightSetting: highlightSetting,
+		HighlightSetting: request.HighlightSetting,
 		CreationTime:     uint64(time.Now().Unix()),
 	})
 
 	if err != nil {
-		log.Println(err)
+		log.Println("Error uploading in redis: ", err)
 		return "", errors.New("не удалось загрузить файл, попробуйте снова")
 	}
 
-	if userId == "temp" {
+	if request.UserId == "temp" {
 		result := Find(context.PostgresClient.Database, &User{
 			Name: "temp",
 		})
@@ -89,7 +89,7 @@ func CreateResource(body []byte, userId, userName, language, highlightSetting, f
 	result := Create(
 		context.PostgresClient.Database,
 		&UserResources{
-			UserId:     userId,
+			UserId:     request.UserId,
 			ResourceId: resourceUuid,
 		},
 	)
@@ -99,14 +99,14 @@ func CreateResource(body []byte, userId, userName, language, highlightSetting, f
 		return "", errors.New("не удалось загрузить файл, попробуйте снова")
 	}
 
-	if userId != "temp" {
-		SendNotifications(context, userId, userName)
+	if request.UserId != "temp" {
+		SendNotifications(context, request.UserId, userName)
 	}
 
 	go (*context.SearchClient).UploadInIndex(ctx.Background(), &UploadInIndexRequest{
-		Language:     language,
+		Language:     request.Language,
 		ResourceUuid: resourceUuid,
-		Data:         body,
+		Data:         request.Data,
 	})
 
 	return resourceUuid, nil

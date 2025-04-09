@@ -16,18 +16,19 @@ class ClientServerAPI {
     highlightSetting: string,
     data: Uint8Array
   ) {
-    let promise = await axios.post(`/upload_resource`, data, {
+    console.log(data)
+    let promise = await axios.post(`/upload_resource`, {
+      UserName: userName,
+      UserId: userId,
+      Password: password,
+      FileName: fileName,
+      FolderName: folderName,
+      Language: language,
+      HighlightSetting: highlightSetting,
+      TTL: ttl,
+      Data: Array.from(data)
+    }, {
       withCredentials: true,
-      headers: {
-        "User-id": userId,
-        "User-Name": userName,
-        Password: password,
-        Language: language,
-        "File-Name": fileName,
-        "Folder-Name": folderName,
-        TTL: ttl,
-        "Highlight-Setting": highlightSetting,
-      },
     });
 
     return promise;
@@ -77,14 +78,13 @@ class ClientServerAPI {
   async createUser(userName: string, email: string, password: string) {
     let promise = await axios.post(
       `/create_user`,
-      {},
+      {
+        UserName: userName,
+        Password: password,
+        Email: email,
+      },
       {
         withCredentials: true,
-        headers: {
-          "User-Name": userName,
-          Password: password,
-          Email: email,
-        },
       }
     );
 
@@ -92,13 +92,16 @@ class ClientServerAPI {
   }
 
   async checkPassword(userName: string, password: string) {
-    let promise = await axios.get(`/check_account_password`, {
-      withCredentials: true,
-      headers: {
-        "User-Name": userName,
+    let promise = await axios.post(
+      `/auth`,
+      {
+        UserName: userName,
         Password: password,
       },
-    });
+      {
+        withCredentials: true,
+      }
+    );
 
     return promise;
   }
@@ -191,15 +194,12 @@ class ClientServerAPI {
   ) {
     let promise = await axios.post(
       `/create_folder`,
-      {},
       {
-        headers: {
-          "User-Name": userName,
-          "User-Id": userId,
-          "Folder-Name": folderName,
-          "Folder-Path": folderPath,
-        },
-      }
+        UserName: userName,
+        UserId: userId,
+        FolderName: folderName,
+        FolderPath: folderPath,
+      },
     );
 
     return promise;
@@ -226,12 +226,16 @@ class ClientServerAPI {
   }
 
   async subscribeOnPublications(subsriber_id: string, publisher_id: string) {
-    let promise = await axios.post(`/subscribe`, {}, {
-      headers: {
-        'Subscriber-Id': subsriber_id,
-        'Publisher-Id': publisher_id
+    let promise = await axios.post(
+      `/subscribe`,
+      {},
+      {
+        headers: {
+          "Subscriber-Id": subsriber_id,
+          "Publisher-Id": publisher_id,
+        },
       }
-    });
+    );
 
     return promise;
   }

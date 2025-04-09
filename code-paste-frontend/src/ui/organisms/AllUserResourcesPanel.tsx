@@ -59,7 +59,10 @@ const AllUserResourcesPanel = ({
           stylingProps={stylingProps}
         />
 
-      <CreateFolderButton onClick={onCreateFolder} stylingProps={stylingProps}/>
+        <CreateFolderButton
+          onClick={onCreateFolder}
+          stylingProps={stylingProps}
+        />
       </Stack>
       <ResourcesList
         stylingProps={stylingProps}

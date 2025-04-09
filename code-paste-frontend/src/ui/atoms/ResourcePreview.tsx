@@ -13,7 +13,7 @@ const ResourcePreview = ({
   resource,
   props,
 }: {
-  stylingProps: StylingProps,
+  stylingProps: StylingProps;
   resource: ResourcePreviewModel;
   props: ResourcePreviewProps;
 }) => {
@@ -27,16 +27,17 @@ const ResourcePreview = ({
       }}
       to={`/resource/${resource.resourceUuid}`}
     >
-      <Box className={stylingProps.styles.basicShadow} sx={{ borderRadius: 2, padding: 1 }}>
+      <Box
+        className={stylingProps.styles.basicShadow}
+        sx={{ borderRadius: 2, padding: 1 }}
+      >
         <Stack
           direction={"row"}
           alignItems={"center"}
           alignContent={"center"}
           spacing={2}
         >
-          {
-            resource.type === "folder" && <Folder/>
-          }
+          {resource.type === "folder" && <Folder />}
           <Typography
             style={{
               fontSize: "30px",

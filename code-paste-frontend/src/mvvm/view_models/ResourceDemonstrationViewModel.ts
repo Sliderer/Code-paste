@@ -33,9 +33,10 @@ export class ResourceDemonstrationViewModel {
       .then(async (data) => {
         console.log(data.data);
         this.resourceModel = {
-          isPrivate: data.data.OwnerId == customSesionStorage.getUserId().getValue()
-            ? false
-            : data.data.IsPrivate,
+          isPrivate:
+            data.data.OwnerId == customSesionStorage.getUserId().getValue()
+              ? false
+              : data.data.IsPrivate,
           name: data.data.Name,
           resource: this.resourceModel.resource,
           resourceUuid: this.resourceModel.resourceUuid,
@@ -47,7 +48,8 @@ export class ResourceDemonstrationViewModel {
           path: data.data.Path,
         };
 
-        this.isCurrentUserAuthor = data.data.OwnerId == customSesionStorage.getUserId().getValue();
+        this.isCurrentUserAuthor =
+          data.data.OwnerId == customSesionStorage.getUserId().getValue();
 
         if (this.resourceModel.isPrivate === false) {
           this.getResourceData("");
@@ -169,7 +171,7 @@ export class ResourceDemonstrationViewModel {
       actions.push({
         title: "Автор",
         action: () => {
-          console.log(this.resourceModel.owner)
+          console.log(this.resourceModel.owner);
           this.resourceAuthorRedirect = this.resourceModel.owner;
         },
         isActive: false,

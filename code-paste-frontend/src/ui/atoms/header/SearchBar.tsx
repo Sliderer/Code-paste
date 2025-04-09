@@ -1,17 +1,15 @@
 import { Box, Button, Stack, TextField } from "@mui/material";
 import StylingProps from "../../../helpers/StylingProps";
-import SearchServerAPI from "../../../mvvm/api/SearchServerAPI";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const SearchBar = ({ stylingProps }: { stylingProps: StylingProps }) => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const navigate = useNavigate();
-  
+
   const navigateToSearchPage = () => {
     if (text.length > 0) {
-      console.log(text)
-      setText('');
+      setText("");
       navigate(`/search/${encodeURIComponent(text)}`);
     }
   };
@@ -21,7 +19,7 @@ const SearchBar = ({ stylingProps }: { stylingProps: StylingProps }) => {
       <Box className={stylingProps.styles.searchBar}>
         <TextField
           onChange={(e) => {
-            setText(e.target.value)
+            setText(e.target.value);
           }}
           variant="standard"
           slotProps={{

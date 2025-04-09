@@ -3,7 +3,6 @@ import ClientServerAPI from "../api/ClientServerAPI";
 import customSesionStorage from "../../helpers/SessionController";
 import ValidationResult from "../../helpers/ValidationResult";
 
-
 export class EnterViewModel {
   private clientServerAPI: ClientServerAPI;
   @observable userName: string | undefined = undefined;
@@ -13,25 +12,25 @@ export class EnterViewModel {
     this.clientServerAPI = new ClientServerAPI();
   }
 
-  validateData(userName: string, password: string) : ValidationResult {
+  validateData(userName: string, password: string): ValidationResult {
     if (userName.length === 0) {
       return {
         isValid: false,
-        error: 'Введите имя'
-      }
+        error: "Введите имя",
+      };
     }
 
     if (password.length === 0) {
       return {
         isValid: false,
-        error: 'Введите пароль'
-      }
+        error: "Введите пароль",
+      };
     }
 
     return {
       isValid: true,
-      error: ''
-    }
+      error: "",
+    };
   }
 
   checkPassword(userName: string, password: string) {

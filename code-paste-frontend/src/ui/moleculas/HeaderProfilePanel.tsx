@@ -8,7 +8,7 @@ const HeaderProfilePanel = () => {
   const theme = useTheme();
   const styles = useStyles(theme);
   const nickname = customSesionStorage.getUserName().getValue();
-  
+
   return (
     <Stack direction={"row"} sx={{ display: "flex", alignItems: "center" }}>
       <HeaderProfilePanelIcon />

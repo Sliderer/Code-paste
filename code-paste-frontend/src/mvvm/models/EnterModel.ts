@@ -1,11 +1,11 @@
 class EnterModel {
-    email: string
-    password: string
+  email: string;
+  password: string;
 
-    constructor(email: string, password: string) {
-        this.email = email;
-        this.password = password;
-    }
+  constructor(email: string, password: string) {
+    this.email = email;
+    this.password = password;
+  }
 }
 
 export default EnterModel;

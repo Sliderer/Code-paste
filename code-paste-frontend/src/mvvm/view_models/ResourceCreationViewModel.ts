@@ -15,7 +15,7 @@ export class ResourceCreationViewModel {
 
   private language: string = "default";
   private ttl: number = 0;
-  private highlightSetting: string = 'text';
+  private highlightSetting: string = "text";
 
   private languageCodes: Map<string, string> = new Map<string, string>([
     ["Обычный текст", "default"],
@@ -143,8 +143,9 @@ export class ResourceCreationViewModel {
         this.createdResource = data.data;
         this.model = new ResourceCreationModel();
       })
-      .catch(data => {
-        this.uploadingError = 'Не удалось загрузить файл: проверьте правильность пути до папки';
+      .catch((data) => {
+        this.uploadingError =
+          "Не удалось загрузить файл: проверьте правильность пути до папки";
       });
   }
 }

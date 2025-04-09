@@ -1,4 +1,4 @@
-import { Button, Stack, Typography, useTheme } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import ChangableText from "../atoms/ChangableText";
 import ValidationResult from "../../helpers/ValidationResult";
 import StylingProps from "../../helpers/StylingProps";
@@ -43,7 +43,7 @@ const CurrentUserAccount = ({
             <Button
               className={stylingProps.styles.createResourcePanel}
               onClick={logOut}
-              sx={{ textAlign: "center", fontSize: 20}}
+              sx={{ textAlign: "center", fontSize: 20 }}
             >
               Выйти
             </Button>

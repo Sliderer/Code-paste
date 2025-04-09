@@ -1,8 +1,9 @@
 package server
 
 import (
+	"client_backend/lib"
 	. "client_backend/models_for_server"
-	. "client_backend/requests"
+	"client_backend/requests"
 	. "client_backend/responses"
 	. "client_backend/server/handlers"
 	"encoding/json"
@@ -34,7 +35,7 @@ func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *ht
 		passwordToCheck := r.Header.Get("Password")
 		result, err := ResourcePasswordCheck(resourceUuid, passwordToCheck, serverImpl.Context)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			lib.SetError(w, http.StatusInternalServerError, "Can not check resource password: "+err.Error())
 			return
 		}
 		resultJson, _ := json.Marshal(result)
@@ -56,13 +57,13 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 
 		resourceMetaData, err := GetResourceMetaData(userId, resourceUuid, session.GetUserName(), serverImpl.Context)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			lib.SetError(w, http.StatusInternalServerError, "Can not get metadata: "+err.Error())
 			return
 		}
 		response, err := json.Marshal(resourceMetaData)
 
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			lib.SetError(w, http.StatusInternalServerError, "Can not parse metadata: "+err.Error())
 			return
 		}
 
@@ -108,7 +109,7 @@ func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Req
 		textData, err := GetResourceData(resourceUuid, serverImpl.Context)
 
 		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
+			lib.SetError(w, http.StatusNotFound, "Resource not found")
 			return
 		}
 
@@ -121,86 +122,122 @@ func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Req
 }
 
 func (serverImpl *ServerImpl) UploadResource(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, user-name, user-id, password, file-name, folder-name, language, ttl, highlight-setting")
+	w = SetDefaultHeaders(w, "content-type")
+	switch r.Method {
+	case "POST":
+		request, err := lib.GetRequest[requests.CreateResource](r)
 
-	if r.Method == "POST" {
-		len := r.ContentLength
-		body := make([]byte, len)
-		r.Body.Read(body)
-
-		userName := r.Header.Get("User-Name")
-		userId := r.Header.Get("User-Id")
-		filePassword := r.Header.Get("Password")
-		fileName := r.Header.Get("File-Name")
-		folderName := r.Header.Get("Folder-Name")
-		language := r.Header.Get("Language")
-		highlightSetting := r.Header.Get("Highlight-Setting")
-		ttl, _ := strconv.Atoi(r.Header.Get("ttl"))
-
-		resourceUuid, err := CreateResource(body, userId, userName, language, highlightSetting, filePassword, fileName, folderName, ttl, serverImpl.Context)
+		resourceUuid, err := CreateResourceHandler(request, serverImpl.Context)
 		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte(err.Error()))
-			log.Println(err.Error())
+			lib.SetError(w, http.StatusNotFound, "Path not found: "+err.Error())
 			return
 		}
 		w.Write([]byte(resourceUuid))
-	} else {
+	case "OPTIONS":
 		w.WriteHeader(http.StatusOK)
+	default:
+		lib.SetError(w, http.StatusNotFound, "Path not found")
 	}
 }
 
 func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, user-name, email, password")
+	w = SetDefaultHeaders(w, "content-type")
 
-	if r.Method == "POST" {
-		session, _ := serverImpl.Context.SessionStore.GetSession(r)
-		userName := r.Header.Get("User-Name")
-		email := r.Header.Get("Email")
-		password := r.Header.Get("Password")
-
-		userId, err := CreateUser(userName, email, password, serverImpl.Context)
+	switch r.Method {
+	case "POST":
+		request, err := lib.GetRequest[requests.CreateUser](r)
 
 		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusNotFound)
+			lib.SetError(w, http.StatusNotFound, "Invalid request: "+err.Error())
+			return
+		}
+
+		session, _ := serverImpl.Context.SessionStore.GetSession(r)
+
+		userId, err := CreateUserHandler(request, serverImpl.Context)
+
+		if err != nil {
+			lib.SetError(w, http.StatusNotFound, "Error creating user: "+err.Error())
 			return
 		}
 
 		session.SetAuthenticated(true)
-		session.SetUserName(userName)
+		session.SetUserName(request.UserName)
 		session.Save(r, w)
+
 		w.Write([]byte(userId))
-	} else {
+	case "OPTIONS":
 		w.WriteHeader(http.StatusOK)
+	default:
+		lib.SetError(w, http.StatusNotFound, "Path not found")
 	}
 }
 
-func (serverImpl *ServerImpl) CheckAccountPassword(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, user-name, password")
+func (serverImpl *ServerImpl) AuthUser(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w, "content-type")
 
-	if r.Method == "GET" {
-
+	switch r.Method {
+	case "POST":
 		session, err := serverImpl.Context.SessionStore.GetSession(r)
 
-		userName := r.Header.Get("User-Name")
-		password := r.Header.Get("Password")
-
-		result, err := CheckAccountPassword(userName, password, serverImpl.Context)
+		request, err := lib.GetRequest[requests.AuthUser](r)
 
 		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
+			lib.SetError(w, http.StatusNotFound, "Invalid request: "+err.Error())
+			return
+		}
+
+		result, err := CheckAccountPassword(request, serverImpl.Context)
+
+		if err != nil {
+			lib.SetError(w, http.StatusUnauthorized, "Can not authorize user: "+err.Error())
 			return
 		}
 
 		session.SetAuthenticated(true)
-		session.SetUserName(userName)
+		session.SetUserName(request.UserName)
 		session.Save(r, w)
+
 		resultJson, _ := json.Marshal(result)
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
-	} else {
+	case "OPTIONS":
 		w.WriteHeader(http.StatusOK)
+	default:
+		lib.SetError(w, http.StatusNotFound, "Path not found")
+	}
+}
+
+func (serverImpl *ServerImpl) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	w = SetDefaultHeaders(w, "content-type")
+
+	switch r.Method {
+	case "DELETE":
+		session, err := serverImpl.Context.SessionStore.GetSession(r)
+
+		request, err := lib.GetRequest[requests.DeleteUser](r)
+
+		if err != nil {
+			lib.SetError(w, http.StatusNotFound, "Invalid request: "+err.Error())
+			return
+		}
+
+		result, err := DeleteUserHandler(request, serverImpl.Context)
+
+		if err != nil {
+			lib.SetError(w, http.StatusUnauthorized, "Can not delete user: "+err.Error())
+			return
+		}
+
+		session.SetAuthenticated(false)
+
+		resultJson, _ := json.Marshal(result)
+		w.WriteHeader(http.StatusOK)
+		w.Write(resultJson)
+	case "OPTIONS":
+		w.WriteHeader(http.StatusOK)
+	default:
+		lib.SetError(w, http.StatusNotFound, "Path not found")
 	}
 }
 
@@ -255,8 +292,7 @@ func (serverImpl *ServerImpl) GetUserMetadata(w http.ResponseWriter, r *http.Req
 		userName := r.Header.Get("User-Name")
 		userMetaData, err := GetUserMetaData(userName, serverImpl.Context)
 		if err != nil {
-			log.Println("Can not get user metadata: ", err)
-			w.WriteHeader(http.StatusNotFound)
+			lib.SetError(w, http.StatusUnauthorized, "Can not get user metadata: "+err.Error())
 			return
 		}
 
@@ -271,21 +307,21 @@ func (serverImpl *ServerImpl) UpdateUserContacts(w http.ResponseWriter, r *http.
 	w = SetDefaultHeaders(w, "content-type")
 
 	if r.Method == "POST" {
-		len := r.ContentLength
-		body := make([]byte, len)
-		r.Body.Read(body)
-
-		var requestBody UpdateUserContactsRequest
-		json.Unmarshal(body, &requestBody)
-
-		err := UpdateUserContacts(requestBody, serverImpl.Context)
+		request, err := lib.GetRequest[requests.UpdateUserContactsRequest](r)
 
 		if err != nil {
-			log.Println("Error updating user contacts: ", err)
-			w.WriteHeader(http.StatusNotFound)
-		} else {
-			w.WriteHeader(http.StatusOK)
+			lib.SetError(w, http.StatusInternalServerError, "Invalid request: "+err.Error())
+			return
 		}
+
+		err = UpdateUserContacts(request, serverImpl.Context)
+
+		if err != nil {
+			lib.SetError(w, http.StatusInternalServerError, "Error updating user contacts: "+err.Error())
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
@@ -293,14 +329,13 @@ func (serverImpl *ServerImpl) LikeResource(w http.ResponseWriter, r *http.Reques
 	w = SetDefaultHeaders(w, "content-type")
 
 	if r.Method == "POST" {
-		len := r.ContentLength
-		body := make([]byte, len)
-		r.Body.Read(body)
+		requestBody, err := lib.GetRequest[requests.LikeResourceRequest](r)
 
-		var requestBody LikeResourceRequest
-		json.Unmarshal(body, &requestBody)
-
-		err := LikeResource(requestBody, serverImpl.Context)
+		if err != nil {
+			lib.SetError(w, http.StatusInternalServerError, "Invalid request: "+err.Error())
+			return
+		}
+		err = LikeResource(requestBody, serverImpl.Context)
 
 		if err != nil {
 			log.Println("Error updating user contacts: ", err)
@@ -312,22 +347,24 @@ func (serverImpl *ServerImpl) LikeResource(w http.ResponseWriter, r *http.Reques
 }
 
 func (serverImpl *ServerImpl) CreateFolder(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, user-name, user-id, folder-name, folder-path")
+	w = SetDefaultHeaders(w, "content-type")
 
 	if r.Method == "POST" {
-		userName := r.Header.Get("User-Name")
-		userId := r.Header.Get("User-Id")
-		folderName := r.Header.Get("Folder-Name")
-		folderPath := r.Header.Get("Folder-Path")
 
-		err := CreateFolder(userName, userId, folderName, folderPath, serverImpl.Context)
+		request, err := lib.GetRequest[requests.CreateFolder](r)
 
 		if err != nil {
-			log.Println("Error deleting resource: ", err)
-			w.WriteHeader(http.StatusNotFound)
-		} else {
-			w.WriteHeader(http.StatusOK)
+			lib.SetError(w, http.StatusInternalServerError, "Invalid request: "+err.Error())
+			return
 		}
+
+		err = CreateFolderHandler(request, serverImpl.Context)
+
+		if err != nil {
+			lib.SetError(w, http.StatusInternalServerError, "Can not create folder: "+err.Error())
+		}
+
+		w.WriteHeader(http.StatusOK)
 	} else {
 		w.WriteHeader(http.StatusOK)
 	}
@@ -385,7 +422,7 @@ func (serverImpl *ServerImpl) DeleteResource(w http.ResponseWriter, r *http.Requ
 
 		if err != nil {
 			log.Println("Error deleting resource: ", err)
-			w.WriteHeader(http.StatusNotFound)
+			lib.SetError(w, http.StatusInternalServerError, "Can not delete resource: "+err.Error())
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}

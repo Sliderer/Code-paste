@@ -32,8 +32,8 @@ export class AccountViewModel {
     if (userId == null) {
       this.redirectToEnder = true;
     }
-    
-    this.clientServerAPI.subscribeOnPublications(userId!, this.account!.id)
+
+    this.clientServerAPI.subscribeOnPublications(userId!, this.account!.id);
   };
 
   getUserMetaData = (userName: string) => {
@@ -85,20 +85,22 @@ export class AccountViewModel {
 
   setOnCreateFolder = (value: boolean) => {
     this.createFolder = value;
-  }
+  };
 
   onCreateFolder = (folderName: string) => {
-    this.clientServerAPI.createFolder(
-      customSessionStorage.getUserName().getValue()!,
-      customSessionStorage.getUserId().getValue()!,
-      folderName,
-      this.defaultPath
-    ).then(_ => {
-      if (this.account !== undefined) {
-        this.updateResourcesLists();
-      }
-    })
-  }
+    this.clientServerAPI
+      .createFolder(
+        customSessionStorage.getUserName().getValue()!,
+        customSessionStorage.getUserId().getValue()!,
+        folderName,
+        this.defaultPath
+      )
+      .then((_) => {
+        if (this.account !== undefined) {
+          this.updateResourcesLists();
+        }
+      });
+  };
 
   private getUsersResourcesWithFilter = (needOnlyLiked: boolean) => {
     this.clientServerAPI

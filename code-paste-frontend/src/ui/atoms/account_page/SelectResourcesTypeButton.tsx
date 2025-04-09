@@ -12,15 +12,17 @@ const SelectResourcesTypeButton = ({
   onClick: () => void;
   stylingProps: StylingProps;
 }) => {
-  const color = isActive ? stylingProps.theme.palette.primary.dark : stylingProps.theme.palette.primary.light;
-  const border = isActive ? "1px solid" : "none"; 
+  const color = isActive
+    ? stylingProps.theme.palette.primary.dark
+    : stylingProps.theme.palette.primary.light;
+  const border = isActive ? "1px solid" : "none";
 
   return (
     <Button
       sx={{
         color: color,
         borderBottom: border,
-        padding: "10px 20px 10px 20px"
+        padding: "10px 20px 10px 20px",
       }}
       onClick={onClick}
     >

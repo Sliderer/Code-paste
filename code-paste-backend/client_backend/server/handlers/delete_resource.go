@@ -10,9 +10,16 @@ import (
 
 func DeleteResource(userId, userName, resourceUuid string, context *HandleContext) error {
 	resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
-
+	log.Println(resourceMetaData)
 	if err != nil {
 		log.Println("Error getting metadata for deleting resource", err)
+		return err
+	}
+
+	err = context.RedisClient.DeleteResourceMetaData(resourceUuid)
+
+	if err != nil {
+		log.Println("Error deleting metadata from redis")
 		return err
 	}
 

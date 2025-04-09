@@ -1,4 +1,4 @@
-import { MenuItem, Select, SelectChangeEvent} from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { useState } from "react";
 import StylingProps from "../../../helpers/StylingProps";
 
@@ -29,7 +29,11 @@ const SettingsSelectInput = ({
       className={stylingProps.styles.selectPanel}
     >
       {values.map((value, index) => (
-        <MenuItem key={index} value={value} className={stylingProps.styles.selectMenuItem}>
+        <MenuItem
+          key={index}
+          value={value}
+          className={stylingProps.styles.selectMenuItem}
+        >
           {value}
         </MenuItem>
       ))}

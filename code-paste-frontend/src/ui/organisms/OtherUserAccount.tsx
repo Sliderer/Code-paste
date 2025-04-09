@@ -1,4 +1,4 @@
-import { Button, Stack, Typography, useTheme } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import StylingProps from "../../helpers/StylingProps";
 
 const OtherUserAccount = ({

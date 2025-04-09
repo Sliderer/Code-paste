@@ -57,3 +57,13 @@ func (redisClient *RedisClient) GetResourceMetaData(uuid string) (ResourceMetaDa
 
 	return data, err
 }
+
+func (redisClient *RedisClient) DeleteResourceMetaData(uuid string) error {
+	resultChan := make(chan *redis.IntCmd)
+	go func() {
+		resultChan <- redisClient.Client.Del(context.Background(), uuid)
+	}()
+
+	result := <-resultChan
+	return result.Err()
+}

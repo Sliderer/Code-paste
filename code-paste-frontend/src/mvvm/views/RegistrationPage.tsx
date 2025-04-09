@@ -4,7 +4,7 @@ import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import SettingsTextInput from "../../ui/atoms/resource_creation_settings/SettingsTextInput";
 import { Link, useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const RegistrationPage = observer(
   ({ viewModel }: { viewModel: RegistrationViewModel }) => {
@@ -32,13 +32,11 @@ const RegistrationPage = observer(
         password
       );
       if (validationResult.isValid) {
-        viewModel.createUser(userName, email, password).then(
-          isSuccessed => {
-            if (!isSuccessed) {
-              setErrorMessage('Пользователь с таким уменем уже существует');
-            }
+        viewModel.createUser(userName, email, password).then((isSuccessed) => {
+          if (!isSuccessed) {
+            setErrorMessage("Пользователь с таким уменем уже существует");
           }
-        )
+        });
       } else {
         setErrorMessage(validationResult.error);
       }

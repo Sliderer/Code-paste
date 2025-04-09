@@ -1,7 +1,7 @@
 import ResourcePreviewModel from "./ResourcePreviewModel";
 
 class FolderModel {
-    resourcesList: ResourcePreviewModel[] = []
-};
+  resourcesList: ResourcePreviewModel[] = [];
+}
 
 export default FolderModel;

@@ -6,21 +6,22 @@ import (
 	. "client_backend/models_for_server"
 	. "client_backend/postgres"
 	. "client_backend/postgres/models"
+	"client_backend/requests"
 	"log"
 	"strings"
 	"time"
 )
 
-func CreateFolder(userName, userId, folderName string, folderPath string, context *HandleContext) error {
+func CreateFolderHandler(request requests.CreateFolder, context *HandleContext) error {
 
-	hashString := userId + folderName + "folder" + time.Now().String()
+	hashString := request.UserId + request.FolderName + "folder" + time.Now().String()
 	resourceUuid := GetHash(hashString)
 
 	err := context.RedisClient.UploadResourceMetaData(resourceUuid, 0, &ResourceMetaData{
-		Title:   folderName,
-		Path:    folderPath,
-		Owner:   userName,
-		OwnerId: userId,
+		Title:   request.FolderName,
+		Path:    request.FolderPath,
+		Owner:   request.UserName,
+		OwnerId: request.UserId,
 		Type:    "folder",
 	})
 
@@ -32,9 +33,9 @@ func CreateFolder(userName, userId, folderName string, folderPath string, contex
 	result := Create(
 		context.PostgresClient.Database,
 		&UserFolders{
-			UserId:     userId,
+			UserId:     request.UserId,
 			ResourceId: resourceUuid,
-			FolderPath: folderPath + "/" + folderName,
+			FolderPath: request.FolderPath + "/" + request.FolderName,
 		},
 	)
 

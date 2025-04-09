@@ -5,7 +5,6 @@ import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import ResourcePreviewPanel from "../../ui/moleculas/ResourcePreviewPanel";
 import { SearchViewModel } from "../view_models/SearchViewModel";
 import { ResourcePreviewProps } from "../../ui/atoms/ResourcePreview";
-import customSesionStorage from "../../helpers/SessionController";
 import { useEffect } from "react";
 
 const SearchPage = observer(({ viewModel }: { viewModel: SearchViewModel }) => {
@@ -28,7 +27,9 @@ const SearchPage = observer(({ viewModel }: { viewModel: SearchViewModel }) => {
     <Box className={stylingProps.styles.basicPanel} sx={{}}>
       <Stack spacing={10} sx={{ justifyContent: "center", width: "100%" }}>
         {viewModel.resources.length === 0 ? (
-          <Typography sx={{fontSize: 40, textAlign: "center"}}>Ничего не нашлось</Typography>
+          <Typography sx={{ fontSize: 40, textAlign: "center" }}>
+            Ничего не нашлось
+          </Typography>
         ) : (
           <ResourcePreviewPanel
             stylingProps={stylingProps}

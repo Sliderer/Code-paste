@@ -1,12 +1,14 @@
-import { Box, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { ResourceAction } from "../../helpers/ResourceAction";
 import ResourceActionButton from "../atoms/ResourceActionButton";
 import StylingProps from "../../helpers/StylingProps";
 import ResourceModel from "../../mvvm/models/ResourceModel";
-import { getCodeEditorTheme, getLanguageSyntax } from "../../helpers/CodeEditorHelpers";
+import {
+  getCodeEditorTheme,
+  getLanguageSyntax,
+} from "../../helpers/CodeEditorHelpers";
 import CodeMirror from "@uiw/react-codemirror";
 import "../css/code_editor_style.css";
-import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 
 const ResourceDemonstrationPanel = ({
   stylingProps,
