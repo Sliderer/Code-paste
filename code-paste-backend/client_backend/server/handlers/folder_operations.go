@@ -71,6 +71,7 @@ func GetFolderUuid(path string, context *HandleContext) (string, error) {
 	var user User
 	result := Find(context.PostgresClient.Database.Where("name = ?", userName).Limit(1), &user)
 
+	log.Println("info", user.Id, canonisedPath)
 	var userFolder UserFolders
 	result = Find(context.PostgresClient.Database.Where("user_id = ? AND folder_path = ?", user.Id, canonisedPath), &userFolder)
 

@@ -399,11 +399,9 @@ func (serverImpl *ServerImpl) GetFolderUuid(w http.ResponseWriter, r *http.Reque
 		resourceUuid, err := GetFolderUuid(path, serverImpl.Context)
 
 		if err != nil {
-			log.Println("Error getting folder uuid: ", err)
-			w.WriteHeader(http.StatusNotFound)
+			lib.SetError(w, http.StatusInternalServerError, "Error getting folder uuid: "+err.Error())
 		} else {
 			w.WriteHeader(http.StatusOK)
-			log.Println("Folder Uuid", resourceUuid)
 			w.Write([]byte(resourceUuid))
 		}
 	} else {
