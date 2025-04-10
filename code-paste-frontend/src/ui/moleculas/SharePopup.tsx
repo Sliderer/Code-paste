@@ -4,10 +4,12 @@ import { useCallback, useState } from "react";
 import StylingProps from "../../helpers/StylingProps";
 
 const SharePopup = ({
+  id,
   stylingProps,
   resourceUuid,
   goBack,
 }: {
+  id?: string;
   stylingProps: StylingProps;
   resourceUuid: string;
   goBack: () => void;
@@ -19,7 +21,7 @@ const SharePopup = ({
   }, []);
 
   return (
-    <Box>
+    <Box id={id}>
       <Stack
         className={stylingProps.styles.panelWithShadow}
         sx={{ padding: "50px" }}

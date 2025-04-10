@@ -16,7 +16,7 @@ const ResourcePasswordPanel = ({
   const [password, setPassword] = useState("");
 
   return (
-    <Box className={stylingProps.styles.centerPanel}>
+    <Box id='password_panel' className={stylingProps.styles.centerPanel}>
       <Box className={stylingProps.styles.settingsPanel}>
         <Stack spacing={4}>
           <Typography>Этот файл защищен паролем</Typography>

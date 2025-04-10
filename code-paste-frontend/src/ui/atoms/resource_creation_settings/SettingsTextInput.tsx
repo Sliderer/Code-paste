@@ -2,11 +2,13 @@ import { TextField } from "@mui/material";
 import StylingProps from "../../../helpers/StylingProps";
 
 const SettingsTextInput = ({
+  id,
   stylingProps,
   placeholder,
   type,
   onChange,
 }: {
+  id?: string;
   stylingProps: StylingProps;
   placeholder: string;
   type?: string;
@@ -14,6 +16,7 @@ const SettingsTextInput = ({
 }) => {
   return (
     <TextField
+      id={id}
       variant="standard"
       slotProps={{
         input: {

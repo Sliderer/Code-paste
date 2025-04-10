@@ -16,7 +16,6 @@ class ClientServerAPI {
     highlightSetting: string,
     data: Uint8Array
   ) {
-    console.log(data)
     let promise = await axios.post(`/upload_resource`, {
       UserName: userName,
       UserId: userId,

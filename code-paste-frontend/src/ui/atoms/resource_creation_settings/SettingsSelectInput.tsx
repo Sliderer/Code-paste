@@ -3,10 +3,12 @@ import { useState } from "react";
 import StylingProps from "../../../helpers/StylingProps";
 
 const SettingsSelectInput = ({
+  id,
   stylingProps,
   values,
   onChange,
 }: {
+  id?: string;
   stylingProps: StylingProps;
   values: string[];
   onChange: Function;
@@ -21,6 +23,7 @@ const SettingsSelectInput = ({
 
   return (
     <Select
+      id={id}
       value={currentValue}
       sx={{ color: stylingProps.theme.palette.primary.dark }}
       onChange={onValueChange}

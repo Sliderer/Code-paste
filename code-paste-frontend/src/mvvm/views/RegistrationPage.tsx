@@ -4,7 +4,7 @@ import { Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import SettingsTextInput from "../../ui/atoms/resource_creation_settings/SettingsTextInput";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const RegistrationPage = observer(
   ({ viewModel }: { viewModel: RegistrationViewModel }) => {
@@ -25,7 +25,7 @@ const RegistrationPage = observer(
       }
     }, [viewModel.userName]);
 
-    const createUser = () => {
+    const createUser = useCallback(() => {
       const validationResult = viewModel.validateData(
         userName,
         email,
@@ -40,7 +40,7 @@ const RegistrationPage = observer(
       } else {
         setErrorMessage(validationResult.error);
       }
-    };
+    }, [userName, email, password, viewModel]);
 
     return (
       <div
@@ -68,16 +68,19 @@ const RegistrationPage = observer(
             >
               <Stack spacing={4} sx={{ width: "40vh" }}>
                 <SettingsTextInput
+                  id='name_placeholder'
                   stylingProps={stylingProps}
                   placeholder="Имя"
                   onChange={setUserName}
                 />
                 <SettingsTextInput
+                  id='email_placeholder'
                   stylingProps={stylingProps}
                   placeholder="E-mail"
                   onChange={setEmail}
                 />
                 <SettingsTextInput
+                  id='password_placeholder'
                   stylingProps={stylingProps}
                   placeholder="Пароль"
                   type="password"
@@ -87,6 +90,7 @@ const RegistrationPage = observer(
                   {errorMessage}
                 </Typography>
                 <Button
+                  id='register_button'
                   className={stylingProps.styles.publishButton}
                   sx={{
                     background: stylingProps.theme.palette.primary.main,

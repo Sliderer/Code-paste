@@ -22,10 +22,14 @@ func CreateUserHandler(request requests.CreateUser, context *HandleContext) (str
 		},
 	)
 
+	if result.Error != nil {
+		return "", result.Error
+	}
+
 	return userId, result.Error
 }
 
-func CheckAccountPassword(request requests.AuthUser, context *HandleContext) (response.PredicateResponse, error) {
+func CheckAccountPassword(request requests.AuthUser, context *HandleContext) (*response.PredicateResponse, error) {
 	hashedPassword := GetHash(request.Password)
 	var user User
 	result := Find(
@@ -33,13 +37,17 @@ func CheckAccountPassword(request requests.AuthUser, context *HandleContext) (re
 		&user,
 	)
 
-	return response.PredicateResponse{
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &response.PredicateResponse{
 		Result: result.RowsAffected > 0,
 		UserId: user.Id,
 	}, result.Error
 }
 
-func DeleteUserHandler(request requests.DeleteUser, context *HandleContext) (response.PredicateResponse, error) {
+func DeleteUserHandler(request requests.DeleteUser, context *HandleContext) (*response.PredicateResponse, error) {
 	hashedPassword := GetHash(request.Password)
 	user := User{
 		Id:       request.UserId,
@@ -51,7 +59,11 @@ func DeleteUserHandler(request requests.DeleteUser, context *HandleContext) (res
 		&user,
 	)
 
-	return response.PredicateResponse{
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &response.PredicateResponse{
 		Result: result.RowsAffected > 0,
 		UserId: request.UserId,
 	}, result.Error

@@ -7,11 +7,13 @@ import ValidationResult from "../../helpers/ValidationResult";
 import StylingProps from "../../helpers/StylingProps";
 
 const ChangableText = ({
+  id,
   stylingProps,
   defaultText,
   validate,
   onChange,
 }: {
+  id?: string;
   stylingProps: StylingProps;
   defaultText: string;
   validate: (value: string) => ValidationResult;

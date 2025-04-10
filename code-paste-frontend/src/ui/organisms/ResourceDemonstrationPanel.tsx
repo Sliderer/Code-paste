@@ -27,6 +27,7 @@ const ResourceDemonstrationPanel = ({
         <Stack direction={"row"} spacing={4} justifyContent={"center"}>
           {actions.map((action, index) => (
             <ResourceActionButton
+              id='action_button'
               stylingProps={stylingProps}
               key={index}
               action={action}
@@ -34,6 +35,7 @@ const ResourceDemonstrationPanel = ({
           ))}
         </Stack>
         <Box
+          id='demonstration_panel'
           className={stylingProps.styles.basicShadow}
           sx={{
             padding: 1,

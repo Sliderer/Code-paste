@@ -6,6 +6,7 @@ import ValidationResult from "../../helpers/ValidationResult";
 export class EnterViewModel {
   private clientServerAPI: ClientServerAPI;
   @observable userName: string | undefined = undefined;
+  @observable errorMessage: string = '';
 
   constructor() {
     makeObservable(this);
@@ -34,13 +35,18 @@ export class EnterViewModel {
   }
 
   checkPassword(userName: string, password: string) {
-    this.clientServerAPI.checkPassword(userName, password).then((data) => {
-      if (data.data.Result) {
-        this.userName = userName;
-        customSesionStorage.getUserName().setValue(userName);
-        customSesionStorage.getUserId().setValue(data.data.UserId);
-      }
-    });
+    this.clientServerAPI
+      .checkPassword(userName, password)
+      .then((data) => {
+        if (data.data.Result) {
+          this.userName = userName;
+          customSesionStorage.getUserName().setValue(userName);
+          customSesionStorage.getUserId().setValue(data.data.UserId);
+        } else {
+          this.errorMessage = 'Пользователя не существует, либо введен неверный пароль'
+        }
+      })
+      .catch((e) => console.log(e));
   }
 }
 

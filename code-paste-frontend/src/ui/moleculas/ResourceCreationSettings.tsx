@@ -45,6 +45,7 @@ const ResourceCreationSettings = ({
     <Box className={stylingProps.styles.settingsPanel}>
       <Stack display={"grid"} spacing={5} sx={{ width: "15vw" }}>
         <SettingsTextInput
+          id='filename_placeholder'
           stylingProps={stylingProps}
           key={"fileName"}
           placeholder="Имя"
@@ -52,6 +53,7 @@ const ResourceCreationSettings = ({
         />
 
         <SettingsTextInput
+          id='password_placeholder'
           stylingProps={stylingProps}
           key={"password"}
           placeholder="Пароль"
@@ -60,6 +62,7 @@ const ResourceCreationSettings = ({
         />
 
         <SettingsTextInput
+          id='folder_name_placeholder'
           stylingProps={stylingProps}
           key={"folderName"}
           placeholder="Название папки"
@@ -67,6 +70,7 @@ const ResourceCreationSettings = ({
         />
 
         <SettingsSelectInput
+          id='life_period_select'
           stylingProps={stylingProps}
           key={"lifePeriod"}
           values={ttlOptions}
@@ -74,6 +78,7 @@ const ResourceCreationSettings = ({
         />
 
         <SettingsSelectInput
+          id='hoghlight_select'
           stylingProps={stylingProps}
           key={"highlitingSyntax"}
           values={syntaxHighlightingLanguages}
@@ -81,6 +86,7 @@ const ResourceCreationSettings = ({
         />
 
         <SettingsSelectInput
+          id='language_select'
           stylingProps={stylingProps}
           key={"translateLanguage"}
           values={translateLanguages}
@@ -88,6 +94,7 @@ const ResourceCreationSettings = ({
         />
         <Typography sx={{ textAlign: "center" }}>{error}</Typography>
         <Button
+          id='publish_button'
           className={stylingProps.styles.publishButton}
           sx={{
             background: stylingProps.theme.palette.primary.main,

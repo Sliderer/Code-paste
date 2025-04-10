@@ -21,16 +21,18 @@ export class SearchViewModel {
     this.searchAPI.search(text).then((data) => {
       let resourceUuids: string[] = data.data;
       resourceUuids.map((resourceUuid) => {
-        this.clientAPI.getResourcePreview(resourceUuid).then((data) => {
-          console.log(data.data);
-          this.refresh({
-            Title: data.data.Title,
-            Preview: data.data.Preview,
-            ResourceUuid: resourceUuid,
-            Author: data.data.Author,
-            Type: "text",
-          });
-        });
+        this.clientAPI
+          .getResourcePreview(resourceUuid)
+          .then((data) => {
+            this.refresh({
+              Title: data.data.Title,
+              Preview: data.data.Preview,
+              ResourceUuid: resourceUuid,
+              Author: data.data.Author,
+              Type: "text",
+            });
+          })
+          .catch((e) => console.log(e));
       });
     });
   };

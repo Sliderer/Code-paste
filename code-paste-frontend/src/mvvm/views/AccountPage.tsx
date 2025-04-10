@@ -6,7 +6,7 @@ import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import { ResourcePreviewProps } from "../../ui/atoms/ResourcePreview";
 import CurrentUserAccount from "../../ui/organisms/CurrentUserAccount";
 import OtherUserAccount from "../../ui/organisms/OtherUserAccount";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import customSesionStorage from "../../helpers/SessionController";
 import ResourcesList from "../../ui/organisms/ResourcesList";
 import AllUserResourcesPanel from "../../ui/organisms/AllUserResourcesPanel";
@@ -38,13 +38,12 @@ const AccountPage = observer(
       }
     }, []);
 
-    const logout = () => {
+    const logout = useCallback(() => {
       viewModel.logOut();
       window.location.reload();
-    };
+    }, [viewModel, window]);
 
     useEffect(() => {
-      console.log("refrsh", viewModel.account !== undefined);
       if (viewModel.account !== undefined) {
         viewModel.updateResourcesLists();
       }
@@ -87,6 +86,7 @@ const AccountPage = observer(
                 subscribeOnPublications={viewModel.subscribeOnPublications}
               />
               <ResourcesList
+                id='resources_list'
                 stylingProps={stylingProps}
                 resourcesList={viewModel.resourcesList}
                 resourcePreviewProps={resourcePreviewProps}

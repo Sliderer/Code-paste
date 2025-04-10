@@ -34,6 +34,7 @@ const CurrentUserAccount = ({
         <Stack spacing={3}>
           <Stack direction={"row"} spacing={5}>
             <Typography
+              id='nickname_text'
               className={stylingProps.styles.headerStyle}
               sx={{ textAlign: "top", fontSize: 50, fontWeight: "bold" }}
             >
@@ -41,6 +42,7 @@ const CurrentUserAccount = ({
             </Typography>
 
             <Button
+              id='logout_button'
               className={stylingProps.styles.createResourcePanel}
               onClick={logOut}
               sx={{ textAlign: "center", fontSize: 20 }}
@@ -50,12 +52,14 @@ const CurrentUserAccount = ({
           </Stack>
           <Stack direction={"row"} justifyContent={"center"} spacing={5}>
             <ChangableText
+              id='email_text'
               stylingProps={stylingProps}
               defaultText={email}
               validate={(value: string) => validateContact(value, "email")}
               onChange={(value: string) => updateContact(value, "email")}
             />
             <ChangableText
+              id='telegram_text'
               stylingProps={stylingProps}
               defaultText={telegram}
               validate={(value: string) => validateContact(value, "telegram")}

@@ -14,6 +14,7 @@ const ResourceNavigationPanel = ({
 }) => {
   return (
     <Stack
+      id='resource_navigation'
       direction={"row"}
       spacing={2}
       alignContent={"center"}

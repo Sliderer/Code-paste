@@ -7,8 +7,8 @@ import ValidationResult from "../../helpers/ValidationResult";
 
 export class AccountViewModel {
   @observable account: AccountModel | undefined = undefined;
-  @observable resourcesList: ResourcePreviewModel[] = [];
-  @observable likedResourcesList: ResourcePreviewModel[] = [];
+  @observable resourcesList: ResourcePreviewModel[] | undefined = undefined;
+  @observable likedResourcesList: ResourcePreviewModel[] | undefined = undefined;
   @observable redirectToEnder: boolean = false;
   @observable createFolder: boolean = false;
   private clientServerAPI: ClientServerAPI;
@@ -21,10 +21,13 @@ export class AccountViewModel {
   }
 
   logOut = () => {
-    this.clientServerAPI.logOut().then((_) => {
-      customSessionStorage.getUserId().removeValue();
-      customSessionStorage.getUserName().removeValue();
-    });
+    this.clientServerAPI
+      .logOut()
+      .then((_) => {
+        customSessionStorage.getUserId().removeValue();
+        customSessionStorage.getUserName().removeValue();
+      })
+      .catch((e) => console.log(e));
   };
 
   subscribeOnPublications = (publisher: string) => {
@@ -33,25 +36,30 @@ export class AccountViewModel {
       this.redirectToEnder = true;
     }
 
-    this.clientServerAPI.subscribeOnPublications(userId!, this.account!.id);
+    this.clientServerAPI
+      .subscribeOnPublications(userId!, this.account!.id)
+      .catch((e) => console.log(e));
   };
 
   getUserMetaData = (userName: string) => {
-    this.clientServerAPI.getUserMetaData(userName).then((data) => {
-      this.account = {
-        id: data.data.UserId,
-        userName: userName,
-        email: data.data.Email,
-        telegram: data.data.Telegram,
-      };
-      this.updateResourcesLists();
-    });
+    this.clientServerAPI
+      .getUserMetaData(userName)
+      .then((data) => {
+        this.account = {
+          id: data.data.UserId,
+          userName: userName,
+          email: data.data.Email,
+          telegram: data.data.Telegram,
+        };
+        this.updateResourcesLists();
+      })
+      .catch((e) => console.log(e));
   };
 
   updateResourcesLists = () => {
     this.loadedResourcesCount = 0;
-    this.resourcesList = [];
-    this.likedResourcesList = [];
+    this.resourcesList = undefined;
+    this.likedResourcesList = undefined;
     this.getUsersResources();
     this.getLikedUsersResources();
   };
@@ -59,9 +67,6 @@ export class AccountViewModel {
   updateContact = (value: string, field: string) => {
     this.clientServerAPI
       .updateUserContacts(this.account!.id, value, field)
-      .then((_) => {
-        console.log("contacts updated");
-      })
       .catch((e) => {
         console.log(e);
       });
@@ -122,6 +127,10 @@ export class AccountViewModel {
             this.refresh(needOnlyLiked, resource);
           }
         );
+
+        this.resourcesList = this.resourcesList??[];
+        this.likedResourcesList = this.likedResourcesList??[];
+
         this.loadedResourcesCount += data.data.Resources.length;
       });
   };
@@ -138,7 +147,7 @@ export class AccountViewModel {
   ) {
     if (needOnlyLiked) {
       this.likedResourcesList = [
-        ...this.likedResourcesList,
+        ...this.likedResourcesList??[],
         {
           name: resource.Title,
           previewText: resource.Preview,
@@ -149,7 +158,7 @@ export class AccountViewModel {
       ];
     } else {
       this.resourcesList = [
-        ...this.resourcesList,
+        ...this.resourcesList??[],
         {
           name: resource.Title,
           previewText: resource.Preview,

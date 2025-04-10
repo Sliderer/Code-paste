@@ -25,12 +25,14 @@ func CreateResourceHandler(request requests.CreateResource, context *HandleConte
 
 	if err != nil {
 		log.Fatalln("Encoding gzip error: ", err)
+		return "", err
 	}
 	defer decompressed.Close()
 
 	decompressedData, err := io.ReadAll(decompressed)
 	if err != nil {
 		log.Println("Reading decompressed data error: ", err)
+		return "", err
 	}
 
 	document := Translate(decompressedData, request.Language, context)
@@ -52,6 +54,10 @@ func CreateResourceHandler(request requests.CreateResource, context *HandleConte
 	}
 
 	err = context.MinioClient.UploadFile(userName, filePath, document, int64(utf8.RuneCountInString(document)))
+	if err != nil {
+		log.Println("Error uploading file in minio: ", err)
+		return "", err
+	}
 
 	hashString := request.UserId + fileName + time.Now().String()
 	resourceUuid := GetHash(hashString)
@@ -63,7 +69,7 @@ func CreateResourceHandler(request requests.CreateResource, context *HandleConte
 	err = context.RedisClient.UploadResourceMetaData(resourceUuid, request.TTL, &ResourceMetaData{
 		Title:            fileName,
 		Path:             request.FolderName,
-		Owner:            userName,
+		Owner:            request.UserName,
 		OwnerId:          request.UserId,
 		Password:         passwordHash,
 		Preview:          document[:min(len(document), 100)],

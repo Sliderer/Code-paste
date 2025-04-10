@@ -15,10 +15,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context *HandleContext) (response.ResourceMetaDataResponse, error) {
+func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context *HandleContext) (*response.ResourceMetaDataResponse, error) {
 	resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
 	if err != nil {
-		return response.ResourceMetaDataResponse{}, err
+		return nil, err
 	}
 
 	isLiked := false
@@ -28,6 +28,10 @@ func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context
 			context.PostgresClient.Database.Where("user_id = ? AND resource_id = ?", userId, resourceUuid),
 			&likedResourceRow,
 		)
+		if result.Error != nil {
+			return nil, result.Error
+		}
+
 		isLiked = result.RowsAffected > 0 && likedResourceRow.IsActive
 	}
 
@@ -36,7 +40,7 @@ func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context
 		resourcePath += "/" + resourceMetaData.Title
 	}
 
-	return response.ResourceMetaDataResponse{
+	return &response.ResourceMetaDataResponse{
 		IsPrivate:               resourceMetaData.HasPassword(),
 		IsPrivateForCurrentUser: resourceMetaData.Owner != GetUserBucketName(requestSenderName),
 		IsLiked:                 isLiked,
@@ -49,26 +53,26 @@ func GetResourceMetaData(userId, resourceUuid, requestSenderName string, context
 	}, nil
 }
 
-func GetResourcePreview(resourceUuid string, context *HandleContext) (ResourcePreview, error) {
+func GetResourcePreview(resourceUuid string, context *HandleContext) (*ResourcePreview, error) {
 	resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
 	if err != nil {
-		return ResourcePreview{}, err
+		return nil, err
 	}
 
-	return ResourcePreview{
+	return &ResourcePreview{
 		Title:   resourceMetaData.Title,
 		Preview: resourceMetaData.Preview,
 		Author:  resourceMetaData.Owner,
 	}, nil
 }
 
-func ResourcePasswordCheck(resourceUuid string, passwordToCheck string, context *HandleContext) (response.PredicateResponse, error) {
+func ResourcePasswordCheck(resourceUuid string, passwordToCheck string, context *HandleContext) (*response.PredicateResponse, error) {
 	hashedPassword := GetHash(passwordToCheck)
 	resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
 	if err != nil {
-		return response.PredicateResponse{}, err
+		return nil, err
 	}
-	return response.PredicateResponse{
+	return &response.PredicateResponse{
 		Result: resourceMetaData.Password == hashedPassword,
 	}, nil
 }
@@ -80,7 +84,8 @@ func GetResourceData(resourceUuid string, context *HandleContext) ([]byte, error
 	}
 	resourceFullPath := resourceMetaData.Path + "/" + resourceMetaData.Title
 
-	octetData, err := context.MinioClient.DownloadFile(resourceMetaData.Owner, resourceFullPath)
+	bucketName := GetUserBucketName(resourceMetaData.Owner)
+	octetData, err := context.MinioClient.DownloadFile(bucketName, resourceFullPath)
 
 	if err != nil {
 		return nil, err
@@ -94,7 +99,7 @@ func GetResourceData(resourceUuid string, context *HandleContext) ([]byte, error
 	return textData, nil
 }
 
-func GetUserResources(userId string, lookUpPath string, offset int, needOnlyLiked bool, context *HandleContext) ([]ResourcePreview, error) {
+func GetUserResources(userId string, lookUpPath string, offset int, needOnlyLiked bool, context *HandleContext) ([]*ResourcePreview, error) {
 	var userResourceUuids []string
 	const resourcesCountLimit = 30
 	var result *gorm.DB
@@ -133,7 +138,7 @@ func GetUserResources(userId string, lookUpPath string, offset int, needOnlyLike
 		return nil, result.Error
 	}
 
-	resourcePreviews := make([]ResourcePreview, 0)
+	resourcePreviews := make([]*ResourcePreview, 0)
 	for _, resourceUuid := range userResourceUuids {
 		resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
 		if err != nil {
@@ -141,7 +146,6 @@ func GetUserResources(userId string, lookUpPath string, offset int, needOnlyLike
 			continue
 		}
 
-		log.Println("File path matching", lookUpPath, resourceMetaData.Path)
 		if resourceMetaData.Path != lookUpPath {
 			continue
 		}
@@ -151,7 +155,7 @@ func GetUserResources(userId string, lookUpPath string, offset int, needOnlyLike
 			resourceTitle = resourceMetaData.Title[:strings.LastIndex(resourceMetaData.Title, ".")]
 		}
 
-		resourcePreviews = append(resourcePreviews, ResourcePreview{
+		resourcePreviews = append(resourcePreviews, &ResourcePreview{
 			Title:        resourceTitle,
 			Preview:      resourceMetaData.Preview,
 			ResourceUuid: resourceUuid,

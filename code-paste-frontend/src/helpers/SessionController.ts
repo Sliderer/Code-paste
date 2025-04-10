@@ -6,7 +6,6 @@ class StorageItem {
   }
 
   setValue(value: string) {
-    console.log('set')
     sessionStorage.setItem(this.itemName, value);
   }
 

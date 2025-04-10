@@ -6,7 +6,7 @@ import ResourcePasswordPanel from "../../ui/moleculas/ResourcePasswordPanel";
 import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import ResourceDemonstrationPanel from "../../ui/organisms/ResourceDemonstrationPanel";
 import LoadingPanel from "../../ui/atoms/LoadingPanel";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 import SharePopup from "../../ui/moleculas/SharePopup";
 import customSesionStorage from "../../helpers/SessionController";
@@ -23,10 +23,10 @@ const ResourceDemonstrationPage = observer(
     const navigate = useNavigate();
     const location = useLocation();
 
-    const clearPage = () => {
+    const clearPage = useCallback(() => {
       viewModel.clearResource();
       window.removeEventListener("popstate", clearPage);
-    };
+    }, [viewModel]);
 
     const resourcePreviewProps: ResourcePreviewProps = {
       showAuthor: false,
@@ -70,6 +70,7 @@ const ResourceDemonstrationPage = observer(
       <Box className={stylingProps.styles.basicPanel}>
         {viewModel.inSharingMode ? (
           <SharePopup
+            id='share_popup'
             stylingProps={stylingProps}
             resourceUuid={viewModel.resourceModel.resourceUuid!}
             goBack={viewModel.disableShareMode}

@@ -9,17 +9,19 @@ import {
 } from "../../helpers/CodeEditorHelpers";
 
 const ResourceInputField = ({
+  id,
   stylingProps,
   highlightSyntax,
   onTextUpdate,
 }: {
+  id?: string;
   stylingProps: StylingProps;
   highlightSyntax: string;
   onTextUpdate: (value: string) => void;
 }) => {
   const highlightSyntaxLanguage = getLanguageSyntax(highlightSyntax);
   return (
-    <Box className={stylingProps.styles.resourceInputFieldStyle}>
+    <Box id={id} className={stylingProps.styles.resourceInputFieldStyle}>
       <CodeMirror
         theme={getCodeEditorTheme(stylingProps)}
         className="cm-editor"

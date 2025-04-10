@@ -5,7 +5,7 @@ import { useStyles } from "../../ui/styling/styles/ElementStyles";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import SettingsTextInput from "../../ui/atoms/resource_creation_settings/SettingsTextInput";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const EnterPage = observer(({ viewModel }: { viewModel: EnterViewModel }) => {
   const stylingProps = {
@@ -15,7 +15,6 @@ const EnterPage = observer(({ viewModel }: { viewModel: EnterViewModel }) => {
 
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
   let navigation = useNavigate();
 
   useEffect(() => {
@@ -24,14 +23,14 @@ const EnterPage = observer(({ viewModel }: { viewModel: EnterViewModel }) => {
     }
   }, [viewModel.userName]);
 
-  const enter = () => {
+  const enter = useCallback(() => {
     const validationResult = viewModel.validateData(userName, password);
     if (validationResult.isValid) {
       viewModel.checkPassword(userName, password);
     } else {
-      setErrorMessage(validationResult.error);
+      viewModel.errorMessage = validationResult.error;
     }
-  };
+  }, [userName, password]);
 
   return (
     <div
@@ -59,20 +58,23 @@ const EnterPage = observer(({ viewModel }: { viewModel: EnterViewModel }) => {
           >
             <Stack spacing={4} sx={{ width: "40vh" }}>
               <SettingsTextInput
+                id='email_placeholder'
                 stylingProps={stylingProps}
                 placeholder="E-mail"
                 onChange={setUserName}
               />
               <SettingsTextInput
+                id='password_placeholder'
                 stylingProps={stylingProps}
                 placeholder="Пароль"
                 type="password"
                 onChange={setPassword}
               />
               <Typography sx={{ textAlign: "center" }}>
-                {errorMessage}
+                {viewModel.errorMessage}
               </Typography>
               <Button
+                id='enter_button'
                 className={stylingProps.styles.publishButton}
                 sx={{
                   background: stylingProps.theme.palette.primary.main,

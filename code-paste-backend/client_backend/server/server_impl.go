@@ -27,10 +27,21 @@ func SetDefaultHeaders(w http.ResponseWriter, allowedHeaders string) http.Respon
 	return w
 }
 
+func DefaultHandler(method string, w http.ResponseWriter, r *http.Request, handleFunc func()) {
+	switch r.Method {
+	case method:
+		handleFunc()
+	case "OPTIONS":
+		w.WriteHeader(http.StatusOK)
+	default:
+		lib.SetError(w, http.StatusNotFound, "Path not found")
+	}
+}
+
 func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type, password")
 
-	if r.Method == "GET" {
+	DefaultHandler("GET", w, r, func() {
 		resourceUuid := r.PathValue("resourceUuid")
 		passwordToCheck := r.Header.Get("Password")
 		result, err := ResourcePasswordCheck(resourceUuid, passwordToCheck, serverImpl.Context)
@@ -41,15 +52,13 @@ func (serverImpl *ServerImpl) CheckResourcePassword(w http.ResponseWriter, r *ht
 		resultJson, _ := json.Marshal(result)
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type, user-id")
 
-	if r.Method == "GET" {
+	DefaultHandler("GET", w, r, func() {
 		userId := r.Header.Get("User-Id")
 		resourceUuid := r.PathValue("resourceUuid")
 
@@ -70,15 +79,13 @@ func (serverImpl *ServerImpl) GetResourceMetaData(w http.ResponseWriter, r *http
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(response)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) GetResourcePreview(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type, user-id")
 
-	if r.Method == "GET" {
+	DefaultHandler("GET", w, r, func() {
 		resourceUuid := r.PathValue("resourceUuid")
 
 		resourcePreview, err := GetResourcePreview(resourceUuid, serverImpl.Context)
@@ -96,35 +103,31 @@ func (serverImpl *ServerImpl) GetResourcePreview(w http.ResponseWriter, r *http.
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(response)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type, password")
 
-	if r.Method == "GET" {
+	DefaultHandler("GET", w, r, func() {
 		resourceUuid := r.PathValue("resourceUuid")
 		textData, err := GetResourceData(resourceUuid, serverImpl.Context)
 
 		if err != nil {
-			lib.SetError(w, http.StatusNotFound, "Resource not found")
+			lib.SetError(w, http.StatusNotFound, "Can not get resource data: "+err.Error())
 			return
 		}
 
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/text")
 		w.Write(textData)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) UploadResource(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type")
-	switch r.Method {
-	case "POST":
+
+	DefaultHandler("POST", w, r, func() {
 		request, err := lib.GetRequest[requests.CreateResource](r)
 
 		resourceUuid, err := CreateResourceHandler(request, serverImpl.Context)
@@ -133,18 +136,13 @@ func (serverImpl *ServerImpl) UploadResource(w http.ResponseWriter, r *http.Requ
 			return
 		}
 		w.Write([]byte(resourceUuid))
-	case "OPTIONS":
-		w.WriteHeader(http.StatusOK)
-	default:
-		lib.SetError(w, http.StatusNotFound, "Path not found")
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type")
 
-	switch r.Method {
-	case "POST":
+	DefaultHandler("POST", w, r, func() {
 		request, err := lib.GetRequest[requests.CreateUser](r)
 
 		if err != nil {
@@ -166,18 +164,13 @@ func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request)
 		session.Save(r, w)
 
 		w.Write([]byte(userId))
-	case "OPTIONS":
-		w.WriteHeader(http.StatusOK)
-	default:
-		lib.SetError(w, http.StatusNotFound, "Path not found")
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) AuthUser(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type")
 
-	switch r.Method {
-	case "POST":
+	DefaultHandler("POST", w, r, func() {
 		session, err := serverImpl.Context.SessionStore.GetSession(r)
 
 		request, err := lib.GetRequest[requests.AuthUser](r)
@@ -201,18 +194,13 @@ func (serverImpl *ServerImpl) AuthUser(w http.ResponseWriter, r *http.Request) {
 		resultJson, _ := json.Marshal(result)
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
-	case "OPTIONS":
-		w.WriteHeader(http.StatusOK)
-	default:
-		lib.SetError(w, http.StatusNotFound, "Path not found")
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type")
 
-	switch r.Method {
-	case "DELETE":
+	DefaultHandler("DELETE", w, r, func() {
 		session, err := serverImpl.Context.SessionStore.GetSession(r)
 
 		request, err := lib.GetRequest[requests.DeleteUser](r)
@@ -234,17 +222,13 @@ func (serverImpl *ServerImpl) DeleteUser(w http.ResponseWriter, r *http.Request)
 		resultJson, _ := json.Marshal(result)
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
-	case "OPTIONS":
-		w.WriteHeader(http.StatusOK)
-	default:
-		lib.SetError(w, http.StatusNotFound, "Path not found")
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type, user-id, offset, need-only-liked, path")
 
-	if r.Method == "GET" {
+	DefaultHandler("GET", w, r, func() {
 		userId := r.Header.Get("User-Id")
 		path := r.Header.Get("Path")
 		var needOnlyLiked bool
@@ -268,27 +252,25 @@ func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Re
 
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) Logout(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type")
 
-	if r.Method == "GET" {
+	DefaultHandler("GET", w, r, func() {
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
 		session.SetAuthenticated(false)
 		session.SetUserName("")
 		session.Save(r, w)
 		w.WriteHeader(http.StatusOK)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) GetUserMetadata(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type, user-name")
 
-	if r.Method == "GET" {
+	DefaultHandler("GET", w, r, func() {
 		userName := r.Header.Get("User-Name")
 		userMetaData, err := GetUserMetaData(userName, serverImpl.Context)
 		if err != nil {
@@ -300,13 +282,13 @@ func (serverImpl *ServerImpl) GetUserMetadata(w http.ResponseWriter, r *http.Req
 
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) UpdateUserContacts(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type")
 
-	if r.Method == "POST" {
+	DefaultHandler("POST", w, r, func() {
 		request, err := lib.GetRequest[requests.UpdateUserContactsRequest](r)
 
 		if err != nil {
@@ -322,13 +304,13 @@ func (serverImpl *ServerImpl) UpdateUserContacts(w http.ResponseWriter, r *http.
 		}
 
 		w.WriteHeader(http.StatusOK)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) LikeResource(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type")
 
-	if r.Method == "POST" {
+	DefaultHandler("POST", w, r, func() {
 		requestBody, err := lib.GetRequest[requests.LikeResourceRequest](r)
 
 		if err != nil {
@@ -343,14 +325,13 @@ func (serverImpl *ServerImpl) LikeResource(w http.ResponseWriter, r *http.Reques
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) CreateFolder(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type")
 
-	if r.Method == "POST" {
-
+	DefaultHandler("POST", w, r, func() {
 		request, err := lib.GetRequest[requests.CreateFolder](r)
 
 		if err != nil {
@@ -365,15 +346,13 @@ func (serverImpl *ServerImpl) CreateFolder(w http.ResponseWriter, r *http.Reques
 		}
 
 		w.WriteHeader(http.StatusOK)
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) DeleteFolder(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type, user-id")
 
-	if r.Method == "DELETE" {
+	DefaultHandler("DELETE", w, r, func() {
 		userId := r.Header.Get("User-Id")
 		resourceUuid := r.PathValue("resourceUuid")
 
@@ -385,15 +364,13 @@ func (serverImpl *ServerImpl) DeleteFolder(w http.ResponseWriter, r *http.Reques
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) GetFolderUuid(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type, path")
 
-	if r.Method == "GET" {
+	DefaultHandler("GET", w, r, func() {
 		path := r.Header.Get("Path")
 
 		resourceUuid, err := GetFolderUuid(path, serverImpl.Context)
@@ -404,15 +381,13 @@ func (serverImpl *ServerImpl) GetFolderUuid(w http.ResponseWriter, r *http.Reque
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(resourceUuid))
 		}
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) DeleteResource(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type, user-name, user-id")
 
-	if r.Method == "DELETE" {
+	DefaultHandler("DELETE", w, r, func() {
 		userName := r.Header.Get("User-Name")
 		userId := r.Header.Get("User-Id")
 		resourceUuid := r.PathValue("resourceUuid")
@@ -424,15 +399,13 @@ func (serverImpl *ServerImpl) DeleteResource(w http.ResponseWriter, r *http.Requ
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	})
 }
 
 func (serverImpl *ServerImpl) Subscribe(w http.ResponseWriter, r *http.Request) {
 	w = SetDefaultHeaders(w, "content-type, subscriber-id, publisher-id")
 
-	if r.Method == "POST" {
+	DefaultHandler("POST", w, r, func() {
 		subsriberId := r.Header.Get("Subscriber-Id")
 		publisherId := r.Header.Get("Publisher-Id")
 		err := Subscribe(subsriberId, publisherId, serverImpl.Context)
@@ -442,5 +415,5 @@ func (serverImpl *ServerImpl) Subscribe(w http.ResponseWriter, r *http.Request) 
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
-	}
+	})
 }

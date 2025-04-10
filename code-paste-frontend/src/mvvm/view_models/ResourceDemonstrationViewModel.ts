@@ -31,7 +31,6 @@ export class ResourceDemonstrationViewModel {
     this.clientServerAPI
       .getResourceMetaData(userId !== null ? userId : "", resourceUuid)
       .then(async (data) => {
-        console.log(data.data);
         this.resourceModel = {
           isPrivate:
             data.data.OwnerId == customSesionStorage.getUserId().getValue()
@@ -82,7 +81,8 @@ export class ResourceDemonstrationViewModel {
       )
       .then((_) => {
         this.getResourceData("");
-      });
+      })
+      .catch((e) => console.log(e));
   };
 
   onDeleteFolder = () => {
@@ -98,7 +98,6 @@ export class ResourceDemonstrationViewModel {
           "/" +
           splittedPath.slice(1, splittedPath.length - 2).join("/");
         this.onFolderChipsClick(newFolderPath).then((data) => {
-          console.log("new path", data.data);
           this.backRedirectOnDelete = data.data;
         });
       });
@@ -108,6 +107,7 @@ export class ResourceDemonstrationViewModel {
     folderPath: string
   ): Promise<AxiosResponse<string>> => {
     let result = this.clientServerAPI.getFolderUuid(folderPath);
+    result.catch((e) => console.log(e));
 
     return result;
   };
@@ -143,10 +143,12 @@ export class ResourceDemonstrationViewModel {
       actions.push({
         title: "В избранное",
         action: () => {
-          this.clientServerAPI.likeResource(
-            customSesionStorage.getUserId().getValue()!,
-            this.resourceModel.resourceUuid!
-          );
+          this.clientServerAPI
+            .likeResource(
+              customSesionStorage.getUserId().getValue()!,
+              this.resourceModel.resourceUuid!
+            )
+            .catch((e) => console.log(e));
         },
         isActive: this.resourceModel.isLiked,
       });
@@ -156,11 +158,13 @@ export class ResourceDemonstrationViewModel {
       actions.push({
         title: "Удалить",
         action: () => {
-          this.clientServerAPI.deleteResource(
-            customSesionStorage.getUserId().getValue()!,
-            customSesionStorage.getUserName().getValue()!,
-            this.resourceModel.resourceUuid!
-          );
+          this.clientServerAPI
+            .deleteResource(
+              customSesionStorage.getUserId().getValue()!,
+              customSesionStorage.getUserName().getValue()!,
+              this.resourceModel.resourceUuid!
+            )
+            .catch((e) => console.log(e));
           this.isDeleted = true;
         },
         isActive: false,
@@ -275,7 +279,8 @@ export class ResourceDemonstrationViewModel {
               this.refresh(resource);
             }
           );
-        });
+        })
+        .catch((e) => console.log(e));
     }
   };
 

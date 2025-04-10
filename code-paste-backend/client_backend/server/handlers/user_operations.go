@@ -14,13 +14,18 @@ const (
 	EMAIL    = "email"
 )
 
-func GetUserMetaData(userName string, context *HandleContext) (responses.UserMetaData, error) {
+func GetUserMetaData(userName string, context *HandleContext) (*responses.UserMetaData, error) {
 	var user User
 	result := Find(
 		context.PostgresClient.Database.Limit(1).Select("id, email, telegram").Where("name = ?", userName),
 		&user,
 	)
-	return responses.UserMetaData{
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &responses.UserMetaData{
 		UserId:   user.Id,
 		Email:    user.Email,
 		Telegram: user.Telegram,

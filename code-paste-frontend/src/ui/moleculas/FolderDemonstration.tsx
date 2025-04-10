@@ -63,6 +63,7 @@ const FolderDemonstration = ({
             }}
           />
           <Button
+            id='delete_button'
             className={stylingProps.styles.lightShadow}
             sx={{
               backgroundColor: stylingProps.theme.palette.primary.main,

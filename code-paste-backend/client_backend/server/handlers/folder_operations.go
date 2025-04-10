@@ -64,17 +64,22 @@ func DeleteFolder(userId, resourceUuid string, context *HandleContext) error {
 }
 
 func GetFolderUuid(path string, context *HandleContext) (string, error) {
-
 	userName := strings.Split(path, "/")[0]
 	canonisedPath := "default/" + strings.Join(strings.Split(path, "/")[1:], "/")
 
 	var user User
 	result := Find(context.PostgresClient.Database.Where("name = ?", userName).Limit(1), &user)
 
-	log.Println("info", user.Id, canonisedPath)
+	if result.Error != nil {
+		return "", result.Error
+	}
+
 	var userFolder UserFolders
 	result = Find(context.PostgresClient.Database.Where("user_id = ? AND folder_path = ?", user.Id, canonisedPath), &userFolder)
 
-	log.Println(userFolder.ResourceId, path)
+	if result.Error != nil {
+		return "", result.Error
+	}
+
 	return userFolder.ResourceId, result.Error
 }

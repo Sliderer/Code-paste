@@ -11,6 +11,7 @@ const CreateFolderButton = ({
 }) => {
   return (
     <IconButton
+      id='create_folder_button'
       onClick={onClick}
       className={stylingProps.styles.lightShadow}
       sx={{

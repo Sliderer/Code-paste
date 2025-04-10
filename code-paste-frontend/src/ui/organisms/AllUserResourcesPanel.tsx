@@ -18,10 +18,10 @@ const AllUserResourcesPanel = ({
   onCreateFolder,
 }: {
   stylingProps: StylingProps;
-  allResourcesList: ResourcePreviewModel[];
+  allResourcesList: ResourcePreviewModel[] | undefined;
   allResourcesPreviewProps: ResourcePreviewProps;
   allResourcesOnLoad: () => void;
-  likedResourcesList: ResourcePreviewModel[];
+  likedResourcesList: ResourcePreviewModel[] | undefined;
   likedResourcesPreviewProps: ResourcePreviewProps;
   likedResourcesOnLoad: () => void;
   onCreateFolder: () => void;
@@ -65,6 +65,7 @@ const AllUserResourcesPanel = ({
         />
       </Stack>
       <ResourcesList
+        id='resources_list'
         stylingProps={stylingProps}
         resourcesList={resourceList}
         resourcePreviewProps={resourcePreviewProps}

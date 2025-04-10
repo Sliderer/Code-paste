@@ -78,6 +78,7 @@ const ResourceCreationPage = observer(
         sx={{ justifyContent: "space-between" }}
       >
         <ResourceInputField
+          id='input_field'
           stylingProps={stylingProps}
           highlightSyntax={programmingLanguageHighlight}
           onTextUpdate={viewModel.setText}

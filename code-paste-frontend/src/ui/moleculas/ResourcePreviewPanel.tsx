@@ -6,16 +6,18 @@ import ResourcePreview, {
 import StylingProps from "../../helpers/StylingProps";
 
 const ResourcePreviewPanel = ({
+  id,
   stylingProps,
   resources,
   resourcePreviewProps,
 }: {
+  id?: string;
   stylingProps: StylingProps;
   resources: ResourcePreviewModel[];
   resourcePreviewProps: ResourcePreviewProps;
 }) => {
   return (
-    <Stack spacing={3}>
+    <Stack id={id} spacing={3}>
       {resources.map((resource, index) => (
         <ResourcePreview
           stylingProps={stylingProps}

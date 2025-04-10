@@ -4,14 +4,15 @@ import { useState } from "react";
 import StylingProps from "../../helpers/StylingProps";
 
 const ResourceActionButton = ({
+  id,
   stylingProps,
   action,
 }: {
+  id?: string
   stylingProps: StylingProps;
   action: ResourceAction;
 }) => {
   const [isActive, setIsActive] = useState(action.isActive);
-  console.log(action, action.isActive);
 
   const onClick = () => {
     action.action();

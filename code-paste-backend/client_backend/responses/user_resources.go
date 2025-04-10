@@ -5,5 +5,5 @@ import (
 )
 
 type UserResources struct {
-	Resources []ResourcePreview
+	Resources []*ResourcePreview
 }

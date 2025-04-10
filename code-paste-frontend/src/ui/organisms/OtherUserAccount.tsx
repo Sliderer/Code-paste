@@ -20,12 +20,14 @@ const OtherUserAccount = ({
         sx={{ display: "flex" }}
       >
         <Typography
+          id='nickname_text'
           className={stylingProps.styles.headerStyle}
           sx={{ fontSize: 50, fontWeight: "bold" }}
         >
           {nickname}
         </Typography>
         <Button
+          id='subsrcibe_button'
           className={stylingProps.styles.publishButton}
           sx={{
             background: stylingProps.theme.palette.primary.main,
