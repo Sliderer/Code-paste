@@ -5,15 +5,25 @@ import (
 	. "client_backend/models_for_server"
 	. "client_backend/postgres"
 	. "client_backend/postgres/models"
+	"errors"
 	"log"
 )
 
-func DeleteResource(userId, userName, resourceUuid string, context *HandleContext) error {
+func DeleteResource(userId, userName, resourceUuid string, session *ClientSession, context *HandleContext) error {
 	resourceMetaData, err := context.RedisClient.GetResourceMetaData(resourceUuid)
-	log.Println(resourceMetaData)
+
 	if err != nil {
 		log.Println("Error getting metadata for deleting resource", err)
 		return err
+	}
+
+	if resourceMetaData.Owner != "temp" {
+		if !session.IsAuthenticated() {
+			return errors.New("Unauthorized")
+		}
+	} else {
+		userId = "temp"
+		userName = "temp"
 	}
 
 	err = context.RedisClient.DeleteResourceMetaData(resourceUuid)

@@ -74,8 +74,6 @@ export class ResourceDemonstrationViewModel {
   onCreateFolder = (folderName: string) => {
     this.clientServerAPI
       .createFolder(
-        customSesionStorage.getUserName().getValue()!,
-        customSesionStorage.getUserId().getValue()!,
         folderName,
         this.resourceModel.path
       )
@@ -88,7 +86,6 @@ export class ResourceDemonstrationViewModel {
   onDeleteFolder = () => {
     this.clientServerAPI
       .deleteFolder(
-        customSesionStorage.getUserId().getValue()!,
         this.resourceModel.resourceUuid!
       )
       .then((_) => {
@@ -145,7 +142,6 @@ export class ResourceDemonstrationViewModel {
         action: () => {
           this.clientServerAPI
             .likeResource(
-              customSesionStorage.getUserId().getValue()!,
               this.resourceModel.resourceUuid!
             )
             .catch((e) => console.log(e));
@@ -160,8 +156,6 @@ export class ResourceDemonstrationViewModel {
         action: () => {
           this.clientServerAPI
             .deleteResource(
-              customSesionStorage.getUserId().getValue()!,
-              customSesionStorage.getUserName().getValue()!,
               this.resourceModel.resourceUuid!
             )
             .catch((e) => console.log(e));

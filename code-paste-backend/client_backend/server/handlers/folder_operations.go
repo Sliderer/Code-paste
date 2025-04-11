@@ -12,16 +12,16 @@ import (
 	"time"
 )
 
-func CreateFolderHandler(request requests.CreateFolder, context *HandleContext) error {
-
-	hashString := request.UserId + request.FolderName + "folder" + time.Now().String()
+func CreateFolderHandler(request requests.CreateFolder, session *ClientSession, context *HandleContext) error {
+	userId := session.GetUserId()
+	hashString := userId + request.FolderName + "folder" + time.Now().String()
 	resourceUuid := GetHash(hashString)
 
 	err := context.RedisClient.UploadResourceMetaData(resourceUuid, 0, &ResourceMetaData{
 		Title:   request.FolderName,
 		Path:    request.FolderPath,
-		Owner:   request.UserName,
-		OwnerId: request.UserId,
+		Owner:   session.GetUserName(),
+		OwnerId: userId,
 		Type:    "folder",
 	})
 
@@ -33,7 +33,7 @@ func CreateFolderHandler(request requests.CreateFolder, context *HandleContext) 
 	result := Create(
 		context.PostgresClient.Database,
 		&UserFolders{
-			UserId:     request.UserId,
+			UserId:     userId,
 			ResourceId: resourceUuid,
 			FolderPath: request.FolderPath + "/" + request.FolderName,
 		},

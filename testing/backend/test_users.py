@@ -2,7 +2,7 @@ import pytest
 import json
 
 
-def update_contact(client_backend_proxy, user_id, field, value):
+def update_contact(client_backend_proxy, user_id, field, value, session_id):
     update_contacts = client_backend_proxy.send_request(
         method='post',
         uri='update_user_contacts',
@@ -10,6 +10,9 @@ def update_contact(client_backend_proxy, user_id, field, value):
             'UserId': user_id,
             'Field': field,
             'Value': value
+        },
+        cookies={
+            'session_id': session_id
         }
     )
     assert update_contacts.status_code == 200
@@ -49,19 +52,6 @@ def test_regiester_and_enter(client_backend_proxy):
     password = '123456789'
     user_id = create_user(client_backend_proxy, 'username', 'test@mail.ru', password)
     
-    update_contact(client_backend_proxy, user_id, 'telegram', 'tg')
-    update_contact(client_backend_proxy, user_id, 'email', 'test2@mail.ru')
-
-    get_user_metadata = client_backend_proxy.send_request(
-        method='get',
-        uri='get_user_metadata',
-        headers={
-            'User-Name': 'username',
-        }
-    )
-    assert get_user_metadata.status_code == 200
-    assert json.loads(get_user_metadata.text) == {'Email': 'test2@mail.ru', 'Telegram': 'tg', 'UserId': 'nCvnBHez0bKvXglb8_gwIA=='}
-    
     enter_response = client_backend_proxy.send_request(
         'post',
         'auth',
@@ -79,6 +69,19 @@ def test_regiester_and_enter(client_backend_proxy):
         if cookie.name == 'session_id':
             session_id = cookie.value
     assert len(session_id)
+    
+    update_contact(client_backend_proxy, user_id, 'telegram', 'tg', session_id)
+    update_contact(client_backend_proxy, user_id, 'email', 'test2@mail.ru', session_id)
+
+    get_user_metadata = client_backend_proxy.send_request(
+        method='get',
+        uri='get_user_metadata',
+        headers={
+            'User-Name': 'username',
+        }
+    )
+    assert get_user_metadata.status_code == 200
+    assert json.loads(get_user_metadata.text) == {'Email': 'test2@mail.ru', 'Telegram': 'tg', 'UserId': 'nCvnBHez0bKvXglb8_gwIA=='}
     
     logout = client_backend_proxy.send_request(
         method='get',

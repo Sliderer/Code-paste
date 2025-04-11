@@ -8,7 +8,8 @@ import ValidationResult from "../../helpers/ValidationResult";
 export class AccountViewModel {
   @observable account: AccountModel | undefined = undefined;
   @observable resourcesList: ResourcePreviewModel[] | undefined = undefined;
-  @observable likedResourcesList: ResourcePreviewModel[] | undefined = undefined;
+  @observable likedResourcesList: ResourcePreviewModel[] | undefined =
+    undefined;
   @observable redirectToEnder: boolean = false;
   @observable createFolder: boolean = false;
   private clientServerAPI: ClientServerAPI;
@@ -37,7 +38,7 @@ export class AccountViewModel {
     }
 
     this.clientServerAPI
-      .subscribeOnPublications(userId!, this.account!.id)
+      .subscribeOnPublications(this.account!.id)
       .catch((e) => console.log(e));
   };
 
@@ -61,12 +62,19 @@ export class AccountViewModel {
     this.resourcesList = undefined;
     this.likedResourcesList = undefined;
     this.getUsersResources();
-    this.getLikedUsersResources();
+    if (
+      this.account &&
+      this.account.id === customSessionStorage.getUserId().getValue()
+    ) {
+      this.getLikedUsersResources();
+    } else {
+      this.likedResourcesList = [];
+    }
   };
 
   updateContact = (value: string, field: string) => {
     this.clientServerAPI
-      .updateUserContacts(this.account!.id, value, field)
+      .updateUserContacts(value, field)
       .catch((e) => {
         console.log(e);
       });
@@ -95,8 +103,6 @@ export class AccountViewModel {
   onCreateFolder = (folderName: string) => {
     this.clientServerAPI
       .createFolder(
-        customSessionStorage.getUserName().getValue()!,
-        customSessionStorage.getUserId().getValue()!,
         folderName,
         this.defaultPath
       )
@@ -128,8 +134,8 @@ export class AccountViewModel {
           }
         );
 
-        this.resourcesList = this.resourcesList??[];
-        this.likedResourcesList = this.likedResourcesList??[];
+        this.resourcesList = this.resourcesList ?? [];
+        this.likedResourcesList = this.likedResourcesList ?? [];
 
         this.loadedResourcesCount += data.data.Resources.length;
       });
@@ -147,7 +153,7 @@ export class AccountViewModel {
   ) {
     if (needOnlyLiked) {
       this.likedResourcesList = [
-        ...this.likedResourcesList??[],
+        ...(this.likedResourcesList ?? []),
         {
           name: resource.Title,
           previewText: resource.Preview,
@@ -158,7 +164,7 @@ export class AccountViewModel {
       ];
     } else {
       this.resourcesList = [
-        ...this.resourcesList??[],
+        ...(this.resourcesList ?? []),
         {
           name: resource.Title,
           previewText: resource.Preview,

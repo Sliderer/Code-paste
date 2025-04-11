@@ -1,19 +1,32 @@
 import pytest
 import json
 from test_users import create_user, delete_user
+from utils import get_session
 
 def test_folder(client_backend_proxy):
     password = '123456789'
     user_id = create_user(client_backend_proxy, 'user', 'test@mail.ru', password)
     
+    enter_response = client_backend_proxy.send_request(
+        'post',
+        'auth',
+        {
+            'UserName': 'user',
+            'Password': password
+        }
+    )
+    assert enter_response.status_code == 200
+    session_id = get_session(enter_response)
+    
     create_folder = client_backend_proxy.send_request(
         method='post',
         uri='/create_folder',
         json={
-            'UserName': 'user',
-            'UserId': user_id,
             'FolderName': '',
             'FolderPath': 'default/wef'
+        },
+        cookies={
+            'session_id': session_id
         }
     )
     assert create_folder.status_code == 200
@@ -55,8 +68,8 @@ def test_folder(client_backend_proxy):
     delete_folder = client_backend_proxy.send_request(
         method='delete',
         uri=f'/delete_folder/{folder_uuid}',
-        headers={
-            'User-Id': user_id,
+        cookies={
+            'session_id': session_id
         }
     )
     assert delete_folder.status_code == 200

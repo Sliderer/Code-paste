@@ -32,18 +32,20 @@ func GetUserMetaData(userName string, context *HandleContext) (*responses.UserMe
 	}, result.Error
 }
 
-func UpdateUserContacts(request UpdateUserContactsRequest, context *HandleContext) error {
+func UpdateUserContacts(request UpdateUserContactsRequest, session *ClientSession, context *HandleContext) error {
 	result := Update(
-		context.PostgresClient.Database.Model(&User{}).Where("id = ?", request.UserId),
+		context.PostgresClient.Database.Model(&User{}).Where("id = ?", session.GetUserId()),
 		request.Field, request.Value,
 	)
 	return result.Error
 }
 
-func LikeResource(request LikeResourceRequest, context *HandleContext) error {
+func LikeResource(request LikeResourceRequest, session *ClientSession, context *HandleContext) error {
+	userId := session.GetUserId()
+
 	var searchObject LikedResources
 	searchResult := Find(
-		context.PostgresClient.Database.Where("user_id = ? AND resource_id = ?", request.UserId, request.ResourceUuid).Limit(1),
+		context.PostgresClient.Database.Where("user_id = ? AND resource_id = ?", userId, request.ResourceUuid).Limit(1),
 		&searchObject,
 	)
 
@@ -51,7 +53,8 @@ func LikeResource(request LikeResourceRequest, context *HandleContext) error {
 		return searchResult.Error
 	}
 
-	if searchResult.RowsAffected > 0 {
+	log.Println(searchObject.UserId, userId)
+	if searchObject.UserId == userId {
 		result := Update(
 			context.PostgresClient.Database.Model(&searchObject),
 			"is_active", !searchObject.IsActive,
@@ -61,7 +64,7 @@ func LikeResource(request LikeResourceRequest, context *HandleContext) error {
 		result := Create(
 			context.PostgresClient.Database,
 			&LikedResources{
-				UserId:     request.UserId,
+				UserId:     userId,
 				ResourceId: request.ResourceUuid,
 			},
 		)

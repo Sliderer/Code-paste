@@ -159,8 +159,7 @@ func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request)
 			return
 		}
 
-		session.SetAuthenticated(true)
-		session.SetUserName(request.UserName)
+		SetDataInCookie(request.UserName, userId, session)
 		session.Save(r, w)
 
 		w.Write([]byte(userId))
@@ -187,8 +186,7 @@ func (serverImpl *ServerImpl) AuthUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		session.SetAuthenticated(true)
-		session.SetUserName(request.UserName)
+		SetDataInCookie(request.UserName, result.UserId, session)
 		session.Save(r, w)
 
 		resultJson, _ := json.Marshal(result)
@@ -260,9 +258,9 @@ func (serverImpl *ServerImpl) Logout(w http.ResponseWriter, r *http.Request) {
 
 	DefaultHandler("GET", w, r, func() {
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
-		session.SetAuthenticated(false)
-		session.SetUserName("")
+		ClearSession(session)
 		session.Save(r, w)
+
 		w.WriteHeader(http.StatusOK)
 	})
 }
@@ -290,13 +288,18 @@ func (serverImpl *ServerImpl) UpdateUserContacts(w http.ResponseWriter, r *http.
 
 	DefaultHandler("POST", w, r, func() {
 		request, err := lib.GetRequest[requests.UpdateUserContactsRequest](r)
+		session, _ := serverImpl.Context.SessionStore.GetSession(r)
+		if !session.IsAuthenticated() {
+			lib.SetError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 
 		if err != nil {
 			lib.SetError(w, http.StatusInternalServerError, "Invalid request: "+err.Error())
 			return
 		}
 
-		err = UpdateUserContacts(request, serverImpl.Context)
+		err = UpdateUserContacts(request, session, serverImpl.Context)
 
 		if err != nil {
 			lib.SetError(w, http.StatusInternalServerError, "Error updating user contacts: "+err.Error())
@@ -312,12 +315,17 @@ func (serverImpl *ServerImpl) LikeResource(w http.ResponseWriter, r *http.Reques
 
 	DefaultHandler("POST", w, r, func() {
 		requestBody, err := lib.GetRequest[requests.LikeResourceRequest](r)
+		session, _ := serverImpl.Context.SessionStore.GetSession(r)
+		if !session.IsAuthenticated() {
+			lib.SetError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 
 		if err != nil {
 			lib.SetError(w, http.StatusInternalServerError, "Invalid request: "+err.Error())
 			return
 		}
-		err = LikeResource(requestBody, serverImpl.Context)
+		err = LikeResource(requestBody, session, serverImpl.Context)
 
 		if err != nil {
 			log.Println("Error updating user contacts: ", err)
@@ -334,12 +342,18 @@ func (serverImpl *ServerImpl) CreateFolder(w http.ResponseWriter, r *http.Reques
 	DefaultHandler("POST", w, r, func() {
 		request, err := lib.GetRequest[requests.CreateFolder](r)
 
+		session, _ := serverImpl.Context.SessionStore.GetSession(r)
+		if !session.IsAuthenticated() {
+			lib.SetError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
+
 		if err != nil {
 			lib.SetError(w, http.StatusInternalServerError, "Invalid request: "+err.Error())
 			return
 		}
 
-		err = CreateFolderHandler(request, serverImpl.Context)
+		err = CreateFolderHandler(request, session, serverImpl.Context)
 
 		if err != nil {
 			lib.SetError(w, http.StatusInternalServerError, "Can not create folder: "+err.Error())
@@ -353,10 +367,15 @@ func (serverImpl *ServerImpl) DeleteFolder(w http.ResponseWriter, r *http.Reques
 	w = SetDefaultHeaders(w, "content-type, user-id")
 
 	DefaultHandler("DELETE", w, r, func() {
-		userId := r.Header.Get("User-Id")
 		resourceUuid := r.PathValue("resourceUuid")
 
-		err := DeleteFolder(userId, resourceUuid, serverImpl.Context)
+		session, _ := serverImpl.Context.SessionStore.GetSession(r)
+		if !session.IsAuthenticated() {
+			lib.SetError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
+
+		err := DeleteFolder(session.GetUserId(), resourceUuid, serverImpl.Context)
 
 		if err != nil {
 			log.Println("Error deleting resource: ", err)
@@ -385,13 +404,14 @@ func (serverImpl *ServerImpl) GetFolderUuid(w http.ResponseWriter, r *http.Reque
 }
 
 func (serverImpl *ServerImpl) DeleteResource(w http.ResponseWriter, r *http.Request) {
-	w = SetDefaultHeaders(w, "content-type, user-name, user-id")
+	w = SetDefaultHeaders(w, "content-type")
 
 	DefaultHandler("DELETE", w, r, func() {
-		userName := r.Header.Get("User-Name")
-		userId := r.Header.Get("User-Id")
 		resourceUuid := r.PathValue("resourceUuid")
-		err := DeleteResource(userId, userName, resourceUuid, serverImpl.Context)
+
+		session, _ := serverImpl.Context.SessionStore.GetSession(r)
+
+		err := DeleteResource(session.GetUserId(), session.GetUserName(), resourceUuid, session, serverImpl.Context)
 
 		if err != nil {
 			log.Println("Error deleting resource: ", err)
@@ -406,9 +426,14 @@ func (serverImpl *ServerImpl) Subscribe(w http.ResponseWriter, r *http.Request) 
 	w = SetDefaultHeaders(w, "content-type, subscriber-id, publisher-id")
 
 	DefaultHandler("POST", w, r, func() {
-		subsriberId := r.Header.Get("Subscriber-Id")
+		session, _ := serverImpl.Context.SessionStore.GetSession(r)
+		if !session.IsAuthenticated() {
+			lib.SetError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
+
 		publisherId := r.Header.Get("Publisher-Id")
-		err := Subscribe(subsriberId, publisherId, serverImpl.Context)
+		err := Subscribe(session.GetUserId(), publisherId, serverImpl.Context)
 
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)

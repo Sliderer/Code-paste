@@ -3,6 +3,7 @@ import gzip
 import json
 import base64
 from test_users import create_user, delete_user
+from utils import get_session
 
 def check_response(response, status_code, text):
     assert response.status_code == status_code
@@ -35,15 +36,19 @@ def create_resource_request(client_backend_proxy, user_name, user_id, compressed
     return create_resource
 
 
-def delete_resource(client_backend_proxy, resource_uuid, user_name, user_id):
+def delete_resource(client_backend_proxy, resource_uuid, user_name, user_id, session_id=None):
     headers = {
         'User-Name': user_name,
         'User-Id': user_id
     }
+    cookies = {
+                'session_id': session_id
+              } if session_id else {}
     delete_resource = client_backend_proxy.send_request(
         method='delete',
         uri=f'delete_resource/{resource_uuid}',
-        headers=headers
+        headers=headers,
+        cookies=cookies
     )
     assert delete_resource.status_code == 200
 
@@ -100,6 +105,16 @@ def test_upload_resource(client_backend_proxy):
 def test_get_and_like_resources(client_backend_proxy):
     password = '123456789'
     user_id = create_user(client_backend_proxy, 'user', 'test@mail.ru', password)
+    enter_response = client_backend_proxy.send_request(
+        'post',
+        'auth',
+        {
+            'UserName': 'user',
+            'Password': password
+        }
+    )
+    assert enter_response.status_code == 200
+    session_id = get_session(enter_response)
 
     resource_text = 'abcd'
     compressed_value = compress_data(resource_text)
@@ -138,6 +153,9 @@ def test_get_and_like_resources(client_backend_proxy):
         json={
             'UserId': user_id,
             'ResourceUuid': resource_uuid
+        },
+        cookies={
+            'session_id': session_id
         }
     )
     assert like_resource.status_code == 200
@@ -157,4 +175,4 @@ def test_get_and_like_resources(client_backend_proxy):
     assert response == resources
     
     delete_user(client_backend_proxy, user_id, password)
-    delete_resource(client_backend_proxy, resource_uuid, 'user', user_id)
+    delete_resource(client_backend_proxy, resource_uuid, 'user', user_id, session_id)

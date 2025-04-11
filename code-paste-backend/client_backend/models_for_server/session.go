@@ -10,13 +10,33 @@ type ClientSession struct {
 	Session *Session
 }
 
+func ClearSession(session *ClientSession) {
+	session.SetAuthenticated(false)
+	session.SetUserName("")
+	session.SetUserId("")
+}
+
+func SetDataInCookie(userName string, userId string, session *ClientSession) {
+	session.SetAuthenticated(true)
+	session.SetUserName(userName)
+	session.SetUserId(userId)
+}
+
 func getSessionValue[T any](session *Session, key string) T {
-	isAuthenticated, exists := session.Values["IsAuthenticated"]
-	if !exists || !isAuthenticated.(bool) {
-		var emptyResult T
+	isAuthenticatedValue, exists := session.Values["IsAuthenticated"]
+	var emptyResult T
+
+	isAuthenticated, ok := isAuthenticatedValue.(bool)
+	if !ok || !exists || !isAuthenticated {
 		return emptyResult
 	}
-	return session.Values[key].(T)
+	result, ok := session.Values[key].(T)
+
+	if !ok {
+		return emptyResult
+	}
+
+	return result
 }
 
 func (session *ClientSession) Save(r *http.Request, w http.ResponseWriter) {
@@ -24,7 +44,8 @@ func (session *ClientSession) Save(r *http.Request, w http.ResponseWriter) {
 }
 
 func (session *ClientSession) IsAuthenticated() bool {
-	return session.Session.Values["IsAuthenticated"].(bool)
+	isAuthenticated, ok := session.Session.Values["IsAuthenticated"].(bool)
+	return ok && isAuthenticated
 }
 
 func (session *ClientSession) SetAuthenticated(value bool) {
@@ -37,4 +58,12 @@ func (session *ClientSession) GetUserName() string {
 
 func (session *ClientSession) SetUserName(value string) {
 	session.Session.Values["UserName"] = value
+}
+
+func (session *ClientSession) GetUserId() string {
+	return getSessionValue[string](session.Session, "UserId")
+}
+
+func (session *ClientSession) SetUserId(value string) {
+	session.Session.Values["UserId"] = value
 }

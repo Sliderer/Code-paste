@@ -143,11 +143,10 @@ class ClientServerAPI {
     return promise;
   }
 
-  async updateUserContacts(userId: string, value: string, field: string) {
+  async updateUserContacts(value: string, field: string) {
     let promise = await axios.post(
       `/update_user_contacts`,
       {
-        UserId: userId,
         Value: value,
         Field: field,
       },
@@ -159,11 +158,10 @@ class ClientServerAPI {
     return promise;
   }
 
-  async likeResource(userId: string, resourceUuid: string) {
+  async likeResource(resourceUuid: string) {
     let promise = await axios.post(
       `/like_resource`,
       {
-        UserId: userId,
         Resourceuuid: resourceUuid,
       },
       {
@@ -174,28 +172,21 @@ class ClientServerAPI {
     return promise;
   }
 
-  async deleteResource(userId: string, userName: string, resourceUuid: string) {
+  async deleteResource(resourceUuid: string) {
     let promise = await axios.delete(`/delete_resource/${resourceUuid}`, {
-      headers: {
-        "User-Id": userId,
-        "User-Name": userName,
-      },
+      withCredentials: true
     });
 
     return promise;
   }
 
   async createFolder(
-    userName: string,
-    userId: string,
     folderName: string,
     folderPath: string
   ) {
     let promise = await axios.post(
       `/create_folder`,
       {
-        UserName: userName,
-        UserId: userId,
         FolderName: folderName,
         FolderPath: folderPath,
       },
@@ -204,11 +195,9 @@ class ClientServerAPI {
     return promise;
   }
 
-  async deleteFolder(userId: string, resourceUuid: string) {
+  async deleteFolder(resourceUuid: string) {
     let promise = await axios.delete(`/delete_folder/${resourceUuid}`, {
-      headers: {
-        "User-Id": userId,
-      },
+      withCredentials: true
     });
 
     return promise;
@@ -224,13 +213,13 @@ class ClientServerAPI {
     return promise;
   }
 
-  async subscribeOnPublications(subsriber_id: string, publisher_id: string) {
+  async subscribeOnPublications(publisher_id: string) {
     let promise = await axios.post(
       `/subscribe`,
       {},
       {
+        withCredentials: true,
         headers: {
-          "Subscriber-Id": subsriber_id,
           "Publisher-Id": publisher_id,
         },
       }
