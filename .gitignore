@@ -1,4 +1,4 @@
-code-paste-backend/notivication_service/config/production_config.yml
+code-paste-backend/notification_service/config/production_config.yml
 code-paste-backend/notivication_service/config/testing_config.yml
 
 code-paste-backend/client_backend/config/production_config.yml
