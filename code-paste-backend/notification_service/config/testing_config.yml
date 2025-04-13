@@ -1,0 +1,13 @@
+server_port: 8081
+email_notificator:
+  our_address: "code-paste@mail.ru"
+  server_address: "smtp.mail.ru:587"
+  server_host: "smtp.mail.ru"
+  password: "EF8vzxv9en03mdTtwfkd"
+  user_id: "code-paste@mail.ru"
+telegram_notificator:
+  bot_token: 7314772909:AAGSeLJcid1DLSA94VjEHEBKYzaaEE7SfW4
+redis-settings:
+  address: "10.5.0.6:6379"
+  password: "redisadmin"
+  client-name: "redisadmin"
