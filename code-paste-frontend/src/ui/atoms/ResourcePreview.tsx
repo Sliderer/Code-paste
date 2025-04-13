@@ -9,16 +9,19 @@ export type ResourcePreviewProps = {
 };
 
 const ResourcePreview = ({
+  id,
   stylingProps,
   resource,
   props,
 }: {
+  id?: string;
   stylingProps: StylingProps;
   resource: ResourcePreviewModel;
   props: ResourcePreviewProps;
 }) => {
   return (
     <Link
+      id='resource_preview_link'
       reloadDocument
       style={{
         color: stylingProps.theme.palette.primary.dark,

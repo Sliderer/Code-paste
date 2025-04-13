@@ -32,6 +32,7 @@ const SearchPage = observer(({ viewModel }: { viewModel: SearchViewModel }) => {
           </Typography>
         ) : (
           <ResourcePreviewPanel
+            id='resource_preview_panel'
             stylingProps={stylingProps}
             resources={viewModel.resources}
             resourcePreviewProps={resourcePreviewProps}

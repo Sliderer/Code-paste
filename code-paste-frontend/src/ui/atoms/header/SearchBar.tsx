@@ -18,6 +18,7 @@ const SearchBar = ({ stylingProps }: { stylingProps: StylingProps }) => {
     <Stack direction={"row"} sx={{ justifyContent: "center" }}>
       <Box className={stylingProps.styles.searchBar}>
         <TextField
+          id="search_placeholder"
           onChange={(e) => {
             setText(e.target.value);
           }}
@@ -32,6 +33,7 @@ const SearchBar = ({ stylingProps }: { stylingProps: StylingProps }) => {
         />
       </Box>
       <Button
+        id="search_button"
         className={stylingProps.styles.searchButton}
         sx={{
           color: stylingProps.theme.palette.primary.dark,

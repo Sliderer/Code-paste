@@ -2,11 +2,13 @@ import { Button } from "@mui/material";
 import StylingProps from "../../../helpers/StylingProps";
 
 const SelectResourcesTypeButton = ({
+  id,
   buttonText,
   isActive,
   onClick,
   stylingProps,
 }: {
+  id?: string,
   buttonText: string;
   isActive: boolean;
   onClick: () => void;
@@ -19,6 +21,7 @@ const SelectResourcesTypeButton = ({
 
   return (
     <Button
+      id={id}
       sx={{
         color: color,
         borderBottom: border,

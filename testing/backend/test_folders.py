@@ -1,22 +1,14 @@
 import pytest
 import json
 from test_users import create_user, delete_user
-from utils import get_session
+from utils import user_auth
 
 def test_folder(client_backend_proxy):
+    user_name = 'user'
     password = '123456789'
-    user_id = create_user(client_backend_proxy, 'user', 'test@mail.ru', password)
+    user_id = create_user(client_backend_proxy, user_name, 'test@mail.ru', password)
     
-    enter_response = client_backend_proxy.send_request(
-        'post',
-        'auth',
-        {
-            'UserName': 'user',
-            'Password': password
-        }
-    )
-    assert enter_response.status_code == 200
-    session_id = get_session(enter_response)
+    session_id = user_auth(client_backend_proxy, user_name, password)
     
     create_folder = client_backend_proxy.send_request(
         method='post',
@@ -42,7 +34,7 @@ def test_folder(client_backend_proxy):
 
     resources = {
        'Resources': [
-           {'Title': '', 'Preview': '', 'ResourceUuid': '4ARWHnE_-8cQMQdq6QfXSg==', 'Author': 'user', 'CreationTime': 0, 'Type': 'folder'}
+           {'Title': '', 'Preview': '', 'ResourceUuid': '4ARWHnE_-8cQMQdq6QfXSg==', 'Author': user_name, 'CreationTime': 0, 'Type': 'folder'}
        ],
     }
     assert get_resources.status_code == 200
@@ -53,12 +45,11 @@ def test_folder(client_backend_proxy):
 
     folder_uuid = response['Resources'][0]['ResourceUuid']
     
-    
     get_folder_uuid = client_backend_proxy.send_request(
         method='get',
         uri=f'get_folderUuid',
         headers={
-            'Path': 'user/wef/',
+            'Path': f'{user_name}/wef/',
         }
     )
     assert get_folder_uuid.status_code == 200

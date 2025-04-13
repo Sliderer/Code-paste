@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 import pytest
 from proxies.client_server_proxy import ClientServerProxy
 

@@ -1,40 +1,11 @@
 import pytest
-import gzip
 import json
-import base64
 from test_users import create_user, delete_user
-from utils import get_session
+from utils import get_session, compress_data, create_resource_request, user_auth
 
 def check_response(response, status_code, text):
     assert response.status_code == status_code
     assert response.text == text
-
-
-def compress_data(text: str):
-    return gzip.compress(bytes(text, 'utf-8'))
-
-def create_resource_request(client_backend_proxy, user_name, user_id, compressed_value):
-    create_resource = client_backend_proxy.send_request(
-        method='post',
-        uri='upload_resource',
-        json={
-            'UserName': user_name,
-            'UserId': user_id,
-            'Password': '123',
-            'FileName': 'text',
-            'FolderName': '',
-            'Language': 'default',
-            'HighlightSetting': 'text',
-            'TTL': 0,
-            'Data': base64.b64encode(compressed_value).decode()
-        }
-    )
-
-    assert create_resource.status_code == 200
-    assert len(create_resource.text) > 0
-    
-    return create_resource
-
 
 def delete_resource(client_backend_proxy, resource_uuid, user_name, user_id, session_id=None):
     headers = {
@@ -57,7 +28,7 @@ def test_upload_resource(client_backend_proxy):
     resource_text = 'abcd'
     compressed_value = compress_data(resource_text)
 
-    create_resource = create_resource_request(client_backend_proxy, 'temp', 'temp', compressed_value)
+    create_resource = create_resource_request(client_backend_proxy, 'temp', 'temp', compressed_value, '123')
 
     resource_uuid = create_resource.text
 
@@ -103,22 +74,14 @@ def test_upload_resource(client_backend_proxy):
     
 
 def test_get_and_like_resources(client_backend_proxy):
+    user_name = 'user'
     password = '123456789'
-    user_id = create_user(client_backend_proxy, 'user', 'test@mail.ru', password)
-    enter_response = client_backend_proxy.send_request(
-        'post',
-        'auth',
-        {
-            'UserName': 'user',
-            'Password': password
-        }
-    )
-    assert enter_response.status_code == 200
-    session_id = get_session(enter_response)
+    user_id = create_user(client_backend_proxy, user_name, 'test@mail.ru', password)
+    session_id = user_auth(client_backend_proxy, user_name, password)
 
     resource_text = 'abcd'
     compressed_value = compress_data(resource_text)
-    create_resource = create_resource_request(client_backend_proxy, 'user', user_id, compressed_value)
+    create_resource = create_resource_request(client_backend_proxy, user_name, user_id, compressed_value, '123')
     resource_uuid = create_resource.text
     
     get_resources = client_backend_proxy.send_request(
@@ -133,7 +96,7 @@ def test_get_and_like_resources(client_backend_proxy):
     resources = {
        'Resources': [
            {
-               'Author': 'user',
+               'Author': user_name,
                'CreationTime': 1744236196,
                'Preview': 'abcd',
                'ResourceUuid': resource_uuid,
@@ -175,4 +138,4 @@ def test_get_and_like_resources(client_backend_proxy):
     assert response == resources
     
     delete_user(client_backend_proxy, user_id, password)
-    delete_resource(client_backend_proxy, resource_uuid, 'user', user_id, session_id)
+    delete_resource(client_backend_proxy, resource_uuid, user_name, user_id, session_id)

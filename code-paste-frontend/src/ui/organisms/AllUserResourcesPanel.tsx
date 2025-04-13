@@ -42,6 +42,7 @@ const AllUserResourcesPanel = ({
         spacing={2}
       >
         <SelectResourcesTypeButton
+          id="my_resources_button"
           buttonText={"Мои ресурсы"}
           isActive={showAllResources}
           onClick={() => {
@@ -51,6 +52,7 @@ const AllUserResourcesPanel = ({
         />
 
         <SelectResourcesTypeButton
+          id="liked_resources_button"
           buttonText={"Избранное"}
           isActive={!showAllResources}
           onClick={() => {

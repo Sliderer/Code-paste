@@ -25,6 +25,7 @@ const ResourceActionButton = ({
 
   return (
     <Button
+      id={id}
       className={stylingProps.styles.basicShadow}
       onClick={onClick}
       sx={{

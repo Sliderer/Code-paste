@@ -39,7 +39,7 @@ const ChangableText = ({
   };
 
   return (
-    <Stack>
+    <Stack id={id}>
       <Stack direction={"row"} spacing={1} alignItems={"center"}>
         {inEditMode ? (
           <SettingsTextInput

@@ -10,6 +10,7 @@ const CreateResourceButton = ({
 }) => {
   return (
     <Button
+      id='create_resource_button'
       className={stylingProps.styles.lightShadow}
       onClick={onClick}
       sx={{
