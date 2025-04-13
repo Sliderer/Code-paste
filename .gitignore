@@ -1,4 +1,13 @@
-code-paste-backend/notivication_service/config/config.yml
-code-paste-backend/client_backend/config/config.yml
-code-paste-backend/search_backend/config/config.yml
+code-paste-backend/notification_service/config/production_config.yml
+code-paste-backend/notification_service/config/testing_config.yml
+
+code-paste-backend/client_backend/config/production_config.yml
+code-paste-backend/client_backend/config/testing_config.yml
+
+code-paste-backend/search_backend/config/production_config.yml
+code-paste-backend/search_backend/config/testing_config.yml
+
+code-paste-frontend/src/config/production_config.yml
+code-paste-frontend/src/config/testing_config.yml
+
 postgres-data

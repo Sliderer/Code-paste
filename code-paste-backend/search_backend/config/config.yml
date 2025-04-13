@@ -1,4 +1,0 @@
-grpc_server_port: 8080
-http_server_port: 91
-elastic_search:
-    address: 51.250.41.128:9200
