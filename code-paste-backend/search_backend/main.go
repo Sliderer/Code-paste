@@ -9,7 +9,7 @@ import (
 
 func main() {
 	configParser := lib.ConfigParser{}
-	configParser.ParseConfig("config/config.yml")
+	configParser.ParseConfig("config/production_config.yml")
 	config := configParser.ServiceConfig
 
 	esClient := ElasticSearchClient{}

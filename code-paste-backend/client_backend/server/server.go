@@ -92,7 +92,7 @@ func (server *ClientServer) StartServer() {
 	http.HandleFunc("/delete_folder/{resourceUuid}", server.serverImpl.DeleteFolder) 
 	http.HandleFunc("/get_folderUuid", server.serverImpl.GetFolderUuid)
 
-	err := http.ListenAndServe(fmt.Sprintf(":%v", server.ServerSettings.Port), nil)
+	err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%v", server.ServerSettings.Port), nil)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -4,7 +4,7 @@ class SearchServerAPI {
   private baseURL: string = "";
 
   constructor() {
-    this.baseURL = "http://127.0.0.1:91";
+    this.baseURL = "http://10.5.0.8:91";
   }
 
   async search(query: string) {

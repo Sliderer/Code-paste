@@ -161,7 +161,7 @@ func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request)
 
 		SetDataInCookie(request.UserName, userId, session)
 		session.Save(r, w)
-
+		log.Println("Auth", session.IsAuthenticated())
 		w.Write([]byte(userId))
 	})
 }
@@ -188,7 +188,7 @@ func (serverImpl *ServerImpl) AuthUser(w http.ResponseWriter, r *http.Request) {
 
 		SetDataInCookie(request.UserName, result.UserId, session)
 		session.Save(r, w)
-
+		log.Println("Auth", session.IsAuthenticated())
 		resultJson, _ := json.Marshal(result)
 		w.WriteHeader(http.StatusOK)
 		w.Write(resultJson)
