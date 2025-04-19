@@ -11,3 +11,5 @@ code-paste-frontend/src/config/production_config.yml
 code-paste-frontend/src/config/testing_config.yml
 
 postgres-data
+redisdata
+elastic_search/data

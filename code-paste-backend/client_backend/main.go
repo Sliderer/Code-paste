@@ -8,7 +8,7 @@ import (
 
 func main() {
 	configParser := ConfigParser{}
-	config := configParser.ParseConfig("./config/config.yml")
+	config := configParser.ParseConfig("./config/production_config.yml")
 	server := ClientServer{
 		ServerSettings: config,
 	}
