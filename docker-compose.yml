@@ -43,7 +43,7 @@ services:
         ipv4_address: 10.5.0.5
 
   redis:
-    image: redis:latest
+    image: redis:alpine
     container_name: redis_container
     environment:
       - REDIS_PASSWORD=redisadmin
@@ -83,7 +83,7 @@ services:
         ipv4_address: 10.5.0.8
 
   elasticsearch:
-    image: elasticsearch:7.16.1
+    image: elasticsearch:alpine
     volumes:
       - ./elastic_search/config.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
       - ./elastic_search/data:/usr/share/elasticsearch/data
@@ -96,7 +96,7 @@ services:
       - "9200:9200"
       - "9300:9300"
     networks:
-      - elk
+      - default
 
   kibana:
     image: kibana:7.16.1

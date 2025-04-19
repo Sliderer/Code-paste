@@ -129,7 +129,11 @@ func (serverImpl *ServerImpl) UploadResource(w http.ResponseWriter, r *http.Requ
 
 	DefaultHandler("POST", w, r, func() {
 		request, err := lib.GetRequest[requests.CreateResource](r)
-
+		if err != nil {
+			lib.SetError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
+			return
+		}
+		
 		resourceUuid, err := CreateResourceHandler(request, serverImpl.Context)
 		if err != nil {
 			lib.SetError(w, http.StatusNotFound, "Path not found: "+err.Error())
@@ -146,7 +150,7 @@ func (serverImpl *ServerImpl) CreateUser(w http.ResponseWriter, r *http.Request)
 		request, err := lib.GetRequest[requests.CreateUser](r)
 
 		if err != nil {
-			lib.SetError(w, http.StatusNotFound, "Invalid request: "+err.Error())
+			lib.SetError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
 			return
 		}
 
@@ -204,7 +208,7 @@ func (serverImpl *ServerImpl) DeleteUser(w http.ResponseWriter, r *http.Request)
 		request, err := lib.GetRequest[requests.DeleteUser](r)
 
 		if err != nil {
-			lib.SetError(w, http.StatusNotFound, "Invalid request: "+err.Error())
+			lib.SetError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
 			return
 		}
 
@@ -295,7 +299,7 @@ func (serverImpl *ServerImpl) UpdateUserContacts(w http.ResponseWriter, r *http.
 		}
 
 		if err != nil {
-			lib.SetError(w, http.StatusInternalServerError, "Invalid request: "+err.Error())
+			lib.SetError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
 			return
 		}
 
@@ -322,7 +326,7 @@ func (serverImpl *ServerImpl) LikeResource(w http.ResponseWriter, r *http.Reques
 		}
 
 		if err != nil {
-			lib.SetError(w, http.StatusInternalServerError, "Invalid request: "+err.Error())
+			lib.SetError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
 			return
 		}
 		err = LikeResource(requestBody, session, serverImpl.Context)
@@ -349,7 +353,7 @@ func (serverImpl *ServerImpl) CreateFolder(w http.ResponseWriter, r *http.Reques
 		}
 
 		if err != nil {
-			lib.SetError(w, http.StatusInternalServerError, "Invalid request: "+err.Error())
+			lib.SetError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
 			return
 		}
 

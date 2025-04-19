@@ -71,26 +71,26 @@ func (server *ClientServer) SetIAMToken(value string) {
 }
 
 func (server *ClientServer) StartServer() {
-	http.HandleFunc("/upload_resource", server.serverImpl.UploadResource)                         
-	http.HandleFunc("/get_resource/{resourceUuid}", server.serverImpl.GetResourceData)            
-	http.HandleFunc("/get_resource_meta/{resourceUuid}", server.serverImpl.GetResourceMetaData)   
+	http.HandleFunc("/upload_resource", server.serverImpl.UploadResource) // + +
+	http.HandleFunc("/get_resource/{resourceUuid}", server.serverImpl.GetResourceData)  // +      
+	http.HandleFunc("/get_resource_meta/{resourceUuid}", server.serverImpl.GetResourceMetaData) // + +
 	http.HandleFunc("/get_resource_preview/{resourceUuid}", server.serverImpl.GetResourcePreview) 
-	http.HandleFunc("/get_resources", server.serverImpl.GetUserResources)                         
-	http.HandleFunc("/like_resource", server.serverImpl.LikeResource)                             
-	http.HandleFunc("/delete_resource/{resourceUuid}", server.serverImpl.DeleteResource)          
+	http.HandleFunc("/get_resources", server.serverImpl.GetUserResources) // +                  
+	http.HandleFunc("/like_resource", server.serverImpl.LikeResource) // +               
+	http.HandleFunc("/delete_resource/{resourceUuid}", server.serverImpl.DeleteResource) // +
 	http.HandleFunc("/check_password/{resourceUuid}", server.serverImpl.CheckResourcePassword)    
 
-	http.HandleFunc("/create_user", server.serverImpl.CreateUser) 
-	http.HandleFunc("/auth", server.serverImpl.AuthUser)          
-	http.HandleFunc("/delete_user", server.serverImpl.DeleteUser) 
-	http.HandleFunc("/subscribe", server.serverImpl.Subscribe)
-	http.HandleFunc("/logout", server.serverImpl.Logout)                           
-	http.HandleFunc("/get_user_metadata", server.serverImpl.GetUserMetadata)       
-	http.HandleFunc("/update_user_contacts", server.serverImpl.UpdateUserContacts) 
+	http.HandleFunc("/create_user", server.serverImpl.CreateUser) // + +
+	http.HandleFunc("/auth", server.serverImpl.AuthUser) // +
+	http.HandleFunc("/delete_user", server.serverImpl.DeleteUser) // +
+	http.HandleFunc("/subscribe", server.serverImpl.Subscribe) // +
+	http.HandleFunc("/logout", server.serverImpl.Logout)  // +                         
+	http.HandleFunc("/get_user_metadata", server.serverImpl.GetUserMetadata)  // + +
+	http.HandleFunc("/update_user_contacts", server.serverImpl.UpdateUserContacts) // +
 
-	http.HandleFunc("/create_folder", server.serverImpl.CreateFolder) 
-	http.HandleFunc("/delete_folder/{resourceUuid}", server.serverImpl.DeleteFolder) 
-	http.HandleFunc("/get_folderUuid", server.serverImpl.GetFolderUuid)
+	http.HandleFunc("/create_folder", server.serverImpl.CreateFolder) // +
+	http.HandleFunc("/delete_folder/{resourceUuid}", server.serverImpl.DeleteFolder) // +
+	http.HandleFunc("/get_folderUuid", server.serverImpl.GetFolderUuid) // +
 
 	err := http.ListenAndServe(fmt.Sprintf(":%v", server.ServerSettings.Port), nil)
 	if err != nil {
