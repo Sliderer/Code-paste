@@ -1,10 +1,11 @@
 import axios, { HeadersDefaults } from "axios";
+import { SEARCH_BACKEND_ADDRESS } from "../../config/config";
 
 class SearchServerAPI {
   private baseURL: string = "";
 
   constructor() {
-    this.baseURL = "http://127.0.0.1:91";
+    this.baseURL = SEARCH_BACKEND_ADDRESS;
   }
 
   async search(query: string) {

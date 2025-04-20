@@ -1,8 +1,9 @@
 import axios, { HeadersDefaults } from "axios";
+import { CLIENT_BACKEND_ADDRESS } from "../../config/config";
 
 class ClientServerAPI {
   constructor() {
-    axios.defaults.baseURL = "http://127.0.0.1:90";
+    axios.defaults.baseURL = CLIENT_BACKEND_ADDRESS;
   }
 
   async uploadTextResource(
