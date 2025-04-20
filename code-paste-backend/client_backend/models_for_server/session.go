@@ -1,6 +1,7 @@
 package models_for_server
 
 import (
+	"log"
 	"net/http"
 
 	. "github.com/gorilla/sessions"
@@ -45,6 +46,7 @@ func (session *ClientSession) Save(r *http.Request, w http.ResponseWriter) {
 
 func (session *ClientSession) IsAuthenticated() bool {
 	isAuthenticated, ok := session.Session.Values["IsAuthenticated"].(bool)
+	log.Println(isAuthenticated, ok)
 	return ok && isAuthenticated
 }
 
