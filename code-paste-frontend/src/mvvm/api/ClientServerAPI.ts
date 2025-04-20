@@ -2,7 +2,7 @@ import axios, { HeadersDefaults } from "axios";
 
 class ClientServerAPI {
   constructor() {
-    axios.defaults.baseURL = "http://127.0.0.1:90";
+    axios.defaults.baseURL = "http://10.5.0.3:90";
   }
 
   async uploadTextResource(
@@ -184,6 +184,7 @@ class ClientServerAPI {
     folderName: string,
     folderPath: string
   ) {
+    console.log('with creads')
     let promise = await axios.post(
       `/create_folder`,
       {

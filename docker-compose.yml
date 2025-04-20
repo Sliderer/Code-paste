@@ -86,10 +86,10 @@ services:
         ipv4_address: 10.5.0.8
 
   elasticsearch:
-    image: elasticsearch:alpine
+    image: elasticsearch:7.16.1
     volumes:
-      - ./elastic_search/config.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-      - ./elastic_search/data:/usr/share/elasticsearch/data
+      - ./elastic_search/config.yml:/var/lib/elasticsearch/config/elasticsearch.yml
+      - ./elastic_search/data:/var/lib/elasticsearch/data
     environment:
       ES_JAVA_OPTS: "-Xmx512m -Xms512m"
       ELASTIC_USERNAME: "elastic"
