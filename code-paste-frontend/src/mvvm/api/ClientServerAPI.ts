@@ -2,7 +2,7 @@ import axios, { HeadersDefaults } from "axios";
 
 class ClientServerAPI {
   constructor() {
-    axios.defaults.baseURL = "http://10.5.0.3:90";
+    axios.defaults.baseURL = "http://127.0.0.1:90";
   }
 
   async uploadTextResource(
@@ -190,6 +190,9 @@ class ClientServerAPI {
         FolderName: folderName,
         FolderPath: folderPath,
       },
+      {
+        withCredentials: true
+      }
     );
 
     return promise;
@@ -205,6 +208,7 @@ class ClientServerAPI {
 
   async getFolderUuid(path: string) {
     let promise = await axios.get(`/get_folderUuid`, {
+      withCredentials: true,
       headers: {
         Path: path,
       },

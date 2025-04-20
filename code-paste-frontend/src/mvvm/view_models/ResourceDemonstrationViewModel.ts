@@ -167,7 +167,7 @@ export class ResourceDemonstrationViewModel {
 
     if (this.resourceModel.owner && this.resourceModel.owner !== "temp") {
       actions.push({
-        title: "Автор",
+        title: this.resourceModel.owner,
         action: () => {
           console.log(this.resourceModel.owner);
           this.resourceAuthorRedirect = this.resourceModel.owner;

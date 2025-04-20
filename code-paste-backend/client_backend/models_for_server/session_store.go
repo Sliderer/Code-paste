@@ -1,6 +1,7 @@
 package models_for_server
 
 import (
+	"log"
 	"net/http"
 
 	. "github.com/gorilla/sessions"
@@ -17,6 +18,8 @@ func (sessionStore *SessionStore) CreateCookieStore() {
 
 func (sessionStore *SessionStore) GetSession(request *http.Request) (*ClientSession, error) {
 	session, err := sessionStore.store.Get(request, "session_id")
-
+	if err != nil {
+		log.Println("Error extracting session: ", err.Error())
+	}
 	return &ClientSession{Session: session}, err
 }

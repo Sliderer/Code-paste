@@ -114,7 +114,7 @@ func (serverImpl *ServerImpl) GetResourceData(w http.ResponseWriter, r *http.Req
 		textData, err := GetResourceData(resourceUuid, serverImpl.Context)
 
 		if err != nil {
-			lib.SetError(w, http.StatusNotFound, "Can not get resource data: "+err.Error())
+			lib.SetError(w, http.StatusInternalServerError, "Can not get resource data: "+err.Error())
 			return
 		}
 
@@ -133,7 +133,7 @@ func (serverImpl *ServerImpl) UploadResource(w http.ResponseWriter, r *http.Requ
 			lib.SetError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
 			return
 		}
-		
+
 		resourceUuid, err := CreateResourceHandler(request, serverImpl.Context)
 		if err != nil {
 			lib.SetError(w, http.StatusNotFound, "Path not found: "+err.Error())
@@ -186,7 +186,7 @@ func (serverImpl *ServerImpl) AuthUser(w http.ResponseWriter, r *http.Request) {
 		result, err := CheckAccountPassword(request, serverImpl.Context)
 
 		if err != nil {
-			lib.SetError(w, http.StatusUnauthorized, "Can not authorize user: "+err.Error())
+			lib.SetError(w, http.StatusInternalServerError, "Can not authorize user: "+err.Error())
 			return
 		}
 
@@ -215,7 +215,7 @@ func (serverImpl *ServerImpl) DeleteUser(w http.ResponseWriter, r *http.Request)
 		result, err := DeleteUserHandler(request, serverImpl.Context)
 
 		if err != nil {
-			lib.SetError(w, http.StatusUnauthorized, "Can not delete user: "+err.Error())
+			lib.SetError(w, http.StatusInternalServerError, "Can not delete user: "+err.Error())
 			return
 		}
 
@@ -244,7 +244,7 @@ func (serverImpl *ServerImpl) GetUserResources(w http.ResponseWriter, r *http.Re
 
 		resourcesPreview, err := GetUserResources(userId, path, offset, needOnlyLiked, serverImpl.Context)
 		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
+			lib.SetError(w, http.StatusInternalServerError, "Can not get user resources: "+err.Error())
 			return
 		}
 
@@ -276,7 +276,7 @@ func (serverImpl *ServerImpl) GetUserMetadata(w http.ResponseWriter, r *http.Req
 		userName := r.Header.Get("User-Name")
 		userMetaData, err := GetUserMetaData(userName, serverImpl.Context)
 		if err != nil {
-			lib.SetError(w, http.StatusUnauthorized, "Can not get user metadata: "+err.Error())
+			lib.SetError(w, http.StatusInternalServerError, "Can not get user metadata: "+err.Error())
 			return
 		}
 
@@ -332,8 +332,7 @@ func (serverImpl *ServerImpl) LikeResource(w http.ResponseWriter, r *http.Reques
 		err = LikeResource(requestBody, session, serverImpl.Context)
 
 		if err != nil {
-			log.Println("Error updating user contacts: ", err)
-			w.WriteHeader(http.StatusNotFound)
+			lib.SetError(w, http.StatusInternalServerError, "Error liking resource: "+err.Error())
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
@@ -345,7 +344,7 @@ func (serverImpl *ServerImpl) CreateFolder(w http.ResponseWriter, r *http.Reques
 
 	DefaultHandler("POST", w, r, func() {
 		request, err := lib.GetRequest[requests.CreateFolder](r)
-
+		log.Println(r.Cookies())
 		session, _ := serverImpl.Context.SessionStore.GetSession(r)
 		if !session.IsAuthenticated() {
 			lib.SetError(w, http.StatusUnauthorized, "Unauthorized")
@@ -382,8 +381,7 @@ func (serverImpl *ServerImpl) DeleteFolder(w http.ResponseWriter, r *http.Reques
 		err := DeleteFolder(session.GetUserId(), resourceUuid, serverImpl.Context)
 
 		if err != nil {
-			log.Println("Error deleting resource: ", err)
-			w.WriteHeader(http.StatusNotFound)
+			lib.SetError(w, http.StatusInternalServerError, "Error deleting folder "+err.Error())
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
@@ -418,7 +416,6 @@ func (serverImpl *ServerImpl) DeleteResource(w http.ResponseWriter, r *http.Requ
 		err := DeleteResource(session.GetUserId(), session.GetUserName(), resourceUuid, session, serverImpl.Context)
 
 		if err != nil {
-			log.Println("Error deleting resource: ", err)
 			lib.SetError(w, http.StatusInternalServerError, "Can not delete resource: "+err.Error())
 		} else {
 			w.WriteHeader(http.StatusOK)
@@ -440,7 +437,7 @@ func (serverImpl *ServerImpl) Subscribe(w http.ResponseWriter, r *http.Request) 
 		err := Subscribe(session.GetUserId(), publisherId, serverImpl.Context)
 
 		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
+			lib.SetError(w, http.StatusInternalServerError, "Can not subscribe: "+err.Error())
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
