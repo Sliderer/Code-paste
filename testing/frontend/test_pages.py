@@ -38,7 +38,7 @@ def test_account_page(web_driver):
     driver.quit()
     
 
-def test_resource_creation_button(web_driver, default_user):
+def test_resource_creation_page(web_driver, default_user):
     driver = web_driver('enter')
     enter_account(driver, default_user)
     time.sleep(1)

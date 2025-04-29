@@ -2,7 +2,7 @@ import pytest
 import json
 from utils import create_user, update_contact, delete_user, user_auth, get_user_metadata
 
-def test_regiester_and_enter(client_backend_proxy):
+def test_user_functions(client_backend_proxy):
     user_name = 'username'
     password = '123456789'
     user_id = create_user(client_backend_proxy, user_name, 'test@mail.ru', password)

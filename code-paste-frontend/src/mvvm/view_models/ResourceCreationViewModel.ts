@@ -36,7 +36,6 @@ export class ResourceCreationViewModel {
   constructor() {
     this.uploadResource = this.uploadResource.bind(this);
     this.setText = this.setText.bind(this);
-    this.getText = this.getText.bind(this);
     this.clientAPI = new ClientServerAPI();
     this.model = new ResourceCreationModel();
     makeObservable(this);
@@ -44,10 +43,6 @@ export class ResourceCreationViewModel {
 
   setText(text: string) {
     this.model.text = text;
-  }
-
-  getText() {
-    return this.model.text;
   }
 
   setFileName(fileName: string) {

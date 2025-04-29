@@ -1,4 +1,4 @@
-import { action, isAction, makeObservable, observable } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 import ResourceModel, {
   getDefaultResourceModel,
 } from "../models/ResourceModel";
@@ -6,7 +6,8 @@ import { FetchingStatus } from "../../helpers/ResourceFetchingStatus";
 import ClientServerAPI from "../api/ClientServerAPI";
 import customSesionStorage from "../../helpers/SessionController";
 import ResourcePreviewModel from "../models/ResourcePreviewModel";
-import { Axios, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
+
 export class ResourceDemonstrationViewModel {
   @observable isPasswordEntered = false;
   @observable inSharingMode = false;

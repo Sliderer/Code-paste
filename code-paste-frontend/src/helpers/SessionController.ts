@@ -18,7 +18,7 @@ class StorageItem {
   }
 }
 
-class CustomSesionStorage {
+class CustomSessionStorage {
   private userName = 'user_name';
   private userId = 'user_id';
 
@@ -36,6 +36,6 @@ class CustomSesionStorage {
   }
 }
 
-const customSesionStorage = new CustomSesionStorage();
+const customSesionStorage = new CustomSessionStorage();
 
 export default customSesionStorage;
