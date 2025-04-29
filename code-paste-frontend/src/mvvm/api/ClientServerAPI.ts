@@ -185,6 +185,7 @@ class ClientServerAPI {
     folderName: string,
     folderPath: string
   ) {
+    console.log('with creads')
     let promise = await axios.post(
       `/create_folder`,
       {
