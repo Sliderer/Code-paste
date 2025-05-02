@@ -3,7 +3,6 @@ import ClientServerAPI from "../api/ClientServerAPI";
 
 import ResourceCreationModel from "../models/ResourceCreationModel";
 import { makeObservable, observable } from "mobx";
-import { HighlightSharp } from "@mui/icons-material";
 import customSesionStorage from "../../helpers/SessionController";
 import ValidationResult from "../../helpers/ValidationResult";
 

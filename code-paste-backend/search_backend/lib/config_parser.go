@@ -7,7 +7,9 @@ import (
 )
 
 type ElasticSearchConfig struct {
-	Address string `yaml:"address"`
+	Address  string `yaml:"address"`
+	Login    string `yaml:"login"`
+	Password string `yaml:"password"`
 }
 
 type ServiceConfig struct {

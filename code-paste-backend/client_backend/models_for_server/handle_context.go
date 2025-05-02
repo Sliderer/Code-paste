@@ -19,7 +19,6 @@ type TranslationContext struct {
 type HandleContext struct {
 	MinioClient         *MinioClient
 	RedisClient         *RedisClient
-	KafkaClient         *KafkaClient
 	PostgresClient      *PostgresClient
 	SessionStore        *SessionStore
 	HttpClient          *http.Client

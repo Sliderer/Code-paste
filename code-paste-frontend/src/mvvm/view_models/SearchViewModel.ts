@@ -1,9 +1,7 @@
 import { action, makeObservable, observable } from "mobx";
-import AccountModel from "../models/AccountModel";
 import SearchServerAPI from "../api/SearchServerAPI";
 import ClientServerAPI from "../api/ClientServerAPI";
 import ResourcePreviewModel from "../models/ResourcePreviewModel";
-import customSesionStorage from "../../helpers/SessionController";
 
 export class SearchViewModel {
   @observable resources: ResourcePreviewModel[] = [];
