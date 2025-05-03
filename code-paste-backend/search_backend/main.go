@@ -13,7 +13,7 @@ func main() {
 	config := configParser.ServiceConfig
 
 	esClient := ElasticSearchClient{}
-	esClient.Connect()
+	esClient.Connect(config.ElasticSearchConfig)
 
 	http_server := httpserver.SearchServer{}
 

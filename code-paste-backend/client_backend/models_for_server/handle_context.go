@@ -1,7 +1,6 @@
 package models_for_server
 
 import (
-	. "client_backend/kafka"
 	. "client_backend/minio"
 	. "client_backend/postgres"
 	. "client_backend/proto/notifications"

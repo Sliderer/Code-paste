@@ -62,6 +62,7 @@ func (serverImpl *ServerImpl) Search(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 
+		log.Println(mapResp)
 		hits := mapResp["hits"].(map[string]interface{})["hits"].([]interface{})
 
 		resource_ids := make([]string, 0)
@@ -71,7 +72,7 @@ func (serverImpl *ServerImpl) Search(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data, _ := json.Marshal(resource_ids)
-
+		log.Println(resource_ids)
 		w.WriteHeader(http.StatusOK)
 		w.Write(data)
 	} else {

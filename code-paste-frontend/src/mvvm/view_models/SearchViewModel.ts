@@ -32,7 +32,7 @@ export class SearchViewModel {
           })
           .catch((e) => console.log(e));
       });
-    });
+    }).catch((e) => console.log(e));
   };
 
   @action private refresh(resource: {

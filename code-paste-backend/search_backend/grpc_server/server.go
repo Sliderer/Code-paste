@@ -47,9 +47,9 @@ func (server GrpcServer) UploadInIndex(ctx context.Context, request *pb.UploadIn
 	result, err := server.EsClient.Client.Index("text_resources", bytes.NewReader(data), server.EsClient.Client.Index.WithDocumentID(request.ResourceUuid))
 
 	if err != nil {
-		log.Println(err)
+		log.Println("Indexing error: " + err.Error())
 	} else {
-		log.Println(result)
+		log.Println("Indexing result: " + result.Status())
 	}
 
 	return &pb.UploadInIndexResponse{}, nil

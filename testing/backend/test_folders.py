@@ -65,3 +65,35 @@ def test_folder(client_backend_proxy):
     )
     assert delete_folder.status_code == 200
     delete_user(client_backend_proxy, user_id, password)
+
+
+def test_without_auth_folder_create(client_backend_proxy):
+    create_folder = client_backend_proxy.send_request(
+        method='post',
+        uri='/create_folder',
+        json={
+            'FolderName': '',
+            'FolderPath': 'default/wef'
+        },
+    )
+    assert create_folder.status_code == 401
+
+
+def test_get_non_existing_folder(client_backend_proxy):
+    get_folder_uuid = client_backend_proxy.send_request(
+        method='get',
+        uri=f'get_folderUuid',
+        headers={
+            'Path': f'sliderer10/wef/',
+        }
+    )
+    assert get_folder_uuid.status_code == 200
+    assert get_folder_uuid.text == ''
+
+
+def test_without_auth_folder_delete(client_backend_proxy):
+    delete_folder = client_backend_proxy.send_request(
+        method='delete',
+        uri=f'/delete_folder/1213',
+    )
+    assert delete_folder.status_code == 401

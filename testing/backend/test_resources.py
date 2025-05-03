@@ -139,3 +139,33 @@ def test_get_and_like_resources(client_backend_proxy):
     
     delete_user(client_backend_proxy, user_id, password)
     delete_resource(client_backend_proxy, resource_uuid, user_name, user_id, session_id)
+
+
+def test_not_existing_resource(client_backend_proxy):
+    get_resource = client_backend_proxy.send_request(
+        method='get',
+        uri=f'get_resource/123',
+    )
+    assert get_resource.status_code == 500
+    
+    
+def test_check_wrong_resource_password(client_backend_proxy):
+    resource_text = 'abcd'
+    compressed_value = compress_data(resource_text)
+
+    create_resource = create_resource_request(client_backend_proxy, 'temp', 'temp', compressed_value, '123')
+
+    resource_uuid = create_resource.text
+    headers = {
+        'Password': 'not_valid_password'
+    }
+    check_password = client_backend_proxy.send_request(
+        method='get',
+        uri=f'check_password/{resource_uuid}',
+        headers=headers
+    )
+    assert check_password.status_code == 200
+    response = json.loads(check_password.text)
+    assert not response['Result']
+
+    delete_resource(client_backend_proxy, resource_uuid, 'temp', 'temp')

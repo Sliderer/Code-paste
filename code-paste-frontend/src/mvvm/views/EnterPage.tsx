@@ -60,7 +60,7 @@ const EnterPage = observer(({ viewModel }: { viewModel: EnterViewModel }) => {
               <SettingsTextInput
                 id='email_placeholder'
                 stylingProps={stylingProps}
-                placeholder="E-mail"
+                placeholder="Name"
                 onChange={setUserName}
               />
               <SettingsTextInput

@@ -9,7 +9,7 @@ const LoadingPanel = ({
   progress?: number;
 }) => {
   return (
-    <Box className={stylingProps.styles.centerPanel}>
+    <Box id={'loading_panel'} className={stylingProps.styles.centerPanel}>
       <CircularProgress value={10} size={150} thickness={1} />
     </Box>
   );
